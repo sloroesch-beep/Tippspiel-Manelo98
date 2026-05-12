@@ -19,7 +19,7 @@ WEB_URL = os.environ.get("WEB_URL", "http://localhost:8000")
 SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 DISCORD_REDIRECT = f"{WEB_URL}/auth/discord/callback"
 
-WM_MATCHES = [
+GRUPPE_MATCHES = [
     ("Mexiko","Suedafrika","11.06.2026","21:00","A"),
     ("Suedkorea","Tschechien","12.06.2026","04:00","A"),
     ("Kanada","Bosnien-Herzegowina","12.06.2026","21:00","B"),
@@ -86,6 +86,54 @@ WM_MATCHES = [
     ("DR Kongo","Usbekistan","28.06.2026","01:30","K"),
     ("England","Panama","27.06.2026","23:00","L"),
     ("Kroatien","Ghana","27.06.2026","23:00","L"),
+    # Gruppe C - Brasilien Gruppe
+    ("Brasilien","Schottland","14.06.2026","19:00","C"),
+    ("Marokko","Haiti","14.06.2026","22:00","C"),
+    ("Brasilien","Marokko","19.06.2026","00:00","C"),
+    ("Schottland","Haiti","19.06.2026","03:00","C"),
+    ("Brasilien","Haiti","24.06.2026","21:00","C"),
+    ("Marokko","Schottland","24.06.2026","21:00","C"),
+]
+
+KO_MATCHES = [
+    # Sechzehntelfinale (28. Juni - 3. Juli)
+    ("1. Gruppe A","2. Gruppe J","28.06.2026","22:00","SF1"),
+    ("1. Gruppe B","2. Gruppe K","29.06.2026","00:30","SF2"),
+    ("1. Gruppe C","3. Platz (best)","29.06.2026","19:00","SF3"),
+    ("1. Gruppe D","2. Gruppe G","29.06.2026","22:30","SF4"),
+    ("1. Gruppe E","3. Platz (best)","30.06.2026","19:00","SF5"),
+    ("1. Gruppe F","2. Gruppe I","30.06.2026","22:00","SF6"),
+    ("1. Gruppe G","2. Gruppe D","01.07.2026","01:00","SF7"),
+    ("1. Gruppe H","3. Platz (best)","01.07.2026","19:00","SF8"),
+    ("1. Gruppe I","2. Gruppe E","01.07.2026","22:00","SF9"),
+    ("1. Gruppe J","2. Gruppe A","02.07.2026","01:00","SF10"),
+    ("1. Gruppe K","2. Gruppe B","02.07.2026","19:00","SF11"),
+    ("1. Gruppe L","3. Platz (best)","02.07.2026","22:00","SF12"),
+    ("2. Gruppe C","3. Platz (best)","03.07.2026","01:00","SF13"),
+    ("2. Gruppe F","3. Platz (best)","03.07.2026","19:00","SF14"),
+    ("2. Gruppe H","3. Platz (best)","03.07.2026","22:00","SF15"),
+    ("2. Gruppe L","3. Platz (best)","04.07.2026","01:00","SF16"),
+    # Achtelfinale (4. Juli - 7. Juli)
+    ("Sieger SF1","Sieger SF2","04.07.2026","22:00","AF1"),
+    ("Sieger SF3","Sieger SF4","05.07.2026","01:00","AF2"),
+    ("Sieger SF5","Sieger SF6","05.07.2026","22:00","AF3"),
+    ("Sieger SF7","Sieger SF8","06.07.2026","01:00","AF4"),
+    ("Sieger SF9","Sieger SF10","06.07.2026","22:00","AF5"),
+    ("Sieger SF11","Sieger SF12","07.07.2026","01:00","AF6"),
+    ("Sieger SF13","Sieger SF14","07.07.2026","22:00","AF7"),
+    ("Sieger SF15","Sieger SF16","08.07.2026","01:00","AF8"),
+    # Viertelfinale (9. Juli - 11. Juli)
+    ("Sieger AF1","Sieger AF2","09.07.2026","22:00","VF1"),
+    ("Sieger AF3","Sieger AF4","10.07.2026","22:00","VF2"),
+    ("Sieger AF5","Sieger AF6","11.07.2026","19:00","VF3"),
+    ("Sieger AF7","Sieger AF8","11.07.2026","22:00","VF4"),
+    # Halbfinale (14. & 15. Juli)
+    ("Sieger VF1","Sieger VF3","14.07.2026","22:00","HF1"),
+    ("Sieger VF2","Sieger VF4","15.07.2026","22:00","HF2"),
+    # Spiel um Platz 3 (18. Juli)
+    ("Verlierer HF1","Verlierer HF2","18.07.2026","21:00","P3"),
+    # Finale (19. Juli)
+    ("Sieger HF1","Sieger HF2","19.07.2026","21:00","FIN"),
 ]
 
 async def init_db():
@@ -104,10 +152,14 @@ async def init_db():
             match_id INTEGER NOT NULL, home_tip INTEGER NOT NULL, away_tip INTEGER NOT NULL,
             points INTEGER DEFAULT NULL, UNIQUE(user_id, match_id))""")
         count = (await (await db.execute("SELECT COUNT(*) FROM matches")).fetchone())[0]
+        if count > 0 and count < 100:
+            await db.execute("DELETE FROM matches")
+            count = 0
         if count == 0:
+            all_matches = GRUPPE_MATCHES + KO_MATCHES
             await db.executemany(
                 "INSERT INTO matches (home_team,away_team,match_date,match_time,group_name) VALUES (?,?,?,?,?)",
-                WM_MATCHES)
+                all_matches)
         await db.commit()
 
 @app.on_event("startup")
