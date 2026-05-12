@@ -262,6 +262,14 @@ img{max-width:100%;}
 .profile-stat{background:#f9f9f9;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
 .profile-stat .val{font-size:20px;font-weight:700;color:var(--black);}
 .profile-stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+.live-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#fee2e2;color:#991b1b;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#dc2626;animation:pulse-dot 1s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+.pill-live{background:#fee2e2;color:#991b1b;}
+.pill-closed{background:#f5f5f5;color:#666;}
+.score-result{font-size:20px;font-weight:700;color:var(--black);}
+.tip-locked{font-size:11px;color:var(--red);margin-top:4px;text-align:center;}
+.last-update{font-size:11px;color:var(--hint);text-align:right;margin-bottom:8px;}
 .bot-bar{background:#eef0fd;border:1px solid #c7d2fe;border-radius:var(--radius-sm);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#3730a3;margin-bottom:12px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 
@@ -327,7 +335,59 @@ async function init(){
     }
   }catch(e){}
   state.loading=false;
+  state.lastUpdate=new Date();
   render();
+  // Starte Live-Update alle 30 Sekunden
+  setInterval(liveUpdate, 30000);
+}
+
+async function liveUpdate(){
+  try{
+    const live=await api('/api/live');
+    let changed=false;
+    live.forEach(m=>{
+      const old=state.matches.find(x=>x.id===m.id);
+      if(old&&(old.status!==m.status||old.home_score!==m.home_score||old.away_score!==m.away_score)){
+        Object.assign(old,{status:m.status,home_score:m.home_score,away_score:m.away_score});
+        changed=true;
+      }
+    });
+    if(changed){
+      if(state.user){
+        state.rankings=await api('/api/rankings');
+        state.results=await api('/api/results');
+      }
+      state.lastUpdate=new Date();
+      render();
+    }else{
+      state.lastUpdate=new Date();
+      const el=document.getElementById('last-update');
+      if(el)el.textContent='Aktualisiert: '+state.lastUpdate.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    }
+  }catch(e){console.log('Live update error:',e);}
+}
+
+function isMatchLocked(m){
+  if(m.status!=='open')return true;
+  try{
+    const parts=m.date.split('.');
+    const dt=new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${m.time}:00Z`);
+    return new Date()>=dt;
+  }catch(e){return false;}
+}
+
+function timeUntilMatch(m){
+  try{
+    const parts=m.date.split('.');
+    const dt=new Date(`${parts[2]}-${parts[1]}-${parts[0]}T${m.time}:00Z`);
+    const diff=dt-new Date();
+    if(diff<=0)return null;
+    const h=Math.floor(diff/3600000);
+    const min=Math.floor((diff%3600000)/60000);
+    if(h>24)return`${Math.floor(h/24)}d ${h%24}h`;
+    if(h>0)return`${h}h ${min}min`;
+    return`${min}min`;
+  }catch(e){return null;}
 }
 
 function flagUrl(t){const c=FLAGS[t];return c?`https://flagcdn.com/w80/${c}.png`:null;}
@@ -519,7 +579,10 @@ function renderSpielplan(){
   if(!state.user){
     html+=`<div class="bot-bar">💬 <span>Melde dich an um Tipps abzugeben. <a href="#" onclick="setPage('login');return false;" style="color:#5865f2;font-weight:700;">Jetzt anmelden →</a></span></div>`;
   }else{
-    html+=`<div class="bot-bar">🤖 <span>Discord-Bot sendet Erinnerungen automatisch in euren Server.</span></div>`;
+    html+=`<div class="bot-bar">🤖 <span>Ergebnisse werden automatisch live aktualisiert. Tipps sind nur bis Anpfiff möglich.</span></div>`;
+  }
+  if(state.lastUpdate){
+    html+=`<div class="last-update" id="last-update">Aktualisiert: ${state.lastUpdate.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</div>`;
   }
 
   const groupLabel=isKO?(koGroups[state.group]||state.group):`Gruppe ${state.group}`;
@@ -536,7 +599,7 @@ function renderSpielplan(){
       const t=state.tips[m.id]||{};
       const hv=t.home,av=t.away;
       const set=hv!==null&&hv!==undefined&&av!==null&&av!==undefined;
-      const canTip=state.user&&m.status==='open';
+      // canTip is now canTipNow (defined below)
       const isPlaceholder=m.home.includes('.')||m.home.includes('Sieger')||m.home.includes('Verlierer');
       html+=`<div class="ko-card${set?' tipped':''}">
         <div class="ko-team">
