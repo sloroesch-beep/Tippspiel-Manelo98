@@ -243,12 +243,23 @@ img{max-width:100%;}
 .bot-bar{background:#eef0fd;border:1px solid #c7d2fe;border-radius:var(--radius-sm);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#3730a3;margin-bottom:12px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 
-@media(max-width:600px){
+@media(max-width:768px){
   .sidebar{display:none;}
   .stat-grid{grid-template-columns:repeat(2,1fr);}
   .welcome-cards{grid-template-columns:1fr;}
   .hero-body{flex-direction:column;padding:24px;}
   .pts-grid{grid-template-columns:1fr 1fr 1fr;}
+  .main{padding:12px;}
+  .topnav a{padding:0 8px;font-size:12px;}
+  .logo-sub{display:none;}
+}
+.mobile-group-bar{display:none;}
+@media(max-width:768px){
+  .mobile-group-bar{display:flex;overflow-x:auto;gap:6px;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .mobile-group-bar::-webkit-scrollbar{display:none;}
+  .mgb-btn{flex-shrink:0;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .12s;}
+  .mgb-btn.active{background:var(--gold);border-color:var(--gold-dark);color:var(--black);}
+  .mgb-sep{width:1px;background:var(--border);flex-shrink:0;margin:4px 0;}
 }
 </style>
 </head>
@@ -355,6 +366,24 @@ async function saveTip(mid,side,delta){
     try{await api('/api/tips',{method:'POST',body:JSON.stringify({match_id:mid,home_tip:hv,away_tip:av})});}
     catch(e){console.error(e);}
   }
+}
+
+function renderMobileGroupBar(){
+  if(state.page !== 'spielplan') return '';
+  const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const koItems = [
+    ['SF','16tel'],['AF','Achtel'],['VF','Viertel'],['HF','Halb'],['FIN','🏆 Finale']
+  ];
+  let html = '<div class="mobile-group-bar">';
+  groups.forEach(g => {
+    html += `<button class="mgb-btn${state.group===g?' active':''}" onclick="setGroup('${g}')">Gr. ${g}</button>`;
+  });
+  html += '<div class="mgb-sep"></div>';
+  koItems.forEach(([id,label]) => {
+    html += `<button class="mgb-btn${state.group===id?' active':''}" onclick="setGroup('${id}')">${label}</button>`;
+  });
+  html += '</div>';
+  return html;
 }
 
 function renderHeader(){
@@ -765,7 +794,7 @@ function render(){
   else if(state.page==='auswertung')content=renderAuswertung();
 
   const hasSidebar=state.page==='spielplan';
-  root.innerHTML=renderHeader()+`
+  root.innerHTML=renderHeader()+renderMobileGroupBar()+`
     <div class="layout">
       ${hasSidebar?renderSidebar():''}
       <main class="main">${content}</main>
