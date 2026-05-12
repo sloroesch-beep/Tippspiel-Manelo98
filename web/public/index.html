@@ -240,6 +240,28 @@ img{max-width:100%;}
 .locked-overlay p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
 .locked-overlay button{background:var(--gold);border:none;color:var(--black);padding:10px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;}
 
+.profile-page{max-width:540px;}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.profile-head{background:var(--dark);border-bottom:3px solid var(--gold);padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.profile-head h2{color:#fff;font-size:14px;font-weight:700;}
+.profile-body{padding:22px 24px;}
+.avatar-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);flex-shrink:0;}
+.avatar-preview-ph{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;border:3px solid var(--gold);flex-shrink:0;}
+.avatar-section{display:flex;align-items:center;gap:20px;margin-bottom:20px;}
+.avatar-info h3{font-size:15px;font-weight:700;margin-bottom:4px;}
+.avatar-info p{font-size:12px;color:var(--muted);line-height:1.5;}
+.upload-btn{background:var(--surface);color:var(--text);border:1.5px dashed var(--border);padding:10px 18px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;}
+.upload-btn:hover{border-color:var(--gold-dark);background:#fffbdc;}
+.upload-progress{font-size:12px;color:var(--muted);margin-top:6px;display:none;}
+.avatar-methods{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.method-label{font-size:11px;font-weight:700;color:var(--hint);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+.save-btn{background:var(--dark);color:#fff;border:none;border-bottom:3px solid var(--gold);padding:10px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.save-btn:hover{background:#222;}
+.success-msg{background:var(--green-bg);border:1px solid #86efac;color:#166534;font-size:12px;padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:12px;display:none;}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;}
+.profile-stat{background:#f9f9f9;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.profile-stat .val{font-size:20px;font-weight:700;color:var(--black);}
+.profile-stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
 .bot-bar{background:#eef0fd;border:1px solid #c7d2fe;border-radius:var(--radius-sm);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#3730a3;margin-bottom:12px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 
@@ -392,13 +414,15 @@ function renderHeader(){
     ['spielplan','⚽ Spielplan'],
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
+    ['profil','👤 Profil'],
   ];
   const uArea=state.user
-    ?`<div style="display:flex;align-items:center;gap:8px;">
+    ?`<div style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="setPage('profil')">
         ${state.user.avatar?`<img class="uav" src="${state.user.avatar}" alt="${state.user.username}">`:
           `<div class="uav-ph">${initials(state.user.username)}</div>`}
         <span class="uname">${state.user.username}</span>
       </div>
+      <button class="logout-btn" onclick="setPage('profil')" style="border-color:rgba(255,255,255,.4);color:rgba(255,255,255,.7);">Profil</button>
       <button class="logout-btn" onclick="doLogout()">Abmelden</button>`
     :`<button class="login-btn" onclick="setPage('login')">Anmelden / Registrieren</button>`;
   return`<header class="topbar">
@@ -652,6 +676,144 @@ function renderAuswertung(){
 
 const var_green='#16a34a';
 
+function renderProfil(){
+  if(!state.user){
+    return`<div class="locked-overlay">
+      <div class="lock-icon">🔒</div>
+      <h3>Bitte anmelden</h3>
+      <p>Melde dich an um dein Profil zu bearbeiten.</p>
+      <button onclick="setPage('login')">Jetzt anmelden</button>
+    </div>`;
+  }
+  const col=avatarColor(state.user.username);
+  const avHTML=state.user.avatar
+    ?`<img class="avatar-preview" src="${state.user.avatar}" alt="${state.user.username}" id="av-preview">`
+    :`<div class="avatar-preview-ph" style="background:${col};" id="av-preview">${initials(state.user.username)}</div>`;
+
+  return`<div class="profile-page">
+    <div class="profile-card">
+      <div class="profile-head"><h2>👤 Mein Profil</h2></div>
+      <div class="profile-body">
+        <div class="success-msg" id="prof-success">✓ Profil erfolgreich gespeichert!</div>
+        <div class="err-msg" id="prof-err"></div>
+        <div class="avatar-section">
+          ${avHTML}
+          <div class="avatar-info">
+            <h3>${state.user.username}</h3>
+            <p style="font-size:12px;color:var(--muted);">Klick auf "Bild hochladen" um ein Foto von deinem Gerät zu wählen — funktioniert auf Windows, iPhone, Android und Mac.</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Anzeigename <span class="hint-tag">(sichtbar für alle Mitspieler)</span></label>
+          <input type="text" id="prof-name" value="${state.user.username}" placeholder="Dein Anzeigename">
+        </div>
+
+        <div class="field">
+          <div class="method-label">Profilbild</div>
+          <div class="avatar-methods">
+            <div>
+              <label class="method-label" style="margin-bottom:6px;">📁 Vom Gerät hochladen</label>
+              <label class="upload-btn" for="prof-file-input">
+                📷 Bild auswählen
+                <span style="font-size:11px;color:var(--muted);">(JPG, PNG, GIF — max. 5MB)</span>
+              </label>
+              <input type="file" id="prof-file-input" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
+              <div class="upload-progress" id="upload-progress">⏳ Wird hochgeladen…</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;"><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--hint);">oder</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
+            <div>
+              <label class="method-label" style="margin-bottom:6px;">🔗 Bild-URL eingeben</label>
+              <input type="url" id="prof-avatar" value="${state.user.avatar&&!state.user.avatar.startsWith('data:')?state.user.avatar:''}" placeholder="https://beispiel.com/meinbild.jpg" oninput="previewAvatar(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;">
+            </div>
+          </div>
+        </div>
+
+        <button class="save-btn" onclick="saveProfile()">💾 Profil speichern</button>
+      </div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-head"><h2>📊 Meine Statistiken</h2></div>
+      <div class="profile-body">
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="val">${state.rankings.find(r=>r.username===state.user.username)?.points||0}</div>
+            <div class="lbl">Punkte</div>
+          </div>
+          <div class="profile-stat">
+            <div class="val">${state.rankings.find(r=>r.username===state.user.username)?.total||0}</div>
+            <div class="lbl">Tipps abgegeben</div>
+          </div>
+          <div class="profile-stat">
+            <div class="val">${(state.rankings.findIndex(r=>r.username===state.user.username)+1)||'-'}</div>
+            <div class="lbl">Platz in Tabelle</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    ${state.user.avatar?'':`<div class="profile-card">
+      <div class="profile-head"><h2>💡 Tipp: Discord-Login für automatisches Profilbild</h2></div>
+      <div class="profile-body">
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;">
+          Wenn du dich über Discord anmeldest, wird dein Discord-Profilbild automatisch übernommen — ohne URL eintippen zu müssen.
+        </p>
+      </div>
+    </div>`}
+  </div>`;
+}
+
+async function uploadAvatar(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 5*1024*1024){ alert('Bild zu groß! Maximal 5MB.'); return; }
+  const prog = document.getElementById('upload-progress');
+  if(prog) prog.style.display='block';
+  const formData = new FormData();
+  formData.append('file', file);
+  try{
+    const r = await fetch('/api/upload-avatar', {method:'POST', credentials:'include', body:formData});
+    if(!r.ok){ const e=await r.json(); throw new Error(e.detail||'Fehler'); }
+    const data = await r.json();
+    state.user.avatar = data.avatar;
+    if(prog) prog.style.display='none';
+    const sucEl = document.getElementById('prof-success');
+    if(sucEl){ sucEl.textContent='✓ Profilbild erfolgreich hochgeladen!'; sucEl.style.display='block'; setTimeout(()=>sucEl.style.display='none',3000); }
+    render();
+  }catch(e){
+    if(prog) prog.style.display='none';
+    const errEl=document.getElementById('prof-err');
+    if(errEl){ errEl.textContent=e.message; errEl.style.display='block'; }
+  }
+}
+
+function previewAvatar(url){
+  const el=document.getElementById('av-preview');
+  if(!el)return;
+  if(url&&url.startsWith('http')){
+    el.outerHTML=`<img class="avatar-preview" src="${url}" alt="Vorschau" id="av-preview" onerror="this.style.opacity='.3'">`;
+  }
+}
+
+async function saveProfile(){
+  const name=document.getElementById('prof-name')?.value?.trim();
+  const avatarUrl=document.getElementById('prof-avatar')?.value?.trim();
+  const errEl=document.getElementById('prof-err');
+  const sucEl=document.getElementById('prof-success');
+  if(!name){if(errEl){errEl.textContent='Bitte einen Anzeigenamen eingeben.';errEl.style.display='block';}return;}
+  try{
+    await api('/api/profile',{method:'POST',body:JSON.stringify({username:name,avatar_url:avatarUrl})});
+    state.user.username=name;
+    if(avatarUrl)state.user.avatar=avatarUrl;
+    if(errEl)errEl.style.display='none';
+    if(sucEl){sucEl.style.display='block';setTimeout(()=>sucEl.style.display='none',3000);}
+    render();
+  }catch(e){
+    if(errEl){errEl.textContent=e.message;errEl.style.display='block';}
+  }
+}
+
 function renderLogin(){
   if(state.authStep==='discord'){
     return`<div class="auth-scene"><div class="auth-card">
@@ -792,6 +954,7 @@ function render(){
   else if(state.page==='spielplan')content=renderSpielplan();
   else if(state.page==='tabelle')content=renderTabelle();
   else if(state.page==='auswertung')content=renderAuswertung();
+  else if(state.page==='profil')content=renderProfil();
 
   const hasSidebar=state.page==='spielplan';
   root.innerHTML=renderHeader()+renderMobileGroupBar()+`
