@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WM Tippspiel 2026 — Fanclub Manelo98</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --navy:#0f2744;--navy-light:#1a3a5c;
+    --gold:#f1c40f;--gold-dark:#d4a017;
+    --discord:#5865f2;
+    --green:#2ecc71;--orange:#f39c12;--red:#e74c3c;
+    --bg:#f4f5f7;--surface:#fff;--border:#e2e4e8;
+    --text:#1a1d23;--muted:#6b7280;--hint:#9ca3af;
+    --radius:10px;--radius-sm:6px;
+  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  img{border-radius:4px;}
+
+  /* Header */
+  .topbar{background:var(--navy);padding:0 20px;display:flex;align-items:center;height:52px;position:sticky;top:0;z-index:100;}
+  .logo{color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;text-decoration:none;}
+  .logo span{color:var(--gold);}
+  .topnav{display:flex;margin-left:24px;gap:0;}
+  .topnav a{padding:0 14px;height:52px;display:flex;align-items:center;font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;text-decoration:none;}
+  .topnav a.active,
+  .topnav a:hover{color:#fff;}
+  .topnav a.active{border-bottom-color:var(--gold);}
+  .user-area{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .user-chip{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,0.85);font-size:13px;}
+  .uav{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.3);}
+  .uav-placeholder{width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--navy);}
+  .logout-btn{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:4px 10px;border-radius:var(--radius-sm);font-size:12px;cursor:pointer;transition:all .15s;}
+  .logout-btn:hover{border-color:rgba(255,255,255,0.5);color:#fff;}
+
+  /* Layout */
+  .layout{display:flex;min-height:calc(100vh - 52px);}
+  .sidebar{width:180px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;flex-shrink:0;}
+  .sb-sec{font-size:10px;font-weight:600;color:var(--hint);letter-spacing:.5px;text-transform:uppercase;padding:10px 8px 5px;}
+  .sb-sec:first-child{padding-top:4px;}
+  .sb-link{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius-sm);font-size:13px;color:var(--muted);cursor:pointer;transition:all .12s;border:none;background:none;width:100%;text-align:left;}
+  .sb-link:hover{background:#f0f2f5;color:var(--text);}
+  .sb-link.active{background:#eef0fd;color:var(--discord);font-weight:500;}
+  .sb-link.locked{opacity:.45;cursor:default;}
+  .sb-link.locked:hover{background:none;color:var(--muted);}
+  .sb-icon{font-size:15px;}
+  .main{flex:1;padding:20px 24px;max-width:860px;}
+
+  /* Player switcher */
+  .player-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .player-bar label{font-size:12px;color:var(--muted);margin-right:2px;}
+  .p-btn{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);cursor:pointer;background:var(--surface);color:var(--muted);transition:all .12s;}
+  .p-btn.active{font-weight:500;border-width:1.5px;}
+  .p-dot{width:8px;height:8px;border-radius:50%;}
+
+  /* Match cards */
+  .group-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:12px 0 7px;display:flex;align-items:center;gap:6px;}
+  .group-label:first-child{padding-top:0;}
+  .match-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:6px;transition:border-color .15s;}
+  .match-card:hover{border-color:#c5c8d0;}
+  .match-card.tipped{border-color:#86efac;background:#f0fdf4;}
+  .match-top{display:flex;align-items:center;gap:6px;margin-bottom:12px;}
+  .match-time{font-size:11px;color:var(--muted);}
+  .status-pill{margin-left:auto;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;}
+  .pill-open{background:#fef3c7;color:#92400e;}
+  .pill-done{background:#d1fae5;color:#065f46;}
+  .teams-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .team-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0;}
+  .team-flag{width:48px;height:32px;object-fit:cover;border-radius:4px;border:1px solid var(--border);}
+  .team-flag-fallback{width:48px;height:32px;border-radius:4px;border:1px solid var(--border);background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-size:22px;}
+  .team-name{font-size:12px;font-weight:500;color:var(--text);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;}
+  .score-center{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;}
+  .score-label{font-size:10px;font-weight:600;color:var(--hint);letter-spacing:.4px;}
+  .score-row{display:flex;align-items:center;gap:4px;}
+  .score-box{width:36px;height:36px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:#f9fafb;font-size:16px;font-weight:600;color:var(--text);display:flex;align-items:center;justify-content:center;user-select:none;cursor:default;}
+  .score-box.filled{background:var(--surface);border-color:#6366f1;}
+  .score-colon{font-size:18px;color:var(--hint);font-weight:300;}
+  .ctrl-row{display:flex;gap:3px;}
+  .ctrl{width:28px;height:22px;border:1px solid var(--border);border-radius:4px;background:var(--surface);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .1s;}
+  .ctrl:hover{background:#f0f2f5;border-color:#c5c8d0;color:var(--text);}
+  .ctrl.plus:hover{background:#eef0fd;border-color:#6366f1;color:#6366f1;}
+  .ctrl.minus:hover{background:#fef2f2;border-color:#fca5a5;color:#dc2626;}
+
+  /* Rankings */
+  .rank-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;}
+  .rank-head{background:var(--navy);padding:12px 18px;display:flex;align-items:center;gap:8px;}
+  .rank-head h2{color:#fff;font-size:14px;font-weight:600;}
+  .rank-head span{color:rgba(255,255,255,0.5);font-size:12px;margin-left:auto;}
+  .rank-row{display:flex;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);gap:12px;transition:background .1s;}
+  .rank-row:last-child{border-bottom:none;}
+  .rank-row:hover{background:#fafafa;}
+  .rpos{width:24px;font-size:13px;font-weight:600;color:var(--muted);flex-shrink:0;}
+  .rname{flex:1;display:flex;align-items:center;gap:9px;font-size:14px;font-weight:500;}
+  .rav{width:28px;height:28px;border-radius:50%;object-fit:cover;}
+  .rav-ph{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;}
+  .rbar-w{width:80px;height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden;}
+  .rbar{height:5px;border-radius:3px;}
+  .rpts{font-weight:700;font-size:15px;color:var(--navy);min-width:30px;text-align:right;}
+  .rtips{font-size:11px;color:var(--hint);min-width:50px;text-align:right;}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+  .stat-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+  .stat-v{font-size:22px;font-weight:700;color:var(--navy);}
+  .stat-l{font-size:11px;color:var(--muted);margin-top:2px;}
+
+  /* Results */
+  .res-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;}
+  .res-head{background:var(--navy);padding:10px 16px;display:flex;align-items:center;gap:8px;}
+  .res-head h3{color:#fff;font-size:13px;font-weight:600;}
+  .res-row{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);gap:8px;font-size:13px;}
+  .res-row:last-child{border-bottom:none;}
+  .res-name{width:90px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .res-tip{flex:1;color:var(--muted);}
+  .badge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;}
+  .badge-exact{background:#d1fae5;color:#065f46;}
+  .badge-tend{background:#fef3c7;color:#92400e;}
+  .badge-wrong{background:#fee2e2;color:#991b1b;}
+  .res-pts{font-weight:700;font-size:13px;min-width:36px;text-align:right;}
+
+  /* Auth screens */
+  .auth-scene{min-height:calc(100vh - 52px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px 16px;}
+  .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:380px;overflow:hidden;}
+  .auth-top{background:var(--navy);padding:24px;text-align:center;}
+  .auth-top .ball{font-size:36px;margin-bottom:8px;}
+  .auth-top h1{color:#fff;font-size:18px;font-weight:600;margin-bottom:4px;}
+  .auth-top p{color:rgba(255,255,255,0.5);font-size:12px;}
+  .auth-tabs{display:flex;border-bottom:1px solid var(--border);}
+  .auth-tab{flex:1;padding:11px;font-size:13px;font-weight:500;text-align:center;cursor:pointer;color:var(--muted);border:none;border-bottom:2px solid transparent;background:none;transition:all .15s;}
+  .auth-tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+  .auth-body{padding:22px 24px;}
+  .disc-btn{width:100%;padding:11px;border-radius:var(--radius-sm);background:var(--discord);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:opacity .15s;}
+  .disc-btn:hover{opacity:.88;}
+  .divider{display:flex;align-items:center;gap:10px;margin:16px 0;}
+  .div-line{flex:1;height:1px;background:var(--border);}
+  .div-text{font-size:11px;color:var(--hint);}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;}
+  .field input{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--surface);color:var(--text);outline:none;transition:border-color .12s;}
+  .field input:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,0.1);}
+  .field input::placeholder{color:var(--hint);}
+  .pw-wrap{position:relative;}
+  .pw-wrap input{padding-right:38px;}
+  .eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--hint);font-size:16px;line-height:1;padding:2px;}
+  .str-bar{height:3px;border-radius:2px;background:#e5e7eb;margin-top:5px;overflow:hidden;}
+  .str-fill{height:100%;border-radius:2px;transition:width .2s,background .2s;}
+  .submit-btn{width:100%;padding:11px;border-radius:var(--radius-sm);background:var(--navy);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;margin-top:4px;transition:opacity .15s;}
+  .submit-btn:hover{opacity:.88;}
+  .auth-hint{font-size:11px;color:var(--hint);text-align:center;margin-top:14px;line-height:1.5;}
+  .auth-hint a{color:var(--discord);cursor:pointer;text-decoration:none;}
+  .err-msg{background:#fee2e2;color:#991b1b;font-size:12px;padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:12px;display:none;}
+  .info-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius-sm);padding:9px 12px;font-size:12px;color:#1e40af;margin-bottom:14px;display:flex;gap:7px;align-items:flex-start;line-height:1.4;}
+
+  /* Discord flow modal */
+  .dc-modal{text-align:center;padding:24px;}
+  .dc-icon{font-size:44px;margin-bottom:12px;}
+  .dc-modal h2{font-size:15px;font-weight:600;margin-bottom:6px;}
+  .dc-modal p{font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+  .perm-list{text-align:left;background:#f9fafb;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:18px;}
+  .perm-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);padding:4px 0;}
+  .perm-ok{color:var(--green);}
+  .perm-no{color:var(--red);}
+  .dc-auth-btn{width:100%;padding:11px;border-radius:var(--radius-sm);background:var(--discord);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;}
+  .back-link{display:block;font-size:12px;color:var(--muted);cursor:pointer;margin-top:12px;}
+  .back-link:hover{color:var(--text);}
+
+  /* Success */
+  .success-wrap{text-align:center;padding:28px 24px;}
+  .success-wrap .big-icon{font-size:42px;margin-bottom:12px;}
+  .success-wrap h2{font-size:16px;font-weight:600;margin-bottom:6px;}
+  .success-wrap p{font-size:13px;color:var(--muted);line-height:1.6;}
+  .go-btn{margin-top:18px;padding:10px 28px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+  .go-btn:hover{opacity:.88;}
+
+  /* Discord bot bar */
+  .bot-bar{background:#eef0fd;border:1px solid #c7d2fe;border-radius:var(--radius-sm);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#3730a3;margin-bottom:14px;}
+  .discord-logo{font-size:18px;flex-shrink:0;}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty-state .e-icon{font-size:36px;margin-bottom:10px;}
+  .empty-state p{font-size:14px;}
+
+  @media(max-width:600px){
+    .sidebar{display:none;}
+    .stat-grid{grid-template-columns:repeat(2,1fr);}
+    .topnav a{padding:0 10px;font-size:12px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+const FLAGS = {
+  'Deutschland':'de','Frankreich':'fr','Portugal':'pt','Argentinien':'ar',
+  'Brasilien':'br','England':'gb-eng','Spanien':'es','Niederlande':'nl',
+  'USA':'us','Mexiko':'mx','Japan':'jp','Südkorea':'kr',
+  'Italien':'it','Belgien':'be','Kroatien':'hr','Marokko':'ma',
+};
+const COLORS = ['#e74c8b','#2ecc71','#f39c12','#5865f2','#1abc9c','#e67e22','#e74c3c','#3498db'];
+
+let state = {
+  user: null,
+  page: 'spielplan',
+  group: 'A',
+  matches: [],
+  tips: {},
+  rankings: [],
+  results: [],
+  authTab: 'login',
+  authStep: 'form',
+  loading: true,
+};
+
+async function api(path, opts={}) {
+  const r = await fetch(path, {credentials:'include', headers:{'Content-Type':'application/json'}, ...opts});
+  if (!r.ok) { const e = await r.json().catch(()=>({detail:'Fehler'})); throw new Error(e.detail||'Fehler'); }
+  return r.json();
+}
+
+async function init() {
+  try { state.user = await api('/api/me'); } catch(e) {}
+  try {
+    state.matches = await api('/api/matches');
+    state.rankings = await api('/api/rankings');
+    state.results = await api('/api/results');
+    if (state.user) state.tips = await api('/api/tips');
+  } catch(e) {}
+  state.loading = false;
+  render();
+}
+
+function flagUrl(team) {
+  const code = FLAGS[team];
+  return code ? `https://flagcdn.com/w80/${code}.png` : null;
+}
+
+function flagEl(team, cls='team-flag') {
+  const url = flagUrl(team);
+  if (url) return `<img class="${cls}" src="${url}" alt="${team}" onerror="this.style.display='none'">`;
+  return `<div class="team-flag-fallback">⚽</div>`;
+}
+
+function avatarColor(name) {
+  let h = 0;
+  for (let c of name) h = ((h<<5)-h)+c.charCodeAt(0);
+  return COLORS[Math.abs(h) % COLORS.length];
+}
+
+function initials(name) {
+  return name.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+
+function rav(user) {
+  if (user.avatar) return `<img class="rav" src="${user.avatar}" alt="${user.username}">`;
+  const col = avatarColor(user.username);
+  return `<div class="rav-ph" style="background:${col};">${initials(user.username)}</div>`;
+}
+
+async function saveTip(matchId, side, delta) {
+  if (!state.user) return;
+  const t = state.tips[matchId] || {home:null,away:null};
+  let hv = t.home, av = t.away;
+  if (side==='h') hv = Math.max(0, Math.min(9, (hv===null?0:hv)+delta));
+  else av = Math.max(0, Math.min(9, (av===null?0:av)+delta));
+  state.tips[matchId] = {home:hv, away:av};
+  render();
+  if (hv !== null && av !== null) {
+    try {
+      await api('/api/tips', {method:'POST', body:JSON.stringify({match_id:matchId,home_tip:hv,away_tip:av})});
+    } catch(e) { console.error(e); }
+  }
+}
+
+function renderHeader() {
+  const navItems = [
+    ['spielplan','⚽ Spielplan'],
+    ['tabelle','🏆 Tabelle'],
+    ['auswertung','📊 Auswertung'],
+  ];
+  const uArea = state.user
+    ? `<div class="user-chip">
+        ${state.user.avatar
+          ? `<img class="uav" src="${state.user.avatar}" alt="${state.user.username}">`
+          : `<div class="uav-placeholder">${initials(state.user.username)}</div>`}
+        <span>${state.user.username}</span>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Abmelden</button>`
+    : `<button class="logout-btn" style="border-color:rgba(255,255,255,0.4);color:#fff;" onclick="setPage('login')">Anmelden</button>`;
+
+  return `<header class="topbar">
+    <a class="logo" href="#" onclick="setPage('spielplan');return false;">⚽ <span>Fanclub Manelo98</span> Tippspiel</a>
+    <nav class="topnav">
+      ${navItems.map(([id,label])=>`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`).join('')}
+    </nav>
+    <div class="user-area">${uArea}</div>
+  </header>`;
+}
+
+function renderSidebar() {
+  const groups = ['A','B','C','D'];
+  const koItems = ['Achtelfinale','Viertelfinale','Halbfinale','Finale'];
+  return `<aside class="sidebar">
+    <div class="sb-sec">Gruppen</div>
+    ${groups.map(g=>`<button class="sb-link${state.group===g&&state.page==='spielplan'?' active':''}" onclick="setGroup('${g}')">${g === state.group && state.page==='spielplan' ? '▶ ' : ''}Gruppe ${g}</button>`).join('')}
+    <div class="sb-sec">K.O.-Runde</div>
+    ${koItems.map(k=>`<button class="sb-link locked">🔒 ${k}</button>`).join('')}
+  </aside>`;
+}
+
+function renderSpielplan() {
+  const matches = state.matches.filter(m=>m.group===state.group);
+  let html = '';
+
+  if (!state.user) {
+    html += `<div class="bot-bar"><span class="discord-logo">💬</span>
+      <span>Melde dich an um Tipps abzugeben. <a href="#" onclick="setPage('login');return false;" style="color:#5865f2;font-weight:600;">Jetzt anmelden →</a></span>
+    </div>`;
+  } else {
+    html += `<div class="bot-bar"><span class="discord-logo">🤖</span>
+      <span>Discord-Bot sendet Erinnerungen direkt in euren Server. Tipps werden hier gespeichert und automatisch ausgewertet.</span>
+    </div>`;
+  }
+
+  html += `<div class="group-label">⚽ Gruppe ${state.group}</div>`;
+
+  if (!matches.length) {
+    html += `<div class="empty-state"><div class="e-icon">📅</div><p>Keine Spiele in dieser Gruppe</p></div>`;
+    return html;
+  }
+
+  for (const m of matches) {
+    const t = state.tips[m.id] || {};
+    const hv = t.home, av = t.away;
+    const set = hv !== null && hv !== undefined && av !== null && av !== undefined;
+    const canTip = state.user && m.status === 'open';
+
+    html += `<div class="match-card${set?' tipped':''}">
+      <div class="match-top">
+        <span style="font-size:11px;">🕐</span>
+        <span class="match-time">${m.date} · ${m.time} Uhr — Gruppe ${m.group}</span>
+        <span class="status-pill ${set?'pill-done':'pill-open'}">${set?'✓ Getippt':'Offen'}</span>
+      </div>
+      <div class="teams-row">
+        <div class="team-col">
+          ${flagEl(m.home)}
+          <span class="team-name">${m.home}</span>
+          ${canTip ? `<div class="ctrl-row">
+            <button class="ctrl minus" onclick="saveTip(${m.id},'h',-1)">−</button>
+            <button class="ctrl plus" onclick="saveTip(${m.id},'h',1)">+</button>
+          </div>` : `<div style="height:22px;"></div>`}
+        </div>
+        <div class="score-center">
+          <div class="score-label">TIPP</div>
+          <div class="score-row">
+            <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${hv!==null&&hv!==undefined?hv:'?'}</div>
+            <span class="score-colon">:</span>
+            <div class="score-box${av!==null&&av!==undefined?' filled':''}">${av!==null&&av!==undefined?av:'?'}</div>
+          </div>
+          ${m.status==='done' ? `<div style="font-size:11px;color:var(--muted);margin-top:3px;">Ergebnis: ${m.home_score}:${m.away_score}</div>` : ''}
+        </div>
+        <div class="team-col">
+          ${flagEl(m.away)}
+          <span class="team-name">${m.away}</span>
+          ${canTip ? `<div class="ctrl-row">
+            <button class="ctrl minus" onclick="saveTip(${m.id},'a',-1)">−</button>
+            <button class="ctrl plus" onclick="saveTip(${m.id},'a',1)">+</button>
+          </div>` : `<div style="height:22px;"></div>`}
+        </div>
+      </div>
+    </div>`;
+  }
+  return html;
+}
+
+function renderTabelle() {
+  const max = state.rankings[0]?.points || 1;
+  const total = state.matches.length;
+  const done = state.matches.filter(m=>m.status==='done').length;
+  const players = state.rankings.length;
+
+  let html = `<div class="stat-grid">
+    <div class="stat-c"><div class="stat-v">${done}</div><div class="stat-l">Spiele gespielt</div></div>
+    <div class="stat-c"><div class="stat-v">${total - done}</div><div class="stat-l">Noch offen</div></div>
+    <div class="stat-c"><div class="stat-v">${total}</div><div class="stat-l">Spiele gesamt</div></div>
+    <div class="stat-c"><div class="stat-v">${players}</div><div class="stat-l">Mitspieler</div></div>
+  </div>
+  <div class="rank-card">
+    <div class="rank-head"><h2>🏆 Aktuelle Rangliste</h2><span>WM 2026</span></div>`;
+
+  if (!state.rankings.length) {
+    html += `<div class="empty-state"><p>Noch keine Mitspieler</p></div>`;
+  } else {
+    const medals = ['🥇','🥈','🥉'];
+    state.rankings.forEach((r,i) => {
+      const col = avatarColor(r.username);
+      const av = r.avatar
+        ? `<img class="rav" src="${r.avatar}" alt="${r.username}">`
+        : `<div class="rav-ph" style="background:${col};">${initials(r.username)}</div>`;
+      const barPct = Math.round(r.points / max * 100);
+      html += `<div class="rank-row">
+        <div class="rpos">${medals[i]||`${i+1}.`}</div>
+        <div class="rname">${av} ${r.username}</div>
+        <div class="rbar-w"><div class="rbar" style="width:${barPct}%;background:${col};"></div></div>
+        <div class="rtips">${r.evaluated} Tipps</div>
+        <div class="rpts">${r.points} Pkt</div>
+      </div>`;
+    });
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderAuswertung() {
+  if (!state.results.length) {
+    return `<div class="empty-state"><div class="e-icon">📊</div><p>Noch keine ausgewerteten Spiele</p></div>`;
+  }
+  let html = '';
+  for (const res of state.results) {
+    html += `<div class="res-card">
+      <div class="res-head"><h3>⚽ ${res.match}</h3></div>`;
+    for (const t of res.tips) {
+      const badge = t.points===3
+        ? `<span class="badge badge-exact">Exakt ✓</span>`
+        : t.points===1
+        ? `<span class="badge badge-tend">Tendenz ≈</span>`
+        : `<span class="badge badge-wrong">Falsch ✗</span>`;
+      const ptsColor = t.points===3?'var(--green)':t.points===1?'var(--orange)':'var(--red)';
+      html += `<div class="res-row">
+        <div class="res-name">${t.username}</div>
+        <div class="res-tip">Tipp: <strong>${t.tip}</strong></div>
+        ${badge}
+        <div class="res-pts" style="color:${ptsColor};">${t.points>0?'+':''}${t.points}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  return html;
+}
+
+function renderLogin() {
+  if (state.authStep === 'discord') {
+    return `<div class="auth-scene">
+      <div class="auth-card">
+        <div class="auth-top">
+          <div class="ball">⚽</div>
+          <h1>WM Tippspiel 2026</h1>
+          <p>Fanclub Manelo98</p>
+        </div>
+        <div class="dc-modal">
+          <div class="dc-icon">💬</div>
+          <h2>Mit Discord verbinden</h2>
+          <p>Du wirst zu Discord weitergeleitet.<br>Danach bist du sofort dabei.</p>
+          <div class="perm-list">
+            <div class="perm-row"><span class="perm-ok">✓</span> Discord-Nutzernamen lesen</div>
+            <div class="perm-row"><span class="perm-ok">✓</span> Profilbild übernehmen</div>
+            <div class="perm-row"><span class="perm-ok">✓</span> Serverzugehörigkeit prüfen</div>
+            <div class="perm-row"><span class="perm-no">✗</span> Keine Nachrichten lesen oder senden</div>
+          </div>
+          <button class="dc-auth-btn" onclick="window.location='/auth/discord'">💬 Weiter zu Discord</button>
+          <a class="back-link" onclick="state.authStep='form';render()">← Zurück</a>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  const isLogin = state.authTab === 'login';
+  const errStyle = 'display:none;';
+
+  return `<div class="auth-scene">
+    <div class="auth-card">
+      <div class="auth-top">
+        <div class="ball">⚽</div>
+        <h1>WM Tippspiel 2026</h1>
+        <p>Fanclub Manelo98</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab${isLogin?' active':''}" onclick="state.authTab='login';render()">Anmelden</button>
+        <button class="auth-tab${!isLogin?' active':''}" onclick="state.authTab='register';render()">Registrieren</button>
+      </div>
+      <div class="auth-body">
+        <div class="err-msg" id="err-msg"></div>
+        <button class="disc-btn" onclick="state.authStep='discord';render()">
+          💬 Mit Discord ${isLogin?'anmelden':'registrieren'}
+        </button>
+        <div class="divider"><div class="div-line"></div><span class="div-text">oder mit E-Mail</span><div class="div-line"></div></div>
+        ${!isLogin ? `<div class="info-box">ℹ️ Du kannst deinen Discord-Account nach der Registrierung verknüpfen.</div>
+          <div class="field"><label>Anzeigename</label><input type="text" id="f-name" placeholder="z. B. Lars_K"></div>` : ''}
+        <div class="field"><label>E-Mail-Adresse</label><input type="email" id="f-email" placeholder="name@beispiel.de"></div>
+        <div class="field">
+          <label>Passwort</label>
+          <div class="pw-wrap">
+            <input type="password" id="f-pw" placeholder="${isLogin?'Dein Passwort':'Mindestens 8 Zeichen'}" ${!isLogin?'oninput="checkStr(this.value)"':''}>
+            <button class="eye-btn" onclick="togglePw()" type="button">👁</button>
+          </div>
+          ${!isLogin ? `<div class="str-bar"><div class="str-fill" id="str-fill" style="width:0%;background:#e74c3c;"></div></div>` : ''}
+        </div>
+        ${isLogin ? `<div style="text-align:right;margin-bottom:14px;margin-top:-6px;"><a style="font-size:11px;color:#5865f2;cursor:pointer;">Passwort vergessen?</a></div>` : ''}
+        <button class="submit-btn" onclick="${isLogin?'doLogin()':'doRegister()'}">${isLogin?'Anmelden':'Konto erstellen'}</button>
+        <p class="auth-hint">${isLogin
+          ? `Noch kein Konto? <a onclick="state.authTab='register';render()">Registrieren</a>`
+          : `Bereits ein Konto? <a onclick="state.authTab='login';render()">Anmelden</a>`}
+        </p>
+      </div>
+    </div>
+  </div>`;
+}
+
+function togglePw() {
+  const inp = document.getElementById('f-pw');
+  if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function checkStr(v) {
+  const fill = document.getElementById('str-fill');
+  if (!fill) return;
+  let s = 0;
+  if (v.length >= 8) s++;
+  if (/[A-Z]/.test(v)) s++;
+  if (/[0-9]/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v)) s++;
+  fill.style.width = (s*25)+'%';
+  fill.style.background = s<=1?'#e74c3c':s===2?'#f39c12':s===3?'#f1c40f':'#2ecc71';
+}
+
+function showErr(msg) {
+  const el = document.getElementById('err-msg');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+async function doLogin() {
+  const email = document.getElementById('f-email')?.value?.trim();
+  const pw = document.getElementById('f-pw')?.value;
+  if (!email || !pw) { showErr('Bitte alle Felder ausfüllen.'); return; }
+  try {
+    const res = await api('/api/login', {method:'POST', body:JSON.stringify({email,password:pw})});
+    state.user = await api('/api/me');
+    state.tips = await api('/api/tips');
+    state.page = 'spielplan';
+    render();
+  } catch(e) { showErr(e.message); }
+}
+
+async function doRegister() {
+  const name = document.getElementById('f-name')?.value?.trim();
+  const email = document.getElementById('f-email')?.value?.trim();
+  const pw = document.getElementById('f-pw')?.value;
+  if (!name || !email || !pw) { showErr('Bitte alle Felder ausfüllen.'); return; }
+  if (pw.length < 8) { showErr('Passwort muss mindestens 8 Zeichen haben.'); return; }
+  try {
+    await api('/api/register', {method:'POST', body:JSON.stringify({username:name,email,password:pw})});
+    state.user = await api('/api/me');
+    state.tips = await api('/api/tips');
+    state.rankings = await api('/api/rankings');
+    state.page = 'spielplan';
+    render();
+  } catch(e) { showErr(e.message); }
+}
+
+async function doLogout() {
+  await api('/api/logout', {method:'POST'});
+  state.user = null;
+  state.tips = {};
+  state.page = 'spielplan';
+  render();
+}
+
+function setPage(p) {
+  state.page = p;
+  if (p === 'spielplan' && state.page !== 'spielplan') state.group = 'A';
+  render();
+}
+
+function setGroup(g) {
+  state.group = g;
+  state.page = 'spielplan';
+  render();
+}
+
+function render() {
+  const root = document.getElementById('root');
+  if (state.loading) { root.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-size:18px;color:#6b7280;">⚽ Wird geladen…</div>`; return; }
+
+  if (state.page === 'login') {
+    root.innerHTML = renderHeader() + renderLogin();
+    return;
+  }
+
+  let content = '';
+  if (state.page === 'spielplan') content = renderSpielplan();
+  else if (state.page === 'tabelle') content = renderTabelle();
+  else if (state.page === 'auswertung') content = renderAuswertung();
+
+  root.innerHTML = renderHeader() + `
+    <div class="layout">
+      ${state.page === 'spielplan' ? renderSidebar() : ''}
+      <main class="main">${content}</main>
+    </div>`;
+}
+
+init();
+</script>
+</body>
+</html>
