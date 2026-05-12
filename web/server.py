@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File
+from fastapi.responses import JSONResponse
 import base64
 import re
+import asyncio
+from datetime import datetime, timezone
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +23,9 @@ DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "")
 WEB_URL = os.environ.get("WEB_URL", "http://localhost:8000")
 SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 DISCORD_REDIRECT = f"{WEB_URL}/auth/discord/callback"
+FOOTBALL_API_KEY = os.environ.get("FOOTBALL_API_KEY", "")
+FOOTBALL_API_URL = "https://api.football-data.org/v4"
+WC_2026_ID = 2000  # WM 2026 Competition ID bei football-data.org
 
 GRUPPE_MATCHES = [
     ("Mexiko","Suedafrika","11.06.2026","21:00","A"),
@@ -200,10 +206,120 @@ async def init_db():
 
         await db.commit()
 
+# ─── Live Score System ────────────────────────────────────────────
+async def fetch_live_scores():
+    """Holt Live-Ergebnisse von football-data.org und aktualisiert DB"""
+    if not FOOTBALL_API_KEY:
+        return
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.get(
+                f"{FOOTBALL_API_URL}/competitions/{WC_2026_ID}/matches",
+                headers={"X-Auth-Token": FOOTBALL_API_KEY},
+                timeout=10
+            )
+            if r.status_code != 200:
+                return
+            data = r.json()
+            matches = data.get("matches", [])
+
+        async with aiosqlite.connect(DB) as db:
+            for m in matches:
+                status = m.get("status", "")
+                score = m.get("score", {})
+                ft = score.get("fullTime", {})
+                home_score = ft.get("home")
+                away_score = ft.get("away")
+
+                # Mapping API-Status zu unserem Status
+                if status in ("FINISHED",):
+                    db_status = "done"
+                elif status in ("IN_PLAY", "PAUSED", "HALFTIME"):
+                    db_status = "live"
+                elif status in ("TIMED", "SCHEDULED"):
+                    db_status = "open"
+                else:
+                    db_status = "open"
+
+                home_name = m.get("homeTeam", {}).get("shortName", "")
+                away_name = m.get("awayTeam", {}).get("shortName", "")
+
+                if not home_name or not away_name:
+                    continue
+
+                # Spiel in unserer DB suchen (fuzzy match auf Teamnamen)
+                async with db.execute(
+                    "SELECT id FROM matches WHERE status != 'done' AND (home_team LIKE ? OR away_team LIKE ?)",
+                    (f"%{home_name[:6]}%", f"%{away_name[:6]}%")
+                ) as cursor:
+                    row = await cursor.fetchone()
+
+                if row and db_status in ("done", "live"):
+                    match_id = row[0]
+                    if home_score is not None and away_score is not None:
+                        await db.execute(
+                            "UPDATE matches SET status=?, home_score=?, away_score=? WHERE id=?",
+                            (db_status, home_score, away_score, match_id)
+                        )
+                        if db_status == "done":
+                            await evaluate_tips(db, match_id, home_score, away_score)
+
+            await db.commit()
+    except Exception as e:
+        print(f"Live score fetch error: {e}")
+
+async def evaluate_tips(db, match_id: int, home_score: int, away_score: int):
+    """Wertet Tipps aus und vergibt Punkte"""
+    async with db.execute("SELECT id, user_id, home_tip, away_tip FROM tips WHERE match_id=? AND points IS NULL", (match_id,)) as c:
+        tips = await c.fetchall()
+    for tip_id, user_id, ht, at in tips:
+        if ht == home_score and at == away_score:
+            pts = 3
+        elif (ht > at and home_score > away_score) or              (ht < at and home_score < away_score) or              (ht == at and home_score == away_score):
+            pts = 1
+        else:
+            pts = 0
+        await db.execute("UPDATE tips SET points=? WHERE id=?", (pts, tip_id))
+
+async def close_expired_tips():
+    """Sperrt Tipps für Spiele die bereits angefangen haben"""
+    now = datetime.now(timezone.utc)
+    async with aiosqlite.connect(DB) as db:
+        async with db.execute("SELECT id, match_date, match_time FROM matches WHERE status='open'") as c:
+            matches = await c.fetchall()
+        for mid, date_str, time_str in matches:
+            try:
+                dt_str = f"{date_str} {time_str}"
+                # Parse DD.MM.YYYY HH:MM
+                dt = datetime.strptime(dt_str, "%d.%m.%Y %H:%M").replace(tzinfo=timezone.utc)
+                if now >= dt:
+                    # Spiel hat angefangen — Tipps sperren, fehlende mit 0 Punkte
+                    await db.execute("UPDATE matches SET status='closed' WHERE id=? AND status='open'", (mid,))
+                    # Nutzer ohne Tipp bekommen 0 Punkte
+                    async with db.execute("SELECT id FROM users") as uc:
+                        all_users = await uc.fetchall()
+                    for (uid,) in all_users:
+                        await db.execute(
+                            "INSERT OR IGNORE INTO tips (user_id, match_id, home_tip, away_tip, points) VALUES (?,?,0,0,0)",
+                            (uid, mid)
+                        )
+            except Exception:
+                pass
+        await db.commit()
+
+async def live_update_loop():
+    """Läuft im Hintergrund — aktualisiert alle 60 Sekunden"""
+    while True:
+        await asyncio.sleep(60)
+        await close_expired_tips()
+        await fetch_live_scores()
+
 @app.on_event("startup")
 async def startup():
     await backup_db()
     await init_db()
+    # Starte Live-Update-Loop im Hintergrund
+    asyncio.create_task(live_update_loop())
 
 async def backup_db():
     """Erstellt vor jedem Start ein Backup der Datenbank"""
@@ -425,5 +541,24 @@ async def admin_status(request: Request):
         "users": users, "matches": matches, "tips": tips,
         "db_version": version, "backups": backups
     }
+
+@app.get("/api/live")
+async def live_scores():
+    """Gibt aktuelle Spielstände zurück — wird vom Frontend alle 30s abgefragt"""
+    async with aiosqlite.connect(DB) as db:
+        async with db.execute(
+            "SELECT id, home_team, away_team, home_score, away_score, status, match_date, match_time FROM matches ORDER BY match_date, match_time"
+        ) as c:
+            rows = await c.fetchall()
+    return [{"id":r[0],"home":r[1],"away":r[2],"home_score":r[3],"away_score":r[4],
+             "status":r[5],"date":r[6],"time":r[7]} for r in rows]
+
+@app.post("/api/admin/fetch-scores")
+async def manual_fetch(request: Request):
+    """Manueller Live-Score-Abruf für Admin"""
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401, "Nicht angemeldet")
+    await fetch_live_scores()
+    return {"ok": True, "message": "Scores aktualisiert"}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
