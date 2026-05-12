@@ -184,6 +184,30 @@
     .stat-grid{grid-template-columns:repeat(2,1fr);}
     .topnav a{padding:0 10px;font-size:12px;}
   }
+
+  .grp-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+  .grp-table th{background:#0f2744;color:#fff;padding:8px 10px;font-weight:500;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+  .grp-table th:not(:first-child){text-align:center;}
+  .grp-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text);}
+  .grp-table td:not(:first-child){text-align:center;color:var(--muted);}
+  .grp-table tr:last-child td{border-bottom:none;}
+  .grp-table tr.qualified td{background:#f0fdf4;}
+  .grp-table tr.qualified td:first-child{border-left:3px solid #2ecc71;}
+  .grp-table tr.qualified-3rd td{background:#fffbeb;}
+  .grp-table tr.qualified-3rd td:first-child{border-left:3px solid #f39c12;}
+  .grp-table .team-flag-sm{width:20px;height:14px;object-fit:cover;border-radius:2px;vertical-align:middle;margin-right:5px;}
+  .grp-legend{display:flex;gap:14px;margin-top:8px;font-size:11px;color:var(--muted);}
+  .grp-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+  .grp-section-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px;}
+
+  .ko-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:6px;display:flex;align-items:center;gap:10px;transition:border-color .15s;}
+  .ko-card:hover{border-color:#c5c8d0;}
+  .ko-card.tipped{border-color:#86efac;background:#f0fdf4;}
+  .ko-team{flex:1;display:flex;align-items:center;gap:8px;font-size:13px;}
+  .ko-team.right{justify-content:flex-end;}
+  .ko-placeholder{font-size:12px;color:var(--muted);font-style:italic;}
+  .ko-badge{font-size:10px;padding:2px 7px;border-radius:10px;background:#e0e7ff;color:#3730a3;font-weight:500;flex-shrink:0;}
+  .ko-date{font-size:11px;color:var(--muted);flex-shrink:0;min-width:80px;text-align:right;}
 </style>
 </head>
 <body>
@@ -319,10 +343,88 @@ function renderSidebar() {
   </aside>`;
 }
 
+function calcGroupTable(group) {
+  const groupMatches = state.matches.filter(m => m.group === group);
+  const teams = {};
+  groupMatches.forEach(m => {
+    [m.home, m.away].forEach(t => {
+      if (!teams[t]) teams[t] = {name:t, sp:0, g:0, u:0, v:0, tore:0, gegen:0, pts:0};
+    });
+    if (m.status === 'done' && m.home_score !== null) {
+      const h = teams[m.home], a = teams[m.away];
+      h.sp++; a.sp++;
+      h.tore += m.home_score; h.gegen += m.away_score;
+      a.tore += m.away_score; a.gegen += m.home_score;
+      if (m.home_score > m.away_score) { h.g++; h.pts+=3; a.v++; }
+      else if (m.home_score < m.away_score) { a.g++; a.pts+=3; h.v++; }
+      else { h.u++; h.pts++; a.u++; a.pts++; }
+    }
+  });
+  return Object.values(teams).sort((a,b) => b.pts-a.pts || (b.tore-b.gegen)-(a.tore-a.gegen) || b.tore-a.tore);
+}
+
+function renderGroupTable(group) {
+  const rows = calcGroupTable(group);
+  if (!rows.length) return '';
+  let html = `<div class="grp-section-title">Gruppentabelle</div>
+  <table class="grp-table">
+    <thead><tr><th>Team</th><th>Sp</th><th>S</th><th>U</th><th>N</th><th>Tore</th><th>Pkt</th></tr></thead><tbody>`;
+  rows.forEach((r,i) => {
+    const flagCode = FLAGS[r.name];
+    const flagImg = flagCode ? `<img class="team-flag-sm" src="https://flagcdn.com/w40/${flagCode}.png" alt="${r.name}">` : '';
+    const cls = i < 2 ? 'qualified' : i === 2 ? 'qualified-3rd' : '';
+    html += `<tr class="${cls}"><td>${flagImg}${r.name}</td><td>${r.sp}</td><td>${r.g}</td><td>${r.u}</td><td>${r.v}</td><td>${r.tore}:${r.gegen}</td><td><strong>${r.pts}</strong></td></tr>`;
+  });
+  html += `</tbody></table>
+  <div class="grp-legend">
+    <div style="display:flex;align-items:center;gap:5px;"><div class="grp-legend-dot" style="background:#2ecc71;"></div><span>Weiterkommen (1. & 2. Platz)</span></div>
+    <div style="display:flex;align-items:center;gap:5px;"><div class="grp-legend-dot" style="background:#f39c12;"></div><span>Evtl. weiter (3. Platz)</span></div>
+  </div>`;
+  return html;
+}
+
+function renderKOMatch(m) {
+  const t = state.tips[m.id] || {};
+  const hv = t.home, av = t.away;
+  const set = hv !== null && hv !== undefined && av !== null && av !== undefined;
+  const canTip = state.user && m.status === 'open';
+  const isPlaceholder = m.home.includes('.') || m.home.includes('Sieger') || m.home.includes('Verlierer');
+  const flagH = FLAGS[m.home] ? `<img class="team-flag" src="https://flagcdn.com/w80/${FLAGS[m.home]}.png" alt="${m.home}" onerror="this.style.display='none'">` : '';
+  const flagA = FLAGS[m.away] ? `<img class="team-flag" src="https://flagcdn.com/w80/${FLAGS[m.away]}.png" alt="${m.away}" onerror="this.style.display='none'">` : '';
+
+  return `<div class="ko-card${set?' tipped':''}">
+    <div class="ko-team">
+      ${flagH}
+      <span class="${isPlaceholder?'ko-placeholder':''}">${m.home}</span>
+    </div>
+    <div class="score-center" style="flex-shrink:0;">
+      <div class="score-label" style="font-size:9px;">${m.date} · ${m.time}</div>
+      <div class="score-row">
+        ${canTip ? `
+        <button class="ctrl minus" onclick="saveTip(${m.id},'h',-1)">−</button>
+        <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${hv!==null&&hv!==undefined?hv:'?'}</div>
+        <span class="score-colon">:</span>
+        <div class="score-box${av!==null&&av!==undefined?' filled':''}">${av!==null&&av!==undefined?av:'?'}</div>
+        <button class="ctrl plus" onclick="saveTip(${m.id},'a',1)">+</button>
+        ` : `
+        <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${hv!==null&&hv!==undefined?hv:'?'}</div>
+        <span class="score-colon">:</span>
+        <div class="score-box${av!==null&&av!==undefined?' filled':''}">${av!==null&&av!==undefined?av:'?'}</div>
+        `}
+      </div>
+      ${m.status==='done'?`<div style="font-size:11px;color:var(--muted);">Ergebnis: ${m.home_score}:${m.away_score}</div>`:''}
+    </div>
+    <div class="ko-team right">
+      <span class="${isPlaceholder?'ko-placeholder':''}">${m.away}</span>
+      ${flagA}
+    </div>
+  </div>`;
+}
+
 function renderSpielplan() {
-  const koGroups = {'SF':'Sechzehntelfinale','AF':'Achtelfinale','VF':'Viertelfinale','HF':'Halbfinale','P3':'Spiel um Platz 3','FIN':'Finale'};
+  const koGroups = {'SF':'Sechzehntelfinale','AF':'Achtelfinale','VF':'Viertelfinale','HF':'Halbfinale','P3':'Spiel um Platz 3','FIN':'🏆 Finale'};
   const isKO = !!koGroups[state.group];
-  const matches = state.matches.filter(m => isKO ? m.group.startsWith(state.group) : m.group===state.group);
+  const matches = state.matches.filter(m => isKO ? m.group.startsWith(state.group) || m.group===state.group : m.group===state.group);
   let html = '';
 
   if (!state.user) {
@@ -340,49 +442,55 @@ function renderSpielplan() {
 
   if (!matches.length) {
     html += `<div class="empty-state"><div class="e-icon">📅</div><p>Keine Spiele in dieser Gruppe</p></div>`;
+    if (!isKO) html += renderGroupTable(state.group);
     return html;
   }
 
-  for (const m of matches) {
-    const t = state.tips[m.id] || {};
-    const hv = t.home, av = t.away;
-    const set = hv !== null && hv !== undefined && av !== null && av !== undefined;
-    const canTip = state.user && m.status === 'open';
+  if (isKO) {
+    for (const m of matches) { html += renderKOMatch(m); }
+  } else {
+    for (const m of matches) {
+      const t = state.tips[m.id] || {};
+      const hv = t.home, av = t.away;
+      const set = hv !== null && hv !== undefined && av !== null && av !== undefined;
+      const canTip = state.user && m.status === 'open';
 
-    html += `<div class="match-card${set?' tipped':''}">
-      <div class="match-top">
-        <span style="font-size:11px;">🕐</span>
-        <span class="match-time">${m.date} · ${m.time} Uhr — Gruppe ${m.group}</span>
-        <span class="status-pill ${set?'pill-done':'pill-open'}">${set?'✓ Getippt':'Offen'}</span>
-      </div>
-      <div class="teams-row">
-        <div class="team-col">
-          ${flagEl(m.home)}
-          <span class="team-name">${m.home}</span>
-          ${canTip ? `<div class="ctrl-row">
-            <button class="ctrl minus" onclick="saveTip(${m.id},'h',-1)">−</button>
-            <button class="ctrl plus" onclick="saveTip(${m.id},'h',1)">+</button>
-          </div>` : `<div style="height:22px;"></div>`}
+      html += `<div class="match-card${set?' tipped':''}">
+        <div class="match-top">
+          <span style="font-size:11px;">🕐</span>
+          <span class="match-time">${m.date} · ${m.time} Uhr</span>
+          <span class="status-pill ${set?'pill-done':'pill-open'}">${set?'✓ Getippt':'Offen'}</span>
         </div>
-        <div class="score-center">
-          <div class="score-label">TIPP</div>
-          <div class="score-row">
-            <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${hv!==null&&hv!==undefined?hv:'?'}</div>
-            <span class="score-colon">:</span>
-            <div class="score-box${av!==null&&av!==undefined?' filled':''}">${av!==null&&av!==undefined?av:'?'}</div>
+        <div class="teams-row">
+          <div class="team-col">
+            ${flagEl(m.home)}
+            <span class="team-name">${m.home}</span>
+            ${canTip ? `<div class="ctrl-row">
+              <button class="ctrl minus" onclick="saveTip(${m.id},'h',-1)">−</button>
+              <button class="ctrl plus" onclick="saveTip(${m.id},'h',1)">+</button>
+            </div>` : `<div style="height:22px;"></div>`}
           </div>
-          ${m.status==='done' ? `<div style="font-size:11px;color:var(--muted);margin-top:3px;">Ergebnis: ${m.home_score}:${m.away_score}</div>` : ''}
+          <div class="score-center">
+            <div class="score-label">TIPP</div>
+            <div class="score-row">
+              <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${hv!==null&&hv!==undefined?hv:'?'}</div>
+              <span class="score-colon">:</span>
+              <div class="score-box${av!==null&&av!==undefined?' filled':''}">${av!==null&&av!==undefined?av:'?'}</div>
+            </div>
+            ${m.status==='done' ? `<div style="font-size:11px;color:var(--muted);margin-top:3px;">Ergebnis: ${m.home_score}:${m.away_score}</div>` : ''}
+          </div>
+          <div class="team-col">
+            ${flagEl(m.away)}
+            <span class="team-name">${m.away}</span>
+            ${canTip ? `<div class="ctrl-row">
+              <button class="ctrl minus" onclick="saveTip(${m.id},'a',-1)">−</button>
+              <button class="ctrl plus" onclick="saveTip(${m.id},'a',1)">+</button>
+            </div>` : `<div style="height:22px;"></div>`}
+          </div>
         </div>
-        <div class="team-col">
-          ${flagEl(m.away)}
-          <span class="team-name">${m.away}</span>
-          ${canTip ? `<div class="ctrl-row">
-            <button class="ctrl minus" onclick="saveTip(${m.id},'a',-1)">−</button>
-            <button class="ctrl plus" onclick="saveTip(${m.id},'a',1)">+</button>
-          </div>` : `<div style="height:22px;"></div>`}
-        </div>
-      </div>
-    </div>`;
+      </div>`;
+    }
+    html += renderGroupTable(state.group);
   }
   return html;
 }
