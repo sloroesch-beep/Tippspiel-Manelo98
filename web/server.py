@@ -140,6 +140,8 @@ KO_MATCHES = [
 
 async def init_db():
     async with aiosqlite.connect(DB) as db:
+
+        # Tabellen erstellen falls nicht vorhanden — bestehende Daten bleiben erhalten
         await db.execute("""CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT, discord_id TEXT UNIQUE,
             username TEXT NOT NULL, email TEXT UNIQUE, password_hash TEXT,
@@ -153,20 +155,70 @@ async def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL,
             match_id INTEGER NOT NULL, home_tip INTEGER NOT NULL, away_tip INTEGER NOT NULL,
             points INTEGER DEFAULT NULL, UNIQUE(user_id, match_id))""")
-        count = (await (await db.execute("SELECT COUNT(*) FROM matches")).fetchone())[0]
-        if count > 0 and count < 100:
-            await db.execute("DELETE FROM matches")
-            count = 0
-        if count == 0:
-            all_matches = GRUPPE_MATCHES + KO_MATCHES
-            await db.executemany(
-                "INSERT INTO matches (home_team,away_team,match_date,match_time,group_name) VALUES (?,?,?,?,?)",
-                all_matches)
+
+        # Sanfte Migration: neue Spalten hinzufügen falls noch nicht vorhanden
+        # (bestehende Daten bleiben IMMER erhalten)
+        try: await db.execute("ALTER TABLE users ADD COLUMN discord_id TEXT UNIQUE")
+        except: pass
+        try: await db.execute("ALTER TABLE users ADD COLUMN avatar TEXT")
+        except: pass
+        try: await db.execute("ALTER TABLE tips ADD COLUMN points INTEGER DEFAULT NULL")
+        except: pass
+
+        # Versionstabelle für zukünftige Migrationen
+        await db.execute("""CREATE TABLE IF NOT EXISTS db_version (
+            version INTEGER PRIMARY KEY,
+            applied_at TEXT DEFAULT CURRENT_TIMESTAMP)""")
+
+        # Aktuelle Version prüfen
+        version_row = await (await db.execute("SELECT MAX(version) FROM db_version")).fetchone()
+        current_version = version_row[0] or 0
+
+        # Version 1: Spiele eintragen wenn DB leer
+        if current_version < 1:
+            count = (await (await db.execute("SELECT COUNT(*) FROM matches")).fetchone())[0]
+            if count == 0:
+                all_matches = GRUPPE_MATCHES + KO_MATCHES
+                await db.executemany(
+                    "INSERT INTO matches (home_team,away_team,match_date,match_time,group_name) VALUES (?,?,?,?,?)",
+                    all_matches)
+            await db.execute("INSERT OR IGNORE INTO db_version (version) VALUES (1)")
+
+        # Version 2: Fehlende KO-Spiele ergänzen ohne bestehende zu löschen
+        if current_version < 2:
+            existing = set()
+            async with db.execute("SELECT home_team||'-'||away_team FROM matches") as c:
+                rows = await c.fetchall()
+                existing = {r[0] for r in rows}
+            new_matches = [m for m in GRUPPE_MATCHES + KO_MATCHES
+                          if f"{m[0]}-{m[1]}" not in existing]
+            if new_matches:
+                await db.executemany(
+                    "INSERT INTO matches (home_team,away_team,match_date,match_time,group_name) VALUES (?,?,?,?,?)",
+                    new_matches)
+            await db.execute("INSERT OR IGNORE INTO db_version (version) VALUES (2)")
+
         await db.commit()
 
 @app.on_event("startup")
 async def startup():
+    await backup_db()
     await init_db()
+
+async def backup_db():
+    """Erstellt vor jedem Start ein Backup der Datenbank"""
+    import shutil
+    from datetime import datetime
+    if os.path.exists(DB):
+        backup_dir = "backups"
+        os.makedirs(backup_dir, exist_ok=True)
+        # Maximal 5 Backups behalten
+        backups = sorted([f for f in os.listdir(backup_dir) if f.endswith('.db')])
+        while len(backups) >= 5:
+            os.remove(os.path.join(backup_dir, backups.pop(0)))
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        shutil.copy2(DB, os.path.join(backup_dir, f"backup_{ts}.db"))
+        print(f"Backup erstellt: backup_{ts}.db")
 
 def hash_pw(pw): return hashlib.sha256(pw.encode()).hexdigest()
 
@@ -354,5 +406,24 @@ async def upload_avatar(request: Request, file: UploadFile = File(...)):
         await db.execute("UPDATE users SET avatar=? WHERE id=?", (data_url, user[0]))
         await db.commit()
     return {"ok": True, "avatar": data_url}
+
+@app.get("/api/admin/status")
+async def admin_status(request: Request):
+    """Zeigt DB-Status — nur für Debug"""
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401, "Nicht angemeldet")
+    async with aiosqlite.connect(DB) as db:
+        users = (await (await db.execute("SELECT COUNT(*) FROM users")).fetchone())[0]
+        matches = (await (await db.execute("SELECT COUNT(*) FROM matches")).fetchone())[0]
+        tips = (await (await db.execute("SELECT COUNT(*) FROM tips")).fetchone())[0]
+        version = (await (await db.execute("SELECT MAX(version) FROM db_version")).fetchone())[0]
+    import os
+    backups = []
+    if os.path.exists("backups"):
+        backups = sorted(os.listdir("backups"), reverse=True)
+    return {
+        "users": users, "matches": matches, "tips": tips,
+        "db_version": version, "backups": backups
+    }
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
