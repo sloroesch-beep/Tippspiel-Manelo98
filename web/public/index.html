@@ -307,17 +307,22 @@ function renderHeader() {
 
 function renderSidebar() {
   const groups = ['A','B','C','D','E','F','G','H','I','J','K','L'];
-  const koItems = ['Achtelfinale','Viertelfinale','Halbfinale','Finale'];
   return `<aside class="sidebar">
     <div class="sb-sec">Gruppen</div>
     ${groups.map(g=>`<button class="sb-link${state.group===g&&state.page==='spielplan'?' active':''}" onclick="setGroup('${g}')">${g === state.group && state.page==='spielplan' ? '▶ ' : ''}Gruppe ${g}</button>`).join('')}
     <div class="sb-sec">K.O.-Runde</div>
-    ${koItems.map(k=>`<button class="sb-link locked">🔒 ${k}</button>`).join('')}
+    <button class="sb-link${state.group==='SF'&&state.page==='spielplan'?' active':''}" onclick="setGroup('SF')">Sechzehntelfinale</button>
+    <button class="sb-link${state.group==='AF'&&state.page==='spielplan'?' active':''}" onclick="setGroup('AF')">Achtelfinale</button>
+    <button class="sb-link${state.group==='VF'&&state.page==='spielplan'?' active':''}" onclick="setGroup('VF')">Viertelfinale</button>
+    <button class="sb-link${state.group==='HF'&&state.page==='spielplan'?' active':''}" onclick="setGroup('HF')">Halbfinale</button>
+    <button class="sb-link${state.group==='FIN'&&state.page==='spielplan'?' active':''}" onclick="setGroup('FIN')">🏆 Finale</button>
   </aside>`;
 }
 
 function renderSpielplan() {
-  const matches = state.matches.filter(m=>m.group===state.group);
+  const koGroups = {'SF':'Sechzehntelfinale','AF':'Achtelfinale','VF':'Viertelfinale','HF':'Halbfinale','P3':'Spiel um Platz 3','FIN':'Finale'};
+  const isKO = !!koGroups[state.group];
+  const matches = state.matches.filter(m => isKO ? m.group.startsWith(state.group) : m.group===state.group);
   let html = '';
 
   if (!state.user) {
@@ -330,7 +335,8 @@ function renderSpielplan() {
     </div>`;
   }
 
-  html += `<div class="group-label">⚽ Gruppe ${state.group}</div>`;
+  const groupLabel = isKO ? (koGroups[state.group]||state.group) : `Gruppe ${state.group}`;
+  html += `<div class="group-label">⚽ ${groupLabel}</div>`;
 
   if (!matches.length) {
     html += `<div class="empty-state"><div class="e-icon">📅</div><p>Keine Spiele in dieser Gruppe</p></div>`;
