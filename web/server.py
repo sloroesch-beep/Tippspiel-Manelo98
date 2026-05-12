@@ -69,4 +69,4 @@ def hash_pw(pw): return hashlib.sha256(pw.encode()).hexdigest()
 async def get_user(token):
     if not token: return None
     async with aiosqlite.connect(DB) as db:
-        async with db.execute("SELECT * FROM users WHERE
+        async with db.execute("SELECT * FROM users WHERE session_token=?", (token,)) as c:
