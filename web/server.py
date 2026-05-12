@@ -20,22 +20,78 @@ SECRET_KEY = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 DISCORD_REDIRECT = f"{WEB_URL}/auth/discord/callback"
 
 WM_MATCHES = [
-    ("Deutschland","Frankreich","12.06.2026","21:00","A"),
-    ("Portugal","Argentinien","12.06.2026","18:00","A"),
-    ("Brasilien","England","13.06.2026","21:00","B"),
-    ("Spanien","Niederlande","13.06.2026","18:00","B"),
-    ("USA","Mexiko","14.06.2026","21:00","C"),
-    ("Japan","Südkorea","14.06.2026","18:00","C"),
-    ("Italien","Belgien","15.06.2026","21:00","D"),
-    ("Kroatien","Marokko","15.06.2026","18:00","D"),
-    ("Deutschland","Portugal","16.06.2026","21:00","A"),
-    ("Frankreich","Argentinien","16.06.2026","18:00","A"),
-    ("Brasilien","Spanien","17.06.2026","21:00","B"),
-    ("England","Niederlande","17.06.2026","18:00","B"),
-    ("USA","Japan","18.06.2026","21:00","C"),
-    ("Mexiko","Südkorea","18.06.2026","18:00","C"),
-    ("Italien","Kroatien","19.06.2026","21:00","D"),
-    ("Belgien","Marokko","19.06.2026","18:00","D"),
+    ("Mexiko","Suedkorea","12.06.2026","21:00","A"),
+    ("Suedafrika","Tschechien","12.06.2026","18:00","A"),
+    ("Mexiko","Suedafrika","16.06.2026","21:00","A"),
+    ("Suedkorea","Tschechien","16.06.2026","18:00","A"),
+    ("Mexiko","Tschechien","20.06.2026","21:00","A"),
+    ("Suedafrika","Suedkorea","20.06.2026","21:00","A"),
+    ("Kanada","Schweiz","13.06.2026","21:00","B"),
+    ("Bosnien","Katar","13.06.2026","18:00","B"),
+    ("Kanada","Bosnien","17.06.2026","21:00","B"),
+    ("Schweiz","Katar","17.06.2026","18:00","B"),
+    ("Kanada","Katar","21.06.2026","21:00","B"),
+    ("Bosnien","Schweiz","21.06.2026","21:00","B"),
+    ("Brasilien","Schottland","14.06.2026","21:00","C"),
+    ("Marokko","Haiti","14.06.2026","18:00","C"),
+    ("Brasilien","Marokko","18.06.2026","21:00","C"),
+    ("Schottland","Haiti","18.06.2026","18:00","C"),
+    ("Brasilien","Haiti","22.06.2026","21:00","C"),
+    ("Marokko","Schottland","22.06.2026","21:00","C"),
+    ("USA","Paraguay","15.06.2026","21:00","D"),
+    ("Australien","Tuerkei","15.06.2026","18:00","D"),
+    ("USA","Australien","19.06.2026","21:00","D"),
+    ("Paraguay","Tuerkei","19.06.2026","18:00","D"),
+    ("USA","Tuerkei","23.06.2026","21:00","D"),
+    ("Paraguay","Australien","23.06.2026","21:00","D"),
+    ("Deutschland","Curacao","14.06.2026","22:00","E"),
+    ("Elfenbeinkueste","Ecuador","15.06.2026","01:00","E"),
+    ("Deutschland","Elfenbeinkueste","20.06.2026","22:00","E"),
+    ("Curacao","Ecuador","21.06.2026","01:00","E"),
+    ("Deutschland","Ecuador","25.06.2026","22:00","E"),
+    ("Curacao","Elfenbeinkueste","25.06.2026","22:00","E"),
+    ("Niederlande","Tunesien","13.06.2026","22:00","F"),
+    ("Japan","Ukraine","14.06.2026","01:00","F"),
+    ("Niederlande","Japan","18.06.2026","22:00","F"),
+    ("Tunesien","Ukraine","19.06.2026","01:00","F"),
+    ("Niederlande","Ukraine","23.06.2026","22:00","F"),
+    ("Tunesien","Japan","23.06.2026","22:00","F"),
+    ("Belgien","Neuseeland","16.06.2026","22:00","G"),
+    ("Aegypten","Iran","17.06.2026","01:00","G"),
+    ("Belgien","Aegypten","21.06.2026","22:00","G"),
+    ("Neuseeland","Iran","22.06.2026","01:00","G"),
+    ("Belgien","Iran","26.06.2026","22:00","G"),
+    ("Neuseeland","Aegypten","26.06.2026","22:00","G"),
+    ("Spanien","Saudi-Arabien","17.06.2026","22:00","H"),
+    ("Kap Verde","Uruguay","18.06.2026","01:00","H"),
+    ("Spanien","Kap Verde","22.06.2026","22:00","H"),
+    ("Saudi-Arabien","Uruguay","23.06.2026","01:00","H"),
+    ("Spanien","Uruguay","27.06.2026","22:00","H"),
+    ("Kap Verde","Saudi-Arabien","27.06.2026","22:00","H"),
+    ("Frankreich","Norwegen","16.06.2026","01:00","I"),
+    ("Senegal","Playoff","16.06.2026","22:00","I"),
+    ("Frankreich","Senegal","20.06.2026","01:00","I"),
+    ("Norwegen","Playoff","20.06.2026","22:00","I"),
+    ("Frankreich","Playoff","24.06.2026","22:00","I"),
+    ("Norwegen","Senegal","24.06.2026","22:00","I"),
+    ("Argentinien","Jordanien","17.06.2026","01:00","J"),
+    ("Algerien","Oesterreich","17.06.2026","22:00","J"),
+    ("Argentinien","Algerien","21.06.2026","01:00","J"),
+    ("Jordanien","Oesterreich","21.06.2026","22:00","J"),
+    ("Argentinien","Oesterreich","25.06.2026","22:00","J"),
+    ("Jordanien","Algerien","25.06.2026","22:00","J"),
+    ("Portugal","Kolumbien","18.06.2026","22:00","K"),
+    ("Usbekistan","Playoff","19.06.2026","01:00","K"),
+    ("Portugal","Usbekistan","23.06.2026","22:00","K"),
+    ("Kolumbien","Playoff","24.06.2026","01:00","K"),
+    ("Portugal","Playoff","28.06.2026","22:00","K"),
+    ("Kolumbien","Usbekistan","28.06.2026","22:00","K"),
+    ("England","Ghana","19.06.2026","22:00","L"),
+    ("Kroatien","Panama","20.06.2026","01:00","L"),
+    ("England","Kroatien","24.06.2026","22:00","L"),
+    ("Ghana","Panama","25.06.2026","01:00","L"),
+    ("England","Panama","29.06.2026","22:00","L"),
+    ("Ghana","Kroatien","29.06.2026","22:00","L"),
 ]
 
 async def init_db():
@@ -182,14 +238,19 @@ async def save_tip(body: TipBody, request: Request):
 @app.get("/api/rankings")
 async def rankings():
     async with aiosqlite.connect(DB) as db:
-        async with db.execute("SELECT u.username,u.avatar,COALESCE(SUM(t.points),0),COUNT(CASE WHEN t.points IS NOT NULL THEN 1 END),COUNT(t.id) FROM users u LEFT JOIN tips t ON u.id=t.user_id GROUP BY u.id ORDER BY 3 DESC") as c:
+        async with db.execute("""SELECT u.username,u.avatar,COALESCE(SUM(t.points),0),
+            COUNT(CASE WHEN t.points IS NOT NULL THEN 1 END),COUNT(t.id)
+            FROM users u LEFT JOIN tips t ON u.id=t.user_id GROUP BY u.id ORDER BY 3 DESC""") as c:
             rows = await c.fetchall()
     return [{"username":r[0],"avatar":r[1],"points":r[2],"evaluated":r[3],"total":r[4]} for r in rows]
 
 @app.get("/api/results")
 async def results():
     async with aiosqlite.connect(DB) as db:
-        async with db.execute("SELECT m.home_team,m.away_team,m.home_score,m.away_score,u.username,t.home_tip,t.away_tip,t.points FROM matches m JOIN tips t ON m.id=t.match_id JOIN users u ON t.user_id=u.id WHERE m.status='done' ORDER BY m.match_date DESC") as c:
+        async with db.execute("""SELECT m.home_team,m.away_team,m.home_score,m.away_score,
+            u.username,t.home_tip,t.away_tip,t.points
+            FROM matches m JOIN tips t ON m.id=t.match_id JOIN users u ON t.user_id=u.id
+            WHERE m.status='done' ORDER BY m.match_date DESC""") as c:
             rows = await c.fetchall()
     grouped = {}
     for r in rows:
