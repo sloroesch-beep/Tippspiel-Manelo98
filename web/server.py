@@ -232,8 +232,19 @@ async def discord_callback(code: str, response: Response):
         ur = await client.get("https://discord.com/api/users/@me",
             headers={"Authorization": f"Bearer {td['access_token']}"})
         du = ur.json()
-    did, uname = du["id"], du["username"]
-    av = f"https://cdn.discordapp.com/avatars/{did}/{du.get('avatar')}.png" if du.get("avatar") else None
+    did = du["id"]
+    # Bevorzuge global_name (Anzeigename) statt username (Anmeldename)
+    uname = du.get("global_name") or du.get("display_name") or du["username"]
+    # Avatar mit korrekter URL und .png oder .gif falls animiert
+    avatar_hash = du.get("avatar")
+    if avatar_hash:
+        ext = "gif" if avatar_hash.startswith("a_") else "png"
+        av = f"https://cdn.discordapp.com/avatars/{did}/{avatar_hash}.{ext}?size=256"
+    else:
+        # Standard Discord Avatar wenn keiner gesetzt
+        discriminator = int(du.get("discriminator", "0") or "0")
+        default_idx = (int(did) >> 22) % 6
+        av = f"https://cdn.discordapp.com/embed/avatars/{default_idx}.png"
     token = secrets.token_urlsafe(32)
     async with aiosqlite.connect(DB) as db:
         ex = await (await db.execute("SELECT id FROM users WHERE discord_id=?", (did,))).fetchone()
