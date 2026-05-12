@@ -1,4 +1,6 @@
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, UploadFile, File
+import base64
+import re
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -304,5 +306,42 @@ async def results():
         if key not in grouped: grouped[key] = {"match":key,"tips":[]}
         grouped[key]["tips"].append({"username":r[4],"tip":f"{r[5]}:{r[6]}","points":r[7]})
     return list(grouped.values())
+
+class ProfileBody(BaseModel):
+    username: str
+    avatar_url: str = ""
+
+@app.post("/api/profile")
+async def update_profile(body: ProfileBody, request: Request, response: Response):
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401, "Nicht angemeldet")
+    if len(body.username) < 2: raise HTTPException(400, "Benutzername zu kurz")
+    async with aiosqlite.connect(DB) as db:
+        try:
+            if body.avatar_url:
+                await db.execute("UPDATE users SET username=?, avatar=? WHERE id=?",
+                    (body.username, body.avatar_url, user[0]))
+            else:
+                await db.execute("UPDATE users SET username=? WHERE id=?",
+                    (body.username, user[0]))
+            await db.commit()
+        except Exception: raise HTTPException(400, "Benutzername bereits vergeben")
+    return {"ok": True, "username": body.username}
+
+@app.post("/api/upload-avatar")
+async def upload_avatar(request: Request, file: UploadFile = File(...)):
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401, "Nicht angemeldet")
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(400, "Nur Bilder erlaubt")
+    data = await file.read()
+    if len(data) > 5 * 1024 * 1024:
+        raise HTTPException(400, "Bild zu groß (max. 5MB)")
+    b64 = base64.b64encode(data).decode()
+    data_url = f"data:{file.content_type};base64,{b64}"
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("UPDATE users SET avatar=? WHERE id=?", (data_url, user[0]))
+        await db.commit()
+    return {"ok": True, "avatar": data_url}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
