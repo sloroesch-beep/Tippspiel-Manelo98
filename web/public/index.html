@@ -1475,10 +1475,10 @@ function render(){
 function renderSpielbaum(){
   const ms = state.matches || [];
 
-  function fl(team, w=22, h=15){
+  function fl(team, w=20, h=13){
     const c=FLAGS[team];
     if(!c||!team) return `<span style="display:inline-block;width:${w}px;height:${h}px;background:#2a2a2a;border-radius:2px;flex-shrink:0;"></span>`;
-    return `<img style="width:${w}px;height:${h}px;object-fit:cover;border-radius:2px;vertical-align:middle;flex-shrink:0;" src="https://flagcdn.com/w40/${c}.png" alt="${team}" onerror="this.style.opacity=0">`;
+    return `<img style="width:${w}px;height:${h}px;object-fit:cover;border-radius:2px;flex-shrink:0;" src="https://flagcdn.com/w40/${c}.png" alt="${team}" onerror="this.style.opacity=0">`;
   }
 
   function getByGroup(g){ return ms.filter(m=>m.group===g).sort((a,b)=>a.id-b.id); }
@@ -1486,34 +1486,32 @@ function renderSpielbaum(){
   function scoreStr(m){
     if(!m) return '–:–';
     if(m.status==='done'&&m.home_score!==null) return `${m.home_score}:${m.away_score}`;
-    if(m.status==='live'&&m.home_score!==null) return `🔴${m.home_score}:${m.away_score}`;
+    if(m.status==='live'&&m.home_score!==null) return `🔴 ${m.home_score}:${m.away_score}`;
     return '–:–';
   }
 
-  function matchCard(m){
-    if(!m) return `<div class="sb-card sb-card-empty"></div>`;
-    const isDone=m.status==='done'&&m.home_score!==null;
-    const isLive=m.status==='live'&&m.home_score!==null;
-    const hs=isDone||isLive?m.home_score:null, as=isDone||isLive?m.away_score:null;
-    const hw=isDone&&hs>as, aw=isDone&&as>hs;
-    const bc=isLive?'var(--red)':isDone?'var(--gold)':'#2a2a2a';
-    return `<div class="sb-card" style="border-color:${bc};">
-      <div class="sb-card-row${hw?' sb-win':''}">
-        <span class="sb-flag">${fl(m.home)}</span>
-        <span class="sb-team">${m.home||'?'}</span>
-        <span class="sb-score${hw?' sb-score-win':''}">${hs!==null?hs:''}</span>
+  function card(m, w=148){
+    if(!m) return `<div style="width:${w}px;height:46px;border:1px dashed #2a2a2a;border-radius:5px;background:#0d0d0d;"></div>`;
+    const done=m.status==='done'&&m.home_score!==null;
+    const live=m.status==='live'&&m.home_score!==null;
+    const hs=done||live?m.home_score:null, as=done||live?m.away_score:null;
+    const hw=done&&hs>as, aw=done&&as>hs;
+    const bc=live?'#cc0000':done?'#ffd700':'#2a2a2a';
+    return `<div style="width:${w}px;background:#111;border:1px solid ${bc};border-radius:5px;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:4px;padding:4px 5px;border-bottom:1px solid #1a1a1a;${hw?'background:#0d1a0d;':''}">
+        ${fl(m.home)}<span style="flex:1;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${hw?'#ffd700':'#ccc'};font-weight:${hw?700:400};">${m.home||'?'}</span>
+        <span style="font-size:10px;font-weight:700;color:${hw?'#ffd700':'#555'};min-width:12px;text-align:right;">${hs!==null?hs:''}</span>
       </div>
-      <div class="sb-card-row${aw?' sb-win':''}">
-        <span class="sb-flag">${fl(m.away)}</span>
-        <span class="sb-team">${m.away||'?'}</span>
-        <span class="sb-score${aw?' sb-score-win':''}">${as!==null?as:''}</span>
+      <div style="display:flex;align-items:center;gap:4px;padding:4px 5px;${aw?'background:#0d1a0d;':''}">
+        ${fl(m.away)}<span style="flex:1;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${aw?'#ffd700':'#ccc'};font-weight:${aw?700:400};">${m.away||'?'}</span>
+        <span style="font-size:10px;font-weight:700;color:${aw?'#ffd700':'#555'};min-width:12px;text-align:right;">${as!==null?as:''}</span>
       </div>
     </div>`;
   }
 
   function gruppeCard(g){
     const spiele=getByGroup(g);
-    if(!spiele.length) return `<div class="sb-gruppe-empty">Gruppe ${g}</div>`;
+    if(!spiele.length) return `<div style="width:205px;height:40px;background:#111;border:1px solid #1a1a1a;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#333;font-size:10px;">Gruppe ${g}</div>`;
     const teams=[...new Set([...spiele.map(m=>m.home),...spiele.map(m=>m.away)])];
     const st={};
     teams.forEach(t=>{st[t]={pts:0,gd:0,gf:0,sp:0};});
@@ -1526,32 +1524,37 @@ function renderSpielbaum(){
       else{st[m.home].pts++;st[m.away].pts++;}
     });
     const sorted=[...teams].sort((a,b)=>st[b].pts-st[a].pts||st[b].gd-st[a].gd||st[b].gf-st[a].gf);
-    const tRows=sorted.map((t,i)=>`<tr class="sb-g-tr">
-      <td class="sb-g-td sb-g-nr" style="color:${i<2?'#ffd700':'#555'}">${i+1}</td>
-      <td class="sb-g-td">${fl(t,18,12)}</td>
-      <td class="sb-g-td sb-g-name">${t}</td>
-      <td class="sb-g-td sb-g-num">${st[t].sp}</td>
-      <td class="sb-g-td sb-g-num" style="color:${i<2?'#ffd700':'#888'};font-weight:700;">${st[t].pts}</td>
-    </tr>`).join('');
-    const sRows=spiele.map(m=>`<tr class="sb-g-tr">
-      <td class="sb-g-td sb-g-date">${(m.date||'').slice(0,6)}</td>
-      <td class="sb-g-td sb-g-home">${m.home}</td>
-      <td class="sb-g-td sb-g-score" style="color:${m.status==='done'?'#ffd700':'#444'}">${scoreStr(m)}</td>
-      <td class="sb-g-td sb-g-away">${m.away}</td>
-    </tr>`).join('');
-    return `<div class="sb-gruppe">
-      <div class="sb-gruppe-head">
-        <span class="sb-gruppe-title">GRUPPE ${g}</span>
-        <div class="sb-gruppe-flags">${teams.slice(0,4).map(t=>fl(t,18,12)).join('')}</div>
+    return `<div style="width:205px;background:#111;border:1px solid #2a2a2a;border-radius:7px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid #ffd700;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:10px;font-weight:800;color:#ffd700;letter-spacing:1px;">GRUPPE ${g}</span>
+        <div style="display:flex;gap:2px;">${teams.slice(0,4).map(t=>fl(t,17,11)).join('')}</div>
       </div>
-      <table class="sb-g-table"><thead><tr class="sb-g-tr sb-g-thead">
-        <th class="sb-g-td" style="font-size:8px;color:#444;">#</th>
-        <th class="sb-g-td"></th>
-        <th class="sb-g-td sb-g-name" style="font-size:8px;color:#444;">Team</th>
-        <th class="sb-g-td sb-g-num" style="font-size:8px;color:#444;">Sp</th>
-        <th class="sb-g-td sb-g-num" style="font-size:8px;color:#444;">Pkt</th>
-      </tr></thead><tbody>${tRows}</tbody></table>
-      <div class="sb-g-spiele"><table class="sb-g-table"><tbody>${sRows}</tbody></table></div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:#0a0a0a;">
+          <th style="padding:2px 4px;font-size:8px;color:#444;text-align:left;width:12px;">#</th>
+          <th style="padding:2px 2px;width:20px;"></th>
+          <th style="padding:2px 4px;font-size:8px;color:#444;text-align:left;">Team</th>
+          <th style="padding:2px 4px;font-size:8px;color:#444;text-align:center;width:16px;">Sp</th>
+          <th style="padding:2px 4px;font-size:8px;color:#444;text-align:center;width:20px;">Pkt</th>
+        </tr></thead>
+        <tbody>${sorted.map((t,i)=>`<tr style="border-bottom:1px solid #161616;">
+          <td style="padding:2px 4px;font-size:9px;color:${i<2?'#ffd700':'#555'};text-align:center;">${i+1}</td>
+          <td style="padding:2px 2px;">${fl(t,17,11)}</td>
+          <td style="padding:2px 4px;font-size:9px;color:#bbb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;">${t}</td>
+          <td style="padding:2px 4px;font-size:9px;color:#555;text-align:center;">${st[t].sp}</td>
+          <td style="padding:2px 4px;font-size:10px;font-weight:700;color:${i<2?'#ffd700':'#888'};text-align:center;">${st[t].pts}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+      <div style="background:#0a0a0a;border-top:1px solid #1a1a1a;">
+        <table style="width:100%;border-collapse:collapse;">
+          <tbody>${spiele.map(m=>`<tr style="border-bottom:1px solid #111;">
+            <td style="padding:1px 4px;font-size:8px;color:#444;white-space:nowrap;width:28px;">${(m.date||'').slice(0,6)}</td>
+            <td style="padding:1px 4px;font-size:8px;color:#888;text-align:right;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.home}</td>
+            <td style="padding:1px 4px;font-size:9px;font-weight:700;color:${m.status==='done'?'#ffd700':'#333'};text-align:center;width:30px;">${scoreStr(m)}</td>
+            <td style="padding:1px 4px;font-size:8px;color:#888;max-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.away}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>
     </div>`;
   }
 
@@ -1567,256 +1570,243 @@ function renderSpielbaum(){
   const hfL=hf.slice(0,1),hfR=hf.slice(1);
   const gL=['A','B','C','D','E','F'],gR=['G','H','I','J','K','L'];
 
-  const finaleHtml=`<div class="sb-finale">
-    <div class="sb-finale-label">🏆 FINALE</div>
-    <div class="sb-finale-date">19. Juli 2026 · New York/New Jersey</div>
-    ${finale?`<div class="sb-finale-card">
-      <div class="sb-finale-row${isDone&&finale.home_score>finale.away_score?' sb-win':''}">
-        <span>${fl(finale.home,26,18)}</span>
-        <span class="sb-finale-team">${finale.home||'?'}</span>
-        <span class="sb-finale-score">${isDone?finale.home_score:''}</span>
-      </div>
-      <div class="sb-finale-row${isDone&&finale.away_score>finale.home_score?' sb-win':''}">
-        <span>${fl(finale.away,26,18)}</span>
-        <span class="sb-finale-team">${finale.away||'?'}</span>
-        <span class="sb-finale-score">${isDone?finale.away_score:''}</span>
-      </div>
-    </div>
-    ${isDone?`<div class="sb-weltmeister">🏆 Weltmeister: ${winner}</div>`:
-    `<div class="sb-weltmeister-placeholder">WELTMEISTER 2026</div>`}`
-    :`<div style="color:#333;padding:10px;font-size:11px;">Ausstehend</div>`}
-    ${p3[0]?`<div class="sb-p3">
-      <div style="font-size:8px;color:#555;margin-bottom:4px;">🥉 Platz 3 · 18. Juli 2026</div>
-      <div style="font-size:9px;color:#888;">${p3[0].home||'?'} – ${p3[0].away||'?'}</div>
-      <div style="font-size:10px;font-weight:700;color:#ffd700;">${scoreStr(p3[0])}</div>
-    </div>`:''}
-  </div>`;
+  // Card height is ~46px, gap=5px => per card slot = 51px
+  // SF: 8 cards, total = 8*46 + 7*5 = 368+35 = 403px
+  // AF: 4 cards spread over 403px => top = (403-4*46-3*5)/2 = (403-184-15)/2 = 102px, gap between = (403-4*46)/3 = ~74px
+  // VF: 2 cards spread over 403px => top = (403-2*46)/2 = 155.5px, gap = 403-2*46-2*155.5 = 0 (just top)
+  // HF: 1 card => top = (403-46)/2 = 178.5px
+  // Finale: centered
 
-  function runde(label, items){
-    return `<div class="sb-runde">
-      <div class="sb-runde-label">${label}</div>
-      <div class="sb-runde-cards">${items.map(m=>matchCard(m)).join('')}</div>
+  const sfH = 8*46 + 7*5; // 403px total height of SF column
+
+  function koCol(items, totalH, label, w=148){
+    const n=items.length;
+    if(!n) return `<div style="flex-shrink:0;width:${w}px;"><div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">${label}</div></div>`;
+    const cardH=46;
+    const totalCards=n*cardH;
+    const topPad=Math.round((totalH-totalCards)/(n+1));
+    const gap=topPad;
+    const cards=items.map(m=>card(m,w)).join(`<div style="height:${gap}px;"></div>`);
+    return `<div style="flex-shrink:0;width:${w}px;">
+      <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">${label}</div>
+      <div style="padding-top:${topPad}px;">${cards}</div>
     </div>`;
   }
 
-  return `<div class="sb-page">
-    <style>
-    .sb-page{background:#0a0a0a;min-height:100vh;padding:12px;}
-    .sb-header{text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #ffd700;}
-    .sb-header-sub{font-size:9px;letter-spacing:4px;color:#cc0000;font-weight:700;margin-bottom:3px;text-transform:uppercase;}
-    .sb-header h2{font-size:clamp(16px,3vw,24px);font-weight:900;color:#fff;margin:0;}
-    .sb-header h2 span{color:#ffd700;}
-    .sb-header p{color:#444;font-size:11px;margin:4px 0 0;}
-    .sb-tricolor{display:flex;justify-content:center;gap:0;margin-top:8px;}
-    .sb-tricolor div{height:3px;}
+  const finaleCard=`<div style="flex-shrink:0;width:175px;display:flex;flex-direction:column;justify-content:center;align-self:stretch;">
+    <div style="background:linear-gradient(180deg,#1a1200,#0d0d0d);border:2px solid #ffd700;border-radius:10px;padding:12px;text-align:center;">
+      <div style="font-size:8px;letter-spacing:3px;color:#ffd700;font-weight:800;margin-bottom:4px;">🏆 FINALE</div>
+      <div style="font-size:8px;color:#444;margin-bottom:8px;">19. Juli 2026 · New York</div>
+      ${finale?`<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:5px;overflow:hidden;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:4px;padding:5px 7px;border-bottom:1px solid #1a1a1a;${isDone&&finale.home_score>finale.away_score?'background:#0d1a0d;':''}">
+          ${fl(finale.home,22,15)}<span style="flex:1;font-size:10px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${finale.home||'?'}</span>
+          <span style="font-size:13px;font-weight:800;color:#ffd700;">${isDone?finale.home_score:''}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;padding:5px 7px;${isDone&&finale.away_score>finale.home_score?'background:#0d1a0d;':''}">
+          ${fl(finale.away,22,15)}<span style="flex:1;font-size:10px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${finale.away||'?'}</span>
+          <span style="font-size:13px;font-weight:800;color:#ffd700;">${isDone?finale.away_score:''}</span>
+        </div>
+      </div>
+      ${isDone?`<div style="background:#ffd700;color:#000;padding:6px;border-radius:5px;font-size:9px;font-weight:900;">🏆 ${winner}</div>`
+      :`<div style="border:1px dashed #ffd700;color:#ffd700;padding:6px;border-radius:5px;font-size:8px;letter-spacing:1px;">WELTMEISTER 2026</div>`}`
+      :`<div style="color:#333;font-size:11px;padding:10px;">Ausstehend</div>`}
+      ${p3[0]?`<div style="margin-top:8px;padding-top:7px;border-top:1px solid #1a1a1a;">
+        <div style="font-size:7px;color:#444;margin-bottom:3px;">🥉 Platz 3 · 18. Juli</div>
+        <div style="font-size:8px;color:#666;">${p3[0].home||'?'} – ${p3[0].away||'?'}</div>
+        <div style="font-size:9px;font-weight:700;color:#ffd700;">${scoreStr(p3[0])}</div>
+      </div>`:''}
+    </div>
+  </div>`;
 
-    /* DESKTOP BRACKET */
-    .sb-bracket{display:flex;align-items:flex-start;gap:0;overflow-x:scroll;padding-bottom:12px;min-height:600px;scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;}.sb-bracket::-webkit-scrollbar{height:8px;}.sb-bracket::-webkit-scrollbar-track{background:#1a1a1a;border-radius:4px;}.sb-bracket::-webkit-scrollbar-thumb{background:#ffd700;border-radius:4px;}
+  // Mobile cards
+  function mobileRunde(label, date, items){
+    if(!items.length) return '';
+    return `<div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:10px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid #ffd700;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:12px;font-weight:700;color:#ffd700;">${label}</span>
+        <span style="font-size:10px;color:#555;">${date}</span>
+      </div>
+      <div style="padding:8px;display:flex;flex-wrap:wrap;gap:6px;">
+        ${items.map(m=>{
+          const done=m.status==='done'&&m.home_score!==null;
+          const live=m.status==='live'&&m.home_score!==null;
+          const hs=done||live?m.home_score:null,as=done||live?m.away_score:null;
+          const hw=done&&hs>as,aw=done&&as>hs;
+          return `<div style="flex:1;min-width:140px;background:#0d0d0d;border:1px solid ${live?'#cc0000':done?'#ffd700':'#2a2a2a'};border-radius:5px;overflow:hidden;">
+            <div style="display:flex;align-items:center;gap:4px;padding:4px 6px;border-bottom:1px solid #1a1a1a;${hw?'background:#0d1a0d;':''}">
+              ${fl(m.home,18,12)}<span style="flex:1;font-size:9px;color:${hw?'#ffd700':'#ccc'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.home||'?'}</span>
+              <span style="font-size:10px;font-weight:700;color:${hw?'#ffd700':'#555'};">${hs!==null?hs:''}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:4px;padding:4px 6px;${aw?'background:#0d1a0d;':''}">
+              ${fl(m.away,18,12)}<span style="flex:1;font-size:9px;color:${aw?'#ffd700':'#ccc'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.away||'?'}</span>
+              <span style="font-size:10px;font-weight:700;color:${aw?'#ffd700':'#555'};">${as!==null?as:''}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
 
-    .sb-gruppen-col{display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
-    .sb-gruppe{background:#111;border:1px solid #2a2a2a;border-radius:7px;overflow:hidden;width:200px;}
-    .sb-gruppe-empty{width:200px;height:40px;background:#111;border:1px solid #1a1a1a;border-radius:7px;display:flex;align-items:center;justify-content:center;color:#333;font-size:10px;}
-    .sb-gruppe-head{background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid #ffd700;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;}
-    .sb-gruppe-title{font-size:10px;font-weight:800;color:#ffd700;letter-spacing:1px;}
-    .sb-gruppe-flags{display:flex;gap:2px;}
-    .sb-g-table{width:100%;border-collapse:collapse;}
-    .sb-g-tr{border-bottom:1px solid #161616;}
-    .sb-g-thead{background:#0a0a0a;}
-    .sb-g-td{padding:2px 4px;font-size:9px;color:#bbb;vertical-align:middle;}
-    .sb-g-nr{width:12px;text-align:center;}
-    .sb-g-name{max-width:65px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .sb-g-num{width:18px;text-align:center;}
-    .sb-g-date{font-size:8px;color:#444;white-space:nowrap;width:30px;}
-    .sb-g-home{text-align:right;max-width:55px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px;}
-    .sb-g-away{max-width:55px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px;}
-    .sb-g-score{text-align:center;font-weight:700;font-size:9px;padding:1px 4px;width:28px;}
-    .sb-g-spiele{background:#0a0a0a;border-top:1px solid #1a1a1a;}
-
-    .sb-sep{width:6px;flex-shrink:0;}
-    .sb-sep-lg{width:10px;flex-shrink:0;}
-
-    .sb-runde{flex-shrink:0;display:flex;flex-direction:column;}
-    .sb-runde-label{font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:4px;text-transform:uppercase;white-space:nowrap;}
-    .sb-runde-cards{display:flex;flex-direction:column;justify-content:space-around;flex:1;gap:4px;}
-
-    .sb-card{background:#111;border:1px solid #2a2a2a;border-radius:5px;overflow:hidden;width:150px;}
-    .sb-card-empty{width:150px;height:46px;background:#0d0d0d;border:1px dashed #1a1a1a;border-radius:5px;}
-    .sb-card-row{display:flex;align-items:center;padding:4px 5px;border-bottom:1px solid #1a1a1a;}
-    .sb-card-row:last-child{border-bottom:none;}
-    .sb-card-row.sb-win{background:#0d1a0d;}
-    .sb-flag{margin-right:4px;flex-shrink:0;}
-    .sb-team{flex:1;font-size:9px;color:#ccc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .sb-score{font-size:10px;font-weight:700;color:#666;min-width:12px;text-align:right;}
-    .sb-score-win{color:#ffd700;}
-
-    .sb-finale{background:linear-gradient(180deg,#1a1200,#0d0d0d);border:2px solid #ffd700;border-radius:10px;padding:12px;text-align:center;width:170px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-self:center;}
-    .sb-finale-label{font-size:9px;letter-spacing:3px;color:#ffd700;font-weight:800;margin-bottom:4px;}
-    .sb-finale-date{font-size:8px;color:#444;margin-bottom:10px;}
-    .sb-finale-card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:5px;overflow:hidden;margin-bottom:8px;}
-    .sb-finale-row{display:flex;align-items:center;padding:5px 7px;border-bottom:1px solid #1a1a1a;gap:5px;}
-    .sb-finale-row:last-child{border-bottom:none;}
-    .sb-finale-row.sb-win{background:#0d1a0d;}
-    .sb-finale-team{flex:1;font-size:10px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
-    .sb-finale-score{font-size:13px;font-weight:800;color:#ffd700;}
-    .sb-weltmeister{background:#ffd700;color:#000;padding:7px;border-radius:5px;font-size:10px;font-weight:900;}
-    .sb-weltmeister-placeholder{border:1px dashed #ffd700;color:#ffd700;padding:7px;border-radius:5px;font-size:8px;letter-spacing:1px;}
-    .sb-p3{margin-top:10px;padding-top:8px;border-top:1px solid #1a1a1a;}
-
-    /* MOBILE: vertical stack */
-    .sb-mobile{display:none;}
-    .sb-mobile-runde{background:#111;border:1px solid #2a2a2a;border-radius:8px;margin-bottom:10px;overflow:hidden;}
-    .sb-mobile-head{background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid #ffd700;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;}
-    .sb-mobile-head h3{font-size:12px;font-weight:700;color:#ffd700;}
-    .sb-mobile-head span{font-size:10px;color:#555;}
-    .sb-mobile-cards{padding:8px;display:flex;flex-wrap:wrap;gap:6px;}
-    .sb-mobile-card{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:5px;overflow:hidden;flex:1;min-width:140px;}
-    .sb-mobile-card-row{display:flex;align-items:center;padding:4px 6px;border-bottom:1px solid #1a1a1a;gap:4px;}
-    .sb-mobile-card-row:last-child{border-bottom:none;}
-    .sb-mobile-card-row.sb-win{background:#0d1a0d;}
-
-    @media(max-width:1200px){
-      .sb-bracket{display:none!important;}
-      .sb-mobile{display:block!important;}
-      .sb-card{width:100%;}
-    }
-    </style>
+  return `<div style="background:#0a0a0a;min-height:100vh;padding:12px;">
 
     <!-- HEADER -->
-    <div class="sb-header">
-      <div class="sb-header-sub">Fanclub Manelo98</div>
-      <h2>FUSSBALL WM 2026 <span>— SPIELBAUM</span></h2>
-      <p>Alle 104 Spiele · Gruppenphase · K.O.-Runde · Finale</p>
-      <div class="sb-tricolor">
-        <div style="width:50px;background:#000;border:1px solid #222;"></div>
-        <div style="width:50px;background:#cc0000;"></div>
-        <div style="width:50px;background:#ffd700;"></div>
+    <div style="text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #ffd700;">
+      <div style="font-size:9px;letter-spacing:4px;color:#cc0000;font-weight:700;margin-bottom:2px;text-transform:uppercase;">Fanclub Manelo98</div>
+      <h2 style="font-size:clamp(16px,3vw,22px);font-weight:900;color:#fff;margin:0;">FUSSBALL WM 2026 <span style="color:#ffd700;">— SPIELBAUM</span></h2>
+      <p style="color:#444;font-size:11px;margin:3px 0 0;">Alle 104 Spiele · Gruppenphase · K.O.-Runde · Finale</p>
+      <div style="display:flex;justify-content:center;margin-top:6px;">
+        <div style="width:40px;height:3px;background:#000;border:1px solid #222;"></div>
+        <div style="width:40px;height:3px;background:#cc0000;"></div>
+        <div style="width:40px;height:3px;background:#ffd700;"></div>
       </div>
     </div>
 
-    <!-- DESKTOP BRACKET -->
-    <div class="sb-bracket">
+    <!-- DESKTOP BRACKET (>= 1100px) -->
+    <div id="sb-desktop" style="display:flex;align-items:flex-start;gap:6px;overflow-x:scroll;padding-bottom:12px;
+      scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;">
+
       <!-- GRUPPEN LINKS -->
-      <div class="sb-gruppen-col">${gL.map(g=>gruppeCard(g)).join('')}</div>
-      <div class="sb-sep-lg"></div>
-
-      <!-- SECHZEHNTELFINALE LINKS (8 Spiele) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Sechzehntelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:5px;">${sfL.map(m=>matchCard(m)).join('')}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+        ${gL.map(g=>gruppeCard(g)).join('')}
       </div>
-      <div class="sb-sep"></div>
 
-      <!-- ACHTELFINALE LINKS (4 Spiele, jedes zentriert zwischen 2 SF-Spielen) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Achtelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-top:28px;">
-          ${afL.map((m,i)=>`<div style="margin-bottom:${i<afL.length-1?'28px':'0'};">${matchCard(m)}</div>`).join('')}
+      <div style="width:8px;flex-shrink:0;"></div>
+
+      <!-- SF LINKS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Sechzehntelfinale</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">${sfL.map(m=>card(m,150)).join('')}</div>
+      </div>
+
+      <div style="width:6px;flex-shrink:0;"></div>
+
+      <!-- AF LINKS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Achtelfinale</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:26px;">
+          ${afL.map((m,i)=>`${card(m,150)}${i<afL.length-1?`<div style="height:26px;"></div>`:''}`).join('')}
         </div>
       </div>
-      <div class="sb-sep"></div>
 
-      <!-- VIERTELFINALE LINKS (2 Spiele) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Viertelfinale</div>
+      <div style="width:6px;flex-shrink:0;"></div>
+
+      <!-- VF LINKS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Viertelfinale</div>
         <div style="display:flex;flex-direction:column;gap:5px;margin-top:80px;">
-          ${vfL.map((m,i)=>`<div style="margin-bottom:${i<vfL.length-1?'100px':'0'};">${matchCard(m)}</div>`).join('')}
+          ${vfL.map((m,i)=>`${card(m,150)}${i<vfL.length-1?`<div style="height:85px;"></div>`:''}`).join('')}
         </div>
       </div>
-      <div class="sb-sep"></div>
 
-      <!-- HALBFINALE LINKS (1 Spiel) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Halbfinale</div>
-        <div style="margin-top:195px;">${hfL.map(m=>matchCard(m)).join('')}</div>
+      <div style="width:6px;flex-shrink:0;"></div>
+
+      <!-- HF LINKS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Halbfinale</div>
+        <div style="margin-top:185px;">${hfL.map(m=>card(m,150)).join('')}</div>
       </div>
-      <div class="sb-sep-lg"></div>
 
-      <!-- FINALE MITTE -->
-      ${finaleHtml}
-      <div class="sb-sep-lg"></div>
+      <div style="width:8px;flex-shrink:0;"></div>
 
-      <!-- HALBFINALE RECHTS (1 Spiel) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Halbfinale</div>
-        <div style="margin-top:195px;">${hfR.map(m=>matchCard(m)).join('')}</div>
+      <!-- FINALE -->
+      ${finaleCard}
+
+      <div style="width:8px;flex-shrink:0;"></div>
+
+      <!-- HF RECHTS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Halbfinale</div>
+        <div style="margin-top:185px;">${hfR.map(m=>card(m,150)).join('')}</div>
       </div>
-      <div class="sb-sep"></div>
 
-      <!-- VIERTELFINALE RECHTS (2 Spiele) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Viertelfinale</div>
+      <div style="width:6px;flex-shrink:0;"></div>
+
+      <!-- VF RECHTS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Viertelfinale</div>
         <div style="display:flex;flex-direction:column;gap:5px;margin-top:80px;">
-          ${vfR.map((m,i)=>`<div style="margin-bottom:${i<vfR.length-1?'100px':'0'};">${matchCard(m)}</div>`).join('')}
+          ${vfR.map((m,i)=>`${card(m,150)}${i<vfR.length-1?`<div style="height:85px;"></div>`:''}`).join('')}
         </div>
       </div>
-      <div class="sb-sep"></div>
 
-      <!-- ACHTELFINALE RECHTS (4 Spiele) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Achtelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:5px;margin-top:28px;">
-          ${afR.map((m,i)=>`<div style="margin-bottom:${i<afR.length-1?'28px':'0'};">${matchCard(m)}</div>`).join('')}
+      <div style="width:6px;flex-shrink:0;"></div>
+
+      <!-- AF RECHTS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Achtelfinale</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:26px;">
+          ${afR.map((m,i)=>`${card(m,150)}${i<afR.length-1?`<div style="height:26px;"></div>`:''}`).join('')}
         </div>
       </div>
-      <div class="sb-sep"></div>
 
-      <!-- SECHZEHNTELFINALE RECHTS (8 Spiele) -->
-      <div style="flex-shrink:0;width:158px;">
-        <div class="sb-runde-label">Sechzehntelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:5px;">${sfR.map(m=>matchCard(m)).join('')}</div>
+      <div style="width:6px;flex-shrink:0;"></div>
+
+      <!-- SF RECHTS -->
+      <div style="flex-shrink:0;width:150px;">
+        <div style="font-size:7px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:6px;text-transform:uppercase;">Sechzehntelfinale</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">${sfR.map(m=>card(m,150)).join('')}</div>
       </div>
-      <div class="sb-sep-lg"></div>
+
+      <div style="width:8px;flex-shrink:0;"></div>
 
       <!-- GRUPPEN RECHTS -->
-      <div class="sb-gruppen-col">${gR.map(g=>gruppeCard(g)).join('')}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
+        ${gR.map(g=>gruppeCard(g)).join('')}
+      </div>
     </div>
 
-    <!-- MOBILE/TABLET: vertical stack -->
-    <div class="sb-mobile">
-      <!-- Finale zuerst auf Mobile -->
-      <div class="sb-mobile-runde">
-        <div class="sb-mobile-head"><h3>🏆 Finale</h3><span>19. Juli 2026</span></div>
-        <div style="padding:10px;">${finaleHtml}</div>
+    <!-- MOBILE/TABLET (<1100px): vertikale Liste -->
+    <div id="sb-mobile" style="display:none;">
+      <!-- Finale -->
+      <div style="background:#111;border:2px solid #ffd700;border-radius:10px;padding:14px;text-align:center;margin-bottom:12px;">
+        <div style="font-size:9px;letter-spacing:3px;color:#ffd700;font-weight:800;margin-bottom:6px;">🏆 FINALE · 19. Juli 2026</div>
+        ${finale?`<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;overflow:hidden;margin-bottom:8px;max-width:280px;margin-left:auto;margin-right:auto;">
+          <div style="display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid #1a1a1a;">
+            ${fl(finale.home,24,16)}<span style="flex:1;font-size:12px;color:#ddd;">${finale.home||'?'}</span>
+            <span style="font-size:15px;font-weight:800;color:#ffd700;">${isDone?finale.home_score:''}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;padding:7px 10px;">
+            ${fl(finale.away,24,16)}<span style="flex:1;font-size:12px;color:#ddd;">${finale.away||'?'}</span>
+            <span style="font-size:15px;font-weight:800;color:#ffd700;">${isDone?finale.away_score:''}</span>
+          </div>
+        </div>
+        ${isDone?`<div style="background:#ffd700;color:#000;padding:8px;border-radius:6px;font-size:12px;font-weight:900;display:inline-block;">🏆 Weltmeister: ${winner}</div>`:
+        `<div style="border:1px dashed #ffd700;color:#ffd700;padding:8px;border-radius:6px;font-size:10px;letter-spacing:1px;display:inline-block;">WELTMEISTER 2026</div>`}`
+        :`<div style="color:#333;">Ausstehend</div>`}
       </div>
-      ${[
-        ['🥉 Platz 3','18. Juli 2026',p3],
-        ['Halbfinale','14.–15. Juli 2026',hf],
-        ['Viertelfinale','9.–11. Juli 2026',vf],
-        ['Achtelfinale','4.–8. Juli 2026',af],
-        ['Sechzehntelfinale','28. Juni–4. Juli 2026',sf]
-      ].map(([label,date,items])=>`
-        <div class="sb-mobile-runde">
-          <div class="sb-mobile-head"><h3>${label}</h3><span>${date}</span></div>
-          <div class="sb-mobile-cards">${items.map(m=>{
-            const isDone=m.status==='done'&&m.home_score!==null;
-            const isLive=m.status==='live'&&m.home_score!==null;
-            const hs=isDone||isLive?m.home_score:null,as=isDone||isLive?m.away_score:null;
-            const hw=isDone&&hs>as,aw=isDone&&as>hs;
-            return `<div class="sb-mobile-card" style="border-color:${isLive?'#cc0000':isDone?'#ffd700':'#2a2a2a'};">
-              <div class="sb-mobile-card-row${hw?' sb-win':''}">
-                ${fl(m.home,18,12)}<span style="flex:1;font-size:9px;color:${hw?'#ffd700':'#ccc'};margin-left:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.home||'?'}</span>
-                <span style="font-size:10px;font-weight:700;color:${hw?'#ffd700':'#555'};">${hs!==null?hs:''}</span>
-              </div>
-              <div class="sb-mobile-card-row${aw?' sb-win':''}">
-                ${fl(m.away,18,12)}<span style="flex:1;font-size:9px;color:${aw?'#ffd700':'#ccc'};margin-left:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.away||'?'}</span>
-                <span style="font-size:10px;font-weight:700;color:${aw?'#ffd700':'#555'};">${as!==null?as:''}</span>
-              </div>
-            </div>`;
-          }).join('')}</div>
-        </div>`).join('')}
-      <!-- Gruppen auf Mobile -->
-      <div class="sb-mobile-runde">
-        <div class="sb-mobile-head"><h3>📋 Gruppenphase</h3><span>11. Juni–28. Juni 2026</span></div>
+      ${p3[0]?mobileRunde('🥉 Platz 3','18. Juli 2026',p3):''}
+      ${mobileRunde('Halbfinale','14.–15. Juli 2026',hf)}
+      ${mobileRunde('Viertelfinale','9.–11. Juli 2026',vf)}
+      ${mobileRunde('Achtelfinale','4.–8. Juli 2026',af)}
+      ${mobileRunde('Sechzehntelfinale','28. Juni–4. Juli 2026',sf)}
+      <div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;margin-bottom:10px;">
+        <div style="background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid #ffd700;padding:8px 12px;">
+          <span style="font-size:12px;font-weight:700;color:#ffd700;">📋 Gruppenphase</span>
+        </div>
         <div style="padding:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">
           ${[...gL,...gR].map(g=>gruppeCard(g)).join('')}
         </div>
       </div>
     </div>
 
+    <div id="sb-resize-trigger" style="display:none;" data-breakpoint="1100"></div>
+
   </div>`;
 }
 
 init();
+
+// Spielbaum responsive toggle
+function updateSpielbaum(){
+  var d=document.getElementById('sb-desktop');
+  var m=document.getElementById('sb-mobile');
+  if(!d||!m)return;
+  if(window.innerWidth<1100){d.style.display='none';m.style.display='block';}
+  else{d.style.display='flex';m.style.display='none';}
+}
+window.addEventListener('resize', updateSpielbaum);
+var _origRender=render;
+render=function(){_origRender();setTimeout(updateSpielbaum,10);};
 </script>
 </body>
 </html>
