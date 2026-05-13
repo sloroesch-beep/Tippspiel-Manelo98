@@ -1474,125 +1474,217 @@ function render(){
 function renderSpielbaum(){
   const ms = state.matches || [];
 
-  function f(team){
+  function fl(team){
     const c=FLAGS[team];
-    if(!c) return '';
-    return `<img class="flag-sm" src="https://flagcdn.com/w40/${c}.png" alt="${team}" onerror="this.style.display='none'">`;
+    if(!c||!team) return `<span style="display:inline-block;width:22px;height:15px;background:#2a2a2a;border-radius:2px;"></span>`;
+    return `<img style="width:22px;height:15px;object-fit:cover;border-radius:2px;vertical-align:middle;flex-shrink:0;" src="https://flagcdn.com/w40/${c}.png" alt="${team}" onerror="this.style.opacity=0">`;
   }
 
-  function erg(m){
-    if(m.status==='done'&&m.home_score!==null&&m.away_score!==null)
-      return`<span class="sb2-erg-done">${m.home_score}:${m.away_score}</span>`;
-    if(m.status==='live'&&m.home_score!==null)
-      return`<span class="sb2-erg-live">🔴 ${m.home_score}:${m.away_score}</span>`;
-    return`<span class="sb2-erg-open">–:–</span>`;
+  function getByGroup(g){ return ms.filter(m=>m.group===g).sort((a,b)=>a.id-b.id); }
+
+  function scoreStr(m){
+    if(!m) return '–:–';
+    if(m.status==='done'&&m.home_score!==null) return `${m.home_score}:${m.away_score}`;
+    if(m.status==='live'&&m.home_score!==null) return `🔴${m.home_score}:${m.away_score}`;
+    return '–:–';
   }
 
-  function gruppeHtml(g){
-    const spiele=ms.filter(m=>m.group===g);
-    if(!spiele.length) return '';
-    // Get teams
-    const teamSet=new Set();
-    spiele.forEach(m=>{teamSet.add(m.home);teamSet.add(m.away);});
-    const teams=[...teamSet];
-    const teamBadges=teams.map(t=>`<div class="sb2-gruppe-team">${f(t)}<span>${t}</span></div>`).join('');
-    const rows=spiele.map(m=>`
-      <tr>
-        <td class="nr">${m.id}</td>
-        <td class="dt">${m.date||''} ${m.time||''}</td>
-        <td class="ort" style="font-size:10px;color:#999;">${m.home} – ${m.away}</td>
-        <td class="spiel">${f(m.home)}${m.home} <span style="color:#ccc;font-weight:400;">–</span> ${f(m.away)}${m.away}</td>
-        <td class="erg">${erg(m)}</td>
-      </tr>`).join('');
-    return`
-    <div class="sb2-section">
-      <div class="sb2-section-head">
-        <h3>⚽ Gruppe ${g}</h3>
+  function matchCard(m, w=170){
+    const ww=w+'px';
+    if(!m) return `<div style="width:${ww};height:50px;border:1px dashed #2a2a2a;border-radius:6px;background:#0d0d0d;"></div>`;
+    const isDone=m.status==='done'&&m.home_score!==null;
+    const isLive=m.status==='live'&&m.home_score!==null;
+    const hs=isDone||isLive?m.home_score:null, as=isDone||isLive?m.away_score:null;
+    const hw=isDone&&hs>as, aw=isDone&&as>hs;
+    const bc=isLive?'#cc0000':isDone?'#ffd700':'#2a2a2a';
+    return `<div style="width:${ww};background:#111;border:1px solid ${bc};border-radius:6px;overflow:hidden;">
+      <div style="display:flex;align-items:center;padding:4px 6px;border-bottom:1px solid #1a1a1a;${hw?'background:#0d1a0d;':''}">
+        ${fl(m.home)}<span style="flex:1;margin-left:4px;font-size:10px;font-weight:${hw?700:400};color:${hw?'#ffd700':'#ccc'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.home||'?'}</span>
+        <span style="font-size:11px;font-weight:700;color:${hw?'#ffd700':'#888'};min-width:14px;text-align:right;">${hs!==null?hs:''}</span>
       </div>
-      <div class="sb2-gruppe-teams">${teamBadges}</div>
-      <table class="sb2-table">
-        <thead><tr><th>#</th><th>Datum/Zeit</th><th>Spiel</th><th></th><th class="center">Erg.</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      <div style="display:flex;align-items:center;padding:4px 6px;${aw?'background:#0d1a0d;':''}">
+        ${fl(m.away)}<span style="flex:1;margin-left:4px;font-size:10px;font-weight:${aw?700:400};color:${aw?'#ffd700':'#ccc'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.away||'?'}</span>
+        <span style="font-size:11px;font-weight:700;color:${aw?'#ffd700':'#888'};min-width:14px;text-align:right;">${as!==null?as:''}</span>
+      </div>
     </div>`;
   }
 
-  function koRunde(titel, datum, prefix){
-    const spiele=ms.filter(m=>m.group&&m.group.startsWith(prefix)).sort((a,b)=>a.id-b.id);
-    if(!spiele.length) return '';
-    const rows=spiele.map(m=>`
-      <div class="sb2-ko-row">
-        <div class="sb2-ko-nr">${m.id}</div>
-        <div class="sb2-ko-dt">${m.date||''}<br>${m.time||''}</div>
-        <div class="sb2-ko-ort" style="font-size:10px;">${m.away||''}</div>
-        <div class="sb2-ko-spiel">${f(m.home)}<span>${m.home}</span><span class="sb2-ko-vs">vs</span>${f(m.away)}<span>${m.away}</span></div>
-        <div class="sb2-ko-erg">${erg(m)}</div>
-      </div>`).join('');
-    return`
-    <div class="sb2-ko-section">
-      <div class="sb2-ko-head">
-        <h3>${titel}</h3>
-        <span>${datum}</span>
+  function gruppeCard(g){
+    const spiele=getByGroup(g);
+    if(!spiele.length) return `<div style="width:220px;height:60px;background:#111;border:1px solid #2a2a2a;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#333;font-size:11px;">Gruppe ${g}</div>`;
+    const teams=[...new Set([...spiele.map(m=>m.home),...spiele.map(m=>m.away)])];
+    const st={};
+    teams.forEach(t=>{st[t]={pts:0,gd:0,gf:0,sp:0};});
+    spiele.filter(m=>m.status==='done'&&m.home_score!==null).forEach(m=>{
+      st[m.home].sp++;st[m.away].sp++;
+      st[m.home].gf+=m.home_score;st[m.home].gd+=m.home_score-m.away_score;
+      st[m.away].gf+=m.away_score;st[m.away].gd+=m.away_score-m.home_score;
+      if(m.home_score>m.away_score)st[m.home].pts+=3;
+      else if(m.home_score<m.away_score)st[m.away].pts+=3;
+      else{st[m.home].pts++;st[m.away].pts++;}
+    });
+    const sorted=[...teams].sort((a,b)=>st[b].pts-st[a].pts||st[b].gd-st[a].gd||st[b].gf-st[a].gf);
+    const tRows=sorted.map((t,i)=>`<tr>
+      <td style="padding:2px 4px;font-size:9px;color:${i<2?'#ffd700':'#555'};width:12px;">${i+1}</td>
+      <td style="padding:2px 2px;">${fl(t)}</td>
+      <td style="padding:2px 4px;font-size:9px;color:#bbb;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t}</td>
+      <td style="padding:2px 4px;font-size:9px;color:#666;text-align:center;width:16px;">${st[t].sp}</td>
+      <td style="padding:2px 4px;font-size:10px;font-weight:700;color:${i<2?'#ffd700':'#888'};text-align:center;width:20px;">${st[t].pts}</td>
+    </tr>`).join('');
+    const sRows=spiele.map(m=>`<tr>
+      <td style="padding:1px 4px;font-size:8px;color:#444;white-space:nowrap;">${(m.date||'').slice(0,6)}</td>
+      <td style="padding:1px 4px;font-size:8px;color:#888;text-align:right;max-width:55px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.home}</td>
+      <td style="padding:1px 4px;font-size:9px;font-weight:700;color:${m.status==='done'?'#ffd700':'#444'};text-align:center;white-space:nowrap;">${scoreStr(m)}</td>
+      <td style="padding:1px 4px;font-size:8px;color:#888;max-width:55px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${m.away}</td>
+    </tr>`).join('');
+    return `<div style="background:#111;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden;width:225px;">
+      <div style="background:linear-gradient(135deg,#1a1200 0%,#0d0d0d 100%);border-bottom:2px solid #ffd700;padding:5px 8px;display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-size:11px;font-weight:800;color:#ffd700;letter-spacing:1px;">GRUPPE ${g}</span>
+        <div style="display:flex;gap:2px;">${teams.slice(0,4).map(t=>fl(t)).join('')}</div>
       </div>
-      <div class="sb2-ko-grid">${rows}</div>
+      <table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#0a0a0a;">
+        <th style="padding:2px 4px;font-size:8px;color:#444;text-align:left;">#</th>
+        <th></th><th style="padding:2px 4px;font-size:8px;color:#444;text-align:left;">Team</th>
+        <th style="padding:2px 4px;font-size:8px;color:#444;">Sp</th>
+        <th style="padding:2px 4px;font-size:8px;color:#444;">Pkt</th>
+      </tr></thead><tbody>${tRows}</tbody></table>
+      <div style="border-top:1px solid #1a1a1a;background:#0a0a0a;">
+        <table style="width:100%;border-collapse:collapse;"><tbody>${sRows}</tbody></table>
+      </div>
     </div>`;
   }
 
-  // Finale
-  const finale=ms.find(m=>m.group==='FIN');
-  const p3=ms.find(m=>m.group==='P3');
+  const sf=getByGroup('SF'), af=getByGroup('AF'), vf=getByGroup('VF');
+  const hf=getByGroup('HF'), p3=getByGroup('P3'), fin=getByGroup('FIN');
+  const finale=fin[0];
   const isDone=finale&&finale.status==='done'&&finale.home_score!==null;
   const winner=isDone?(finale.home_score>finale.away_score?finale.home:finale.away):'';
 
-  const finaleHtml=finale?`
-  <div class="sb2-finale">
-    <div class="sb2-finale-head"><h3>🏆 FINALE — 19. Juli 2026 · New York/New Jersey</h3></div>
-    <div class="sb2-finale-body">
-      <div class="sb2-finale-datum">21:00 Uhr Ortszeit · MetLife Stadium</div>
-      <div class="sb2-finale-teams">
-        <div class="sb2-finale-team">
-          ${finale.home&&FLAGS[finale.home]?`<img src="https://flagcdn.com/w160/${FLAGS[finale.home]}.png" alt="${finale.home}">`:
-            `<div style="width:56px;height:37px;background:#333;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#666;font-size:20px;">⚽</div>`}
-          <span>${finale.home||'?'}</span>
+  const sfL=sf.slice(0,8), sfR=sf.slice(8);
+  const afL=af.slice(0,4), afR=af.slice(4);
+  const vfL=vf.slice(0,2), vfR=vf.slice(2);
+  const hfL=hf.slice(0,1), hfR=hf.slice(1);
+  const gL=['A','B','C','D','E','F'], gR=['G','H','I','J','K','L'];
+
+  function col(items, w, gap=6){
+    return `<div style="display:flex;flex-direction:column;gap:${gap}px;">${items.map(m=>matchCard(m,w)).join('')}</div>`;
+  }
+
+  function colCenter(items, w){
+    return `<div style="display:flex;flex-direction:column;justify-content:space-around;align-self:stretch;">${items.map(m=>matchCard(m,w)).join('')}</div>`;
+  }
+
+  const sep=(w=8)=>`<div style="width:${w}px;flex-shrink:0;"></div>`;
+  const label=(txt)=>`<div style="font-size:8px;font-weight:800;color:#ffd700;letter-spacing:2px;text-align:center;margin-bottom:4px;text-transform:uppercase;writing-mode:horizontal-tb;">${txt}</div>`;
+
+  function runde(items, w, lbl, gap=6){
+    return `<div style="flex-shrink:0;">
+      ${label(lbl)}
+      ${col(items,w,gap)}
+    </div>`;
+  }
+
+  function rundeCenter(items, w, lbl){
+    return `<div style="flex-shrink:0;align-self:stretch;display:flex;flex-direction:column;">
+      ${label(lbl)}
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:space-around;">${items.map(m=>matchCard(m,w)).join('')}</div>
+    </div>`;
+  }
+
+  const finaleCard=`<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;align-self:stretch;">
+    <div style="background:linear-gradient(180deg,#1a1200,#0d0d0d);border:2px solid #ffd700;border-radius:12px;padding:14px 12px;text-align:center;width:185px;">
+      <div style="font-size:9px;letter-spacing:3px;color:#ffd700;font-weight:800;margin-bottom:6px;">🏆 FINALE</div>
+      <div style="font-size:8px;color:#555;margin-bottom:10px;">19. Juli 2026 · New York</div>
+      ${finale?`<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;overflow:hidden;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;padding:5px 7px;border-bottom:1px solid #1a1a1a;">
+          ${fl(finale.home)}<span style="flex:1;margin-left:4px;font-size:10px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${finale.home||'?'}</span>
+          <span style="font-weight:800;color:#ffd700;font-size:12px;">${isDone?finale.home_score:''}</span>
         </div>
-        <span class="sb2-finale-vs">vs</span>
-        <div class="sb2-finale-team">
-          ${finale.away&&FLAGS[finale.away]?`<img src="https://flagcdn.com/w160/${FLAGS[finale.away]}.png" alt="${finale.away}">`:
-            `<div style="width:56px;height:37px;background:#333;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#666;font-size:20px;">⚽</div>`}
-          <span>${finale.away||'?'}</span>
+        <div style="display:flex;align-items:center;padding:5px 7px;">
+          ${fl(finale.away)}<span style="flex:1;margin-left:4px;font-size:10px;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${finale.away||'?'}</span>
+          <span style="font-weight:800;color:#ffd700;font-size:12px;">${isDone?finale.away_score:''}</span>
         </div>
       </div>
-      ${isDone?`<div class="sb2-finale-score">${finale.home_score} : ${finale.away_score}</div>
-        <div class="sb2-weltmeister">🏆 Weltmeister: ${winner}</div>`
-        :`<div style="color:rgba(255,255,255,.3);margin-top:16px;font-size:13px;">Ergebnis ausstehend</div>
-          <div style="background:#222;border:2px dashed var(--gold);border-radius:8px;padding:10px 30px;margin-top:12px;display:inline-block;color:var(--gold);font-size:14px;font-weight:700;letter-spacing:1px;">FUSSBALL-WELTMEISTER 2026</div>`}
+      ${isDone?`<div style="background:#ffd700;color:#000;padding:7px;border-radius:6px;font-size:10px;font-weight:900;">🏆 ${winner}</div>`:
+      `<div style="border:1px dashed #ffd700;color:#ffd700;padding:7px;border-radius:6px;font-size:9px;letter-spacing:1px;">WELTMEISTER 2026</div>`}`
+      :`<div style="color:#333;font-size:11px;padding:10px;">Ausstehend</div>`}
+      ${p3[0]?`<div style="margin-top:10px;padding-top:8px;border-top:1px solid #1a1a1a;">
+        <div style="font-size:8px;color:#555;margin-bottom:4px;">🥉 Platz 3 · 18. Juli</div>
+        <div style="background:#0d0d0d;border:1px solid #1a1a1a;border-radius:4px;padding:4px 6px;">
+          <div style="font-size:9px;color:#888;">${p3[0].home||'?'} – ${p3[0].away||'?'}</div>
+          <div style="font-size:10px;font-weight:700;color:#ffd700;">${scoreStr(p3[0])}</div>
+        </div>
+      </div>`:''}
     </div>
-  </div>`:'';
+  </div>`;
 
-  return`<div class="sb2-page">
-    <div class="sb2-header">
-      <h2>🌍 WM 2026 — <span>Kompletter Spielplan</span></h2>
-      <p>Alle 104 Spiele · Gruppenphase · K.O.-Runde · Finale</p>
+  return `<div style="background:#0a0a0a;min-height:100vh;padding:16px;">
+
+    <!-- HEADER -->
+    <div style="text-align:center;margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid #ffd700;">
+      <div style="font-size:10px;letter-spacing:4px;color:#cc0000;font-weight:700;margin-bottom:3px;">FANCLUB MANELO98</div>
+      <h2 style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin:0;">FUSSBALL WM 2026 <span style="color:#ffd700;">— SPIELBAUM</span></h2>
+      <p style="color:#444;font-size:11px;margin:4px 0 0;">Alle 104 Spiele · Gruppenphase · K.O.-Runde · Finale</p>
+      <div style="display:flex;justify-content:center;gap:0;margin-top:8px;">
+        <div style="width:50px;height:3px;background:#000;border:1px solid #222;"></div>
+        <div style="width:50px;height:3px;background:#cc0000;"></div>
+        <div style="width:50px;height:3px;background:#ffd700;"></div>
+      </div>
     </div>
 
-    ${finaleHtml}
+    <!-- BRACKET (horizontal scroll) -->
+    <div style="overflow-x:auto;padding-bottom:20px;">
+    <div style="display:flex;align-items:flex-start;gap:0;min-width:1600px;min-height:800px;">
 
-    <div style="padding:0 0 8px 0;"><h3 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">📋 Gruppenphase</h3>
-    <div class="sb2-grid">
-      ${gruppeHtml('A')}${gruppeHtml('B')}
-      ${gruppeHtml('C')}${gruppeHtml('D')}
-      ${gruppeHtml('E')}${gruppeHtml('F')}
-      ${gruppeHtml('G')}${gruppeHtml('H')}
-      ${gruppeHtml('I')}${gruppeHtml('J')}
-      ${gruppeHtml('K')}${gruppeHtml('L')}
-    </div></div>
+      <!-- GRUPPEN LINKS -->
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
+        ${gL.map(g=>gruppeCard(g)).join('')}
+      </div>
+      ${sep(10)}
 
-    <h3 style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">⚔️ K.O.-Runde</h3>
-    ${koRunde('Sechzehntelfinale','28. Juni – 4. Juli 2026','SF')}
-    ${koRunde('Achtelfinale','4. – 8. Juli 2026','AF')}
-    ${koRunde('Viertelfinale','9. – 11. Juli 2026','VF')}
-    ${koRunde('Halbfinale','14. – 15. Juli 2026','HF')}
-    ${p3?koRunde('Spiel um Platz 3','18. Juli 2026','P3'):''}
+      <!-- SF LINKS -->
+      ${runde(sfL, 160, 'Sechzehntelfinale', 5)}
+      ${sep(6)}
+
+      <!-- AF LINKS -->
+      ${rundeCenter(afL, 152, 'Achtelfinale')}
+      ${sep(6)}
+
+      <!-- VF LINKS -->
+      ${rundeCenter(vfL, 148, 'Viertelfinale')}
+      ${sep(6)}
+
+      <!-- HF LINKS -->
+      ${rundeCenter(hfL, 148, 'Halbfinale')}
+      ${sep(10)}
+
+      <!-- FINALE MITTE -->
+      ${finaleCard}
+      ${sep(10)}
+
+      <!-- HF RECHTS -->
+      ${rundeCenter(hfR, 148, 'Halbfinale')}
+      ${sep(6)}
+
+      <!-- VF RECHTS -->
+      ${rundeCenter(vfR, 148, 'Viertelfinale')}
+      ${sep(6)}
+
+      <!-- AF RECHTS -->
+      ${rundeCenter(afR, 152, 'Achtelfinale')}
+      ${sep(6)}
+
+      <!-- SF RECHTS -->
+      ${runde(sfR, 160, 'Sechzehntelfinale', 5)}
+      ${sep(10)}
+
+      <!-- GRUPPEN RECHTS -->
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
+        ${gR.map(g=>gruppeCard(g)).join('')}
+      </div>
+
+    </div>
+    </div>
   </div>`;
 }
 
