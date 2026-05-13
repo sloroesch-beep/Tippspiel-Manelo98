@@ -216,6 +216,20 @@ async def daily_standings():
         played = await db.fetchval("SELECT COUNT(*) FROM matches WHERE status='done'")
         next_matches = await db.fetch(
             "SELECT home_team, away_team, match_date, match_time FROM matches WHERE status='open' ORDER BY match_date, match_time LIMIT 3")
+
+        # Tages-MVP: wer hat gestern die meisten Punkte gesammelt?
+        mvp = None
+        if now.hour == 6:
+            mvp = await db.fetchrow("""
+                SELECT u.username, COALESCE(SUM(t.points), 0) as tages_pts
+                FROM users u
+                JOIN tips t ON u.id = t.user_id
+                WHERE t.evaluated_at >= NOW() - INTERVAL '24 hours'
+                  AND t.points IS NOT NULL
+                GROUP BY u.id
+                ORDER BY tages_pts DESC
+                LIMIT 1""")
+
     if not rows:
         return
     medals = ["🥇","🥈","🥉"]
@@ -225,6 +239,13 @@ async def daily_standings():
         desc += f"{medal} **{r['username']}** — {r['pts']} Punkte _{r['tips']} Tipps_\n"
     zeitpunkt = "🌅 Morgen" if now.hour == 6 else "🌆 Abend"
     embed = discord.Embed(title=f"📊 {zeitpunkt}licher Tippspiel-Stand", description=desc, color=0x0f2744)
+
+    if mvp and mvp['tages_pts'] > 0:
+        embed.add_field(
+            name="⭐ Tages-MVP (gestern)",
+            value=f"**{mvp['username']}** mit {mvp['tages_pts']} Punkten am gestrigen Spieltag! 🏆",
+            inline=False)
+
     embed.add_field(name="📈 Turnier", value=f"{played} Spiele gespielt", inline=True)
     if next_matches:
         next_str = "\n".join([f"⚽ **{m['home_team']}** vs **{m['away_team']}** — {m['match_date']} {m['match_time']} Uhr" for m in next_matches])
