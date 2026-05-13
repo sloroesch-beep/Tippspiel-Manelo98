@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 DISCORD_TOKEN = os.environ.get("DISCORD_TOKEN")
 WEB_URL = os.environ.get("WEB_URL", "https://web-production-7f103.up.railway.app")
 ADMIN_ROLE = "Admin"
-DB = "tippspiel.db"
+DB = os.environ.get("DB_PATH", "tippspiel.db")
 
 ERINNERUNGEN_CHANNEL_ID = int(os.environ.get("ERINNERUNGEN_CHANNEL_ID", "0"))
 STAND_CHANNEL_ID = int(os.environ.get("STAND_CHANNEL_ID", "0"))
