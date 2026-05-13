@@ -17,7 +17,7 @@ import hashlib
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-DB = "tippspiel.db"
+DB = os.environ.get("DB_PATH", "tippspiel.db")
 DISCORD_CLIENT_ID = os.environ.get("DISCORD_CLIENT_ID", "")
 DISCORD_CLIENT_SECRET = os.environ.get("DISCORD_CLIENT_SECRET", "")
 WEB_URL = os.environ.get("WEB_URL", "http://localhost:8000")
@@ -560,5 +560,100 @@ async def manual_fetch(request: Request):
     if not user: raise HTTPException(401, "Nicht angemeldet")
     await fetch_live_scores()
     return {"ok": True, "message": "Scores aktualisiert"}
+
+# ─── Admin Endpoints ──────────────────────────────────────────────
+
+ADMIN_DISCORD_IDS = os.environ.get("ADMIN_DISCORD_IDS", "").split(",")
+
+async def is_admin(request: Request):
+    user = await get_user(request.cookies.get("session"))
+    if not user: return False
+    discord_id = user[1] or ""
+    return discord_id in ADMIN_DISCORD_IDS or user[0] == 1  # Erster User = Admin
+
+@app.get("/api/admin/users")
+async def admin_get_users(request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with aiosqlite.connect(DB) as db:
+        async with db.execute("""
+            SELECT u.id, u.discord_id, u.username, u.email, u.avatar,
+                   u.joined_at,
+                   COUNT(t.id) as tips,
+                   COALESCE(SUM(t.points), 0) as pts
+            FROM users u LEFT JOIN tips t ON u.id=t.user_id
+            GROUP BY u.id ORDER BY u.joined_at DESC
+        """) as c:
+            rows = await c.fetchall()
+    return [{"id":r[0],"discord_id":r[1],"username":r[2],"email":r[3],
+             "avatar":r[4],"joined_at":r[5],"tips":r[6],"points":r[7]} for r in rows]
+
+@app.delete("/api/admin/users/{user_id}")
+async def admin_delete_user(user_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("DELETE FROM tips WHERE user_id=?", (user_id,))
+        await db.execute("DELETE FROM users WHERE id=?", (user_id,))
+        await db.commit()
+    return {"ok": True}
+
+@app.post("/api/admin/reset-users")
+async def admin_reset_users(request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("DELETE FROM tips")
+        await db.execute("DELETE FROM users")
+        await db.commit()
+    return {"ok": True, "message": "Alle Nutzer gelöscht"}
+
+@app.post("/api/admin/reset-tips")
+async def admin_reset_tips(request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("DELETE FROM tips")
+        await db.commit()
+    return {"ok": True, "message": "Alle Tipps zurückgesetzt"}
+
+@app.post("/api/admin/reset-user-tips/{user_id}")
+async def admin_reset_user_tips(user_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("DELETE FROM tips WHERE user_id=?", (user_id,))
+        await db.commit()
+    return {"ok": True}
+
+@app.post("/api/admin/result")
+async def admin_set_result(request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    body = await request.json()
+    match_id = body.get("match_id")
+    home_score = body.get("home_score")
+    away_score = body.get("away_score")
+    async with aiosqlite.connect(DB) as db:
+        await db.execute(
+            "UPDATE matches SET home_score=?, away_score=?, status='done' WHERE id=?",
+            (home_score, away_score, match_id)
+        )
+        async with db.execute("SELECT id,user_id,home_tip,away_tip FROM tips WHERE match_id=? AND points IS NULL", (match_id,)) as c:
+            tips = await c.fetchall()
+        for tip_id, uid, ht, at in tips:
+            if ht == home_score and at == away_score: pts = 3
+            elif (ht>at and home_score>away_score) or (ht<at and home_score<away_score) or (ht==at and home_score==away_score): pts = 1
+            else: pts = 0
+            await db.execute("UPDATE tips SET points=? WHERE id=?", (pts, tip_id))
+        await db.commit()
+    return {"ok": True}
+
+@app.get("/api/admin/matches")
+async def admin_get_matches(request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with aiosqlite.connect(DB) as db:
+        async with db.execute("SELECT * FROM matches ORDER BY match_date,match_time") as c:
+            rows = await c.fetchall()
+    return [{"id":r[0],"home":r[1],"away":r[2],"date":r[3],"time":r[4],
+             "group":r[5],"home_score":r[6],"away_score":r[7],"status":r[8]} for r in rows]
+
+@app.get("/api/admin/check")
+async def admin_check(request: Request):
+    return {"is_admin": await is_admin(request)}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
