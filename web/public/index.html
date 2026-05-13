@@ -93,7 +93,7 @@ img{max-width:100%;}
 .sb-link.active{background:#fff8dc;color:#8b6914;font-weight:600;border-left:3px solid var(--gold);}
 .sb-link.locked{opacity:.4;cursor:default;}
 .sb-link.locked:hover{background:none;color:var(--muted);}
-.main{flex:1;padding:20px 24px;max-width:860px;overflow-x:hidden;}
+.main{flex:1;padding:20px 24px;max-width:860px;overflow-x:hidden;}.main.full-width{max-width:100%;padding:0;overflow-x:visible;}
 
 /* WELCOME PAGE */
 .welcome-hero{background:var(--dark);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;position:relative;}
@@ -1462,10 +1462,11 @@ function render(){
   else if(state.page==='spielbaum')content=renderSpielbaum();
 
   const hasSidebar=state.page==='spielplan';
+  const isFullWidth=state.page==='spielbaum';
   root.innerHTML=renderHeader()+renderMobileGroupBar()+`
     <div class="layout">
       ${hasSidebar?renderSidebar():''}
-      <main class="main">${content}</main>
+      <main class="main${isFullWidth?' full-width':''}">${content}</main>
     </div>`;
   if(state.page==='admin')setTimeout(loadAdminUsers,100);
 }
@@ -1610,7 +1611,7 @@ function renderSpielbaum(){
     .sb-tricolor div{height:3px;}
 
     /* DESKTOP BRACKET */
-    .sb-bracket{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:16px;}
+    .sb-bracket{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:16px;min-height:600px;}
 
     .sb-gruppen-col{display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
     .sb-gruppe{background:#111;border:1px solid #2a2a2a;border-radius:7px;overflow:hidden;width:200px;}
@@ -1694,50 +1695,71 @@ function renderSpielbaum(){
 
     <!-- DESKTOP BRACKET -->
     <div class="sb-bracket">
+      <!-- GRUPPEN LINKS -->
       <div class="sb-gruppen-col">${gL.map(g=>gruppeCard(g)).join('')}</div>
       <div class="sb-sep-lg"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- SECHZEHNTELFINALE LINKS (8 Spiele) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Sechzehntelfinale</div>
-        <div class="sb-runde-cards" style="justify-content:flex-start;gap:4px;">${sfL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">${sfL.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- ACHTELFINALE LINKS (4 Spiele) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Achtelfinale</div>
-        <div class="sb-runde-cards">${afL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:18px;padding-top:26px;">${afL.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- VIERTELFINALE LINKS (2 Spiele) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Viertelfinale</div>
-        <div class="sb-runde-cards">${vfL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:80px;padding-top:78px;">${vfL.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- HALBFINALE LINKS (1 Spiel) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Halbfinale</div>
-        <div class="sb-runde-cards">${hfL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;padding-top:200px;">${hfL.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep-lg"></div>
+
+      <!-- FINALE MITTE -->
       ${finaleHtml}
       <div class="sb-sep-lg"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- HALBFINALE RECHTS (1 Spiel) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Halbfinale</div>
-        <div class="sb-runde-cards">${hfR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;padding-top:200px;">${hfR.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- VIERTELFINALE RECHTS (2 Spiele) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Viertelfinale</div>
-        <div class="sb-runde-cards">${vfR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:80px;padding-top:78px;">${vfR.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- ACHTELFINALE RECHTS (4 Spiele) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Achtelfinale</div>
-        <div class="sb-runde-cards">${afR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:18px;padding-top:26px;">${afR.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
-      <div class="sb-runde" style="width:155px;">
+
+      <!-- SECHZEHNTELFINALE RECHTS (8 Spiele) -->
+      <div style="flex-shrink:0;width:155px;">
         <div class="sb-runde-label">Sechzehntelfinale</div>
-        <div class="sb-runde-cards" style="justify-content:flex-start;gap:4px;">${sfR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;">${sfR.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep-lg"></div>
+
+      <!-- GRUPPEN RECHTS -->
       <div class="sb-gruppen-col">${gR.map(g=>gruppeCard(g)).join('')}</div>
     </div>
 
