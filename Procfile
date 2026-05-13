@@ -1,2 +1,1 @@
-web: uvicorn web.server:app --host 0.0.0.0 --port $PORT
-bot: python bot/bot.py
+web: bash start.sh
