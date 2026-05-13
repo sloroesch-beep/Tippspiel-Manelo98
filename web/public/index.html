@@ -1462,11 +1462,18 @@ function render(){
   else if(state.page==='spielbaum')content=renderSpielbaum();
 
   const hasSidebar=state.page==='spielplan';
-  const isFullWidth=state.page==='spielbaum';
+
+  // Spielbaum gets full page - no layout wrapper
+  if(state.page==='spielbaum'){
+    root.innerHTML=renderHeader()+renderMobileGroupBar()+`<div style="width:100%;overflow:hidden;">${content}</div>`;
+    setTimeout(updateSpielbaum,10);
+    return;
+  }
+
   root.innerHTML=renderHeader()+renderMobileGroupBar()+`
     <div class="layout">
       ${hasSidebar?renderSidebar():''}
-      <main class="main${isFullWidth?' full-width':''}">${content}</main>
+      <main class="main">${content}</main>
     </div>`;
   if(state.page==='admin')setTimeout(loadAdminUsers,100);
 }
@@ -1662,8 +1669,7 @@ function renderSpielbaum(){
     </div>
 
     <!-- DESKTOP BRACKET (>= 1100px) -->
-    <div id="sb-desktop" style="display:flex;align-items:flex-start;gap:6px;overflow-x:scroll;padding-bottom:12px;
-      scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;">
+    <div id="sb-desktop" style="display:flex;align-items:flex-start;gap:6px;overflow-x:scroll;padding-bottom:12px;width:100%;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;position:relative;">
 
       <!-- GRUPPEN LINKS -->
       <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
