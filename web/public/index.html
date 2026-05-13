@@ -270,6 +270,85 @@ img{max-width:100%;}
 .score-result{font-size:20px;font-weight:700;color:var(--black);}
 .tip-locked{font-size:11px;color:var(--red);margin-top:4px;text-align:center;}
 .last-update{font-size:11px;color:var(--hint);text-align:right;margin-bottom:8px;}
+.podium-wrap{margin-bottom:16px;}
+.podium-row{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:16px;}
+.podium-card{border-radius:var(--radius);overflow:hidden;text-align:center;position:relative;transition:transform .2s;}
+.podium-card:hover{transform:translateY(-3px);}
+
+.podium-1{background:linear-gradient(145deg,#f6d860,#e6b800,#f9e47a);border:2px solid #d4a017;width:200px;padding:20px 16px 16px;}
+.podium-2{background:linear-gradient(145deg,#e8e8e8,#b8b8b8,#d8d8d8);border:2px solid #999;width:175px;padding:16px 14px 14px;}
+.podium-3{background:linear-gradient(145deg,#e8c4a0,#b87333,#d4956a);border:2px solid #a0522d;width:155px;padding:14px 12px 12px;}
+
+.podium-trophy{font-size:36px;margin-bottom:4px;display:block;}
+.podium-1 .podium-trophy{font-size:44px;}
+.podium-2 .podium-trophy{font-size:36px;}
+.podium-3 .podium-trophy{font-size:30px;}
+
+.podium-place{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.podium-1 .podium-place{color:#8b6914;}
+.podium-2 .podium-place{color:#555;}
+.podium-3 .podium-place{color:#6b3a1f;}
+
+.podium-av{margin:0 auto 8px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.8);}
+.podium-1 .podium-av{width:60px;height:60px;}
+.podium-2 .podium-av{width:52px;height:52px;}
+.podium-3 .podium-av{width:46px;height:46px;}
+
+.podium-av-ph{margin:0 auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.8);}
+.podium-1 .podium-av-ph{width:60px;height:60px;font-size:20px;}
+.podium-2 .podium-av-ph{width:52px;height:52px;font-size:17px;}
+.podium-3 .podium-av-ph{width:46px;height:46px;font-size:15px;}
+
+.podium-name{font-weight:700;margin-bottom:4px;}
+.podium-1 .podium-name{font-size:15px;color:#5c4400;}
+.podium-2 .podium-name{font-size:13px;color:#333;}
+.podium-3 .podium-name{font-size:12px;color:#4a2000;}
+
+.podium-pts{font-weight:700;border-radius:20px;padding:3px 10px;display:inline-block;}
+.podium-1 .podium-pts{background:rgba(255,255,255,.5);color:#8b6914;font-size:15px;}
+.podium-2 .podium-pts{background:rgba(255,255,255,.5);color:#555;font-size:13px;}
+.podium-3 .podium-pts{background:rgba(255,255,255,.4);color:#6b3a1f;font-size:12px;}
+
+.podium-tips{font-size:10px;margin-top:3px;opacity:.7;}
+.podium-1 .podium-tips{color:#8b6914;}
+.podium-2 .podium-tips{color:#555;}
+.podium-3 .podium-tips{color:#6b3a1f;}
+
+.podium-base{height:8px;border-radius:0 0 6px 6px;margin:8px -16px -16px;}
+.podium-1 .podium-base{background:rgba(0,0,0,.15);margin:-16px;}
+.podium-2 .podium-base{background:rgba(0,0,0,.12);margin:-14px;}
+.podium-3 .podium-base{background:rgba(0,0,0,.12);margin:-12px;}
+
+.admin-page{max-width:900px;}
+.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
+.admin-head{background:#1a1a1a;border-bottom:3px solid var(--red);padding:11px 18px;display:flex;align-items:center;gap:8px;}
+.admin-head h2{color:#fff;font-size:13px;font-weight:700;}
+.admin-head span{color:rgba(255,255,255,.4);font-size:12px;margin-left:auto;}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+.admin-table th{background:#f5f5f5;color:var(--muted);font-weight:600;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;}
+.admin-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:#fafafa;}
+.admin-btn{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .12s;}
+.admin-btn-red{background:#fee2e2;color:#991b1b;}
+.admin-btn-red:hover{background:#fca5a5;}
+.admin-btn-blue{background:#dbeafe;color:#1d4ed8;}
+.admin-btn-blue:hover{background:#93c5fd;}
+.admin-btn-gold{background:#fef9c3;color:#854d0e;}
+.admin-btn-gold:hover{background:#fde047;}
+.admin-danger-zone{background:#fff5f5;border:1px solid #fca5a5;border-radius:var(--radius);padding:16px 20px;margin-bottom:14px;}
+.admin-danger-zone h3{color:#991b1b;font-size:14px;font-weight:700;margin-bottom:8px;}
+.admin-danger-zone p{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.admin-danger-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.danger-btn{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;border:none;cursor:pointer;}
+.danger-btn-red{background:#dc2626;color:#fff;}
+.danger-btn-red:hover{background:#b91c1c;}
+.danger-btn-orange{background:#ea580c;color:#fff;}
+.danger-btn-orange:hover{background:#c2410c;}
+.result-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.result-form select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--surface);}
+.result-form input{width:50px;padding:6px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;text-align:center;}
+.admin-notice{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:#92400e;margin-bottom:12px;}
 .bot-bar{background:#eef0fd;border:1px solid #c7d2fe;border-radius:var(--radius-sm);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#3730a3;margin-bottom:12px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 
@@ -315,7 +394,7 @@ const COLORS=['#cc0000','#ffcc00','#1a1a1a','#5865f2','#16a34a','#ea580c','#7c3a
 let state={
   user:null, page:'welcome', group:'A',
   matches:[], tips:{}, rankings:[], results:[],
-  authTab:'login', authStep:'form', loading:true,
+  authTab:'login', authStep:'form', loading:true, isAdmin:false,
 };
 
 async function api(path,opts={}){
@@ -334,10 +413,11 @@ async function init(){
       state.results=await api('/api/results');
     }
   }catch(e){}
+  // Admin check
+  try{const a=await api('/api/admin/check');state.isAdmin=a.is_admin;}catch(e){}
   state.loading=false;
   state.lastUpdate=new Date();
   render();
-  // Starte Live-Update alle 30 Sekunden
   setInterval(liveUpdate, 30000);
 }
 
@@ -475,6 +555,7 @@ function renderHeader(){
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
     ['profil','👤 Profil'],
+    state.isAdmin?['admin','🔧 Admin']:null,
   ];
   const uArea=state.user
     ?`<div style="display:flex;align-items:center;gap:8px;cursor:pointer;" onclick="setPage('profil')">
@@ -491,7 +572,7 @@ function renderHeader(){
       <div class="logo-text"><span class="logo-main">Fanclub Manelo98</span><span class="logo-sub">WM Tippspiel 2026</span></div>
     </a>
     <nav class="topnav">
-      ${navItems.map(([id,label])=>`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`).join('')}
+      ${navItems.filter(Boolean).map(([id,label])=>`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`).join('')}
     </nav>
     <div class="user-area">${uArea}</div>
   </header>
@@ -663,6 +744,69 @@ function renderSpielplan(){
   return html;
 }
 
+
+function wmTrophy(place){
+  const configs = {
+    1: {
+      cup: ['#FFD700','#FFA500','#FFE55C','#CC8800'],
+      stem: ['#DAA520','#B8860B'],
+      base: ['#FFD700','#CC8800'],
+      textColor: '#7A4F00',
+      size: 72
+    },
+    2: {
+      cup: ['#E8E8E8','#A0A0A0','#F5F5F5','#888888'],
+      stem: ['#C0C0C0','#909090'],
+      base: ['#C0C0C0','#909090'],
+      textColor: '#444444',
+      size: 62
+    },
+    3: {
+      cup: ['#CD7F32','#8B4513','#E8A46A','#7B3F00'],
+      stem: ['#B87333','#8B4513'],
+      base: ['#CD7F32','#8B4513'],
+      textColor: '#5C2800',
+      size: 54
+    }
+  };
+  const c = configs[place];
+  const s = c.size;
+  const label = place === 1 ? '1.' : place === 2 ? '2.' : '3.';
+  const fontSize = place === 1 ? 13 : place === 2 ? 12 : 11;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="cup${place}" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="${c.cup[0]}"/>
+        <stop offset="50%" stop-color="${c.cup[1]}"/>
+        <stop offset="100%" stop-color="${c.cup[2]}"/>
+      </linearGradient>
+      <linearGradient id="stem${place}" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="${c.stem[0]}"/>
+        <stop offset="100%" stop-color="${c.stem[1]}"/>
+      </linearGradient>
+      <linearGradient id="base${place}" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="${c.base[0]}"/>
+        <stop offset="100%" stop-color="${c.base[1]}"/>
+      </linearGradient>
+    </defs>
+    <!-- Henkel links -->
+    <path d="M22 32 Q8 32 8 48 Q8 62 22 62" fill="none" stroke="url(#cup${place})" stroke-width="5" stroke-linecap="round"/>
+    <!-- Henkel rechts -->
+    <path d="M78 32 Q92 32 92 48 Q92 62 78 62" fill="none" stroke="url(#cup${place})" stroke-width="5" stroke-linecap="round"/>
+    <!-- Pokal-Körper (WM-Form: oben breiter, Taille, unten breiter) -->
+    <path d="M22 18 Q50 12 78 18 L72 55 Q65 72 58 76 L58 90 L42 90 Q35 72 28 55 Z" fill="url(#cup${place})"/>
+    <!-- Glanzeffekt -->
+    <path d="M30 22 Q40 18 52 20 L48 40 Q40 36 32 38 Z" fill="white" opacity="0.25"/>
+    <!-- Fuß/Stiel -->
+    <rect x="42" y="90" width="16" height="8" rx="2" fill="url(#stem${place})"/>
+    <!-- Basis -->
+    <rect x="28" y="98" width="44" height="10" rx="3" fill="url(#base${place})"/>
+    <!-- Platz-Nummer im Pokal -->
+    <text x="50" y="52" text-anchor="middle" dominant-baseline="central"
+      font-family="Arial,sans-serif" font-size="${fontSize}" font-weight="900"
+      fill="${c.textColor}" opacity="0.85">${label}</text>
+  </svg>`;
+}
 function renderTabelle(){
   if(!state.user){
     return`<div class="locked-overlay">
@@ -676,31 +820,67 @@ function renderTabelle(){
   const total=state.matches.length;
   const done=state.matches.filter(m=>m.status==='done').length;
   const players=state.rankings.length;
+
   let html=`<div class="stat-grid">
     <div class="stat-c"><div class="stat-v">${done}</div><div class="stat-l">Gespielt</div></div>
     <div class="stat-c"><div class="stat-v">${total-done}</div><div class="stat-l">Noch offen</div></div>
     <div class="stat-c"><div class="stat-v">${total}</div><div class="stat-l">Spiele gesamt</div></div>
     <div class="stat-c"><div class="stat-v">${players}</div><div class="stat-l">Mitspieler</div></div>
-  </div>
-  <div class="rank-card"><div class="rank-head"><h2>🏆 Aktuelle Rangliste</h2><span>WM 2026</span></div>`;
-  if(!state.rankings.length){
-    html+=`<div class="empty-state"><p>Noch keine Mitspieler</p></div>`;
-  }else{
-    const medals=['🥇','🥈','🥉'];
-    state.rankings.forEach((r,i)=>{
+  </div>`;
+
+  if(state.rankings.length){
+    // Podium for top 3
+    const podiumConfig=[
+      {place:1,cls:'podium-1',avSize:52,label:'1. Platz'},
+      {place:2,cls:'podium-2',avSize:44,label:'2. Platz'},
+      {place:3,cls:'podium-3',avSize:38,label:'3. Platz'},
+    ];
+
+    html+=`<div class="podium-wrap">`;
+    for(const {place,cls,avSize,label} of podiumConfig){
+      const r=state.rankings[place-1];
+      if(!r)continue;
       const col=avatarColor(r.username);
-      const av=r.avatar?`<img class="rav" src="${r.avatar}" alt="${r.username}">`:
-        `<div class="rav-ph" style="background:${col};">${initials(r.username)}</div>`;
-      html+=`<div class="rank-row">
-        <div class="rpos">${medals[i]||`${i+1}.`}</div>
-        <div class="rname">${av} ${r.username}</div>
-        <div class="rbar-w"><div class="rbar" style="width:${Math.round(r.points/max*100)}%;background:${col};"></div></div>
-        <div class="rtips">${r.evaluated} Tipps</div>
-        <div class="rpts">${r.points} Pkt</div>
+      const avEl=r.avatar
+        ?`<img class="podium-av" src="${r.avatar}" alt="${r.username}" style="width:${avSize}px;height:${avSize}px;">`
+        :`<div class="podium-av-ph" style="width:${avSize}px;height:${avSize}px;font-size:${Math.round(avSize*0.35)}px;background:${col};">${initials(r.username)}</div>`;
+      html+=`<div class="podium-card ${cls}">
+        <div class="podium-trophy-wrap">${wmTrophy(place)}</div>
+        <div class="podium-info">
+          <div class="podium-place-label">${label}</div>
+          <div class="podium-name-row">
+            ${avEl}
+            <span class="podium-name">${r.username}</span>
+          </div>
+          <div class="podium-pts-row">
+            <span class="podium-pts">${r.points} Punkte</span>
+            <span class="podium-tips-label">${r.evaluated} Tipps</span>
+          </div>
+        </div>
       </div>`;
-    });
+    }
+    html+=`</div>`;
+
+    // Rest of rankings (4th place onwards)
+    if(state.rankings.length>3){
+      html+=`<div class="rank-card"><div class="rank-head"><h2>Weitere Plätze</h2></div>`;
+      state.rankings.slice(3).forEach((r,i)=>{
+        const col=avatarColor(r.username);
+        const av=r.avatar?`<img class="rav" src="${r.avatar}" alt="${r.username}">`:
+          `<div class="rav-ph" style="background:${col};">${initials(r.username)}</div>`;
+        html+=`<div class="rank-row">
+          <div class="rpos">${i+4}.</div>
+          <div class="rname">${av} ${r.username}</div>
+          <div class="rbar-w"><div class="rbar" style="width:${Math.round(r.points/max*100)}%;background:${col};"></div></div>
+          <div class="rtips">${r.evaluated} Tipps</div>
+          <div class="rpts">${r.points} Pkt</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  }else{
+    html+=`<div class="rank-card"><div class="empty-state"><p>Noch keine Mitspieler</p></div></div>`;
   }
-  html+=`</div>`;
   return html;
 }
 
@@ -877,6 +1057,134 @@ async function saveProfile(){
   }
 }
 
+function renderAdmin(){
+  if(!state.isAdmin){
+    return`<div class="locked-overlay"><div class="lock-icon">🔒</div><h3>Kein Zugriff</h3><p>Nur Administratoren können diese Seite sehen.</p></div>`;
+  }
+  return`<div class="admin-page">
+    <div class="admin-notice">⚠️ Admin-Bereich — Änderungen sind sofort wirksam und können nicht rückgängig gemacht werden!</div>
+
+    <div class="admin-danger-zone">
+      <h3>🗑️ Gefahrenzone</h3>
+      <p>Diese Aktionen löschen Daten unwiderruflich. Bitte nur mit Bedacht verwenden!</p>
+      <div class="admin-danger-btns">
+        <button class="danger-btn danger-btn-orange" onclick="adminResetTips()">🔄 Alle Tipps zurücksetzen</button>
+        <button class="danger-btn danger-btn-red" onclick="adminResetUsers()">💥 Alle Nutzer löschen</button>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <div class="admin-head"><h2>⚽ Ergebnis eintragen</h2><span>Punkte werden automatisch vergeben</span></div>
+      <div style="padding:16px 18px;">
+        <div class="result-form">
+          <select id="admin-match-sel" style="flex:1;min-width:200px;">
+            <option value="">Spiel auswählen...</option>
+            ${state.matches.filter(m=>m.status!=='done').map(m=>`<option value="${m.id}">${m.home} vs ${m.away} (${m.date})</option>`).join('')}
+          </select>
+          <input type="number" id="admin-home-score" min="0" max="20" placeholder="H" value="0">
+          <span style="font-weight:700;">:</span>
+          <input type="number" id="admin-away-score" min="0" max="20" placeholder="A" value="0">
+          <button class="save-btn" style="padding:7px 16px;font-size:13px;" onclick="adminSetResult()">✅ Eintragen</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-card" id="admin-users-card">
+      <div class="admin-head"><h2>👥 Alle Mitspieler</h2><span id="admin-user-count">Wird geladen...</span></div>
+      <div id="admin-users-body" style="padding:8px 0;">Wird geladen...</div>
+    </div>
+  </div>`;
+}
+
+async function loadAdminUsers(){
+  try{
+    const users=await api('/api/admin/users');
+    const count=document.getElementById('admin-user-count');
+    const body=document.getElementById('admin-users-body');
+    if(count)count.textContent=users.length+' Mitspieler';
+    if(!body)return;
+    if(!users.length){body.innerHTML='<div style="padding:16px;color:var(--muted);font-size:13px;">Noch keine Mitspieler</div>';return;}
+    let html='<table class="admin-table"><thead><tr><th>Avatar</th><th>Anzeigename</th><th>Discord</th><th>Tipps</th><th>Punkte</th><th>Angemeldet</th><th>Aktionen</th></tr></thead><tbody>';
+    users.forEach(u=>{
+      const col=avatarColor(u.username);
+      const av=u.avatar?`<img src="${u.avatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`:
+        `<div style="width:28px;height:28px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">${initials(u.username)}</div>`;
+      const joined=u.joined_at?u.joined_at.split('T')[0]:'—';
+      html+=`<tr>
+        <td>${av}</td>
+        <td><strong>${u.username}</strong></td>
+        <td style="color:var(--muted);font-size:12px;">${u.discord_id||'E-Mail'}</td>
+        <td>${u.tips}</td>
+        <td><strong>${u.points}</strong></td>
+        <td style="font-size:12px;color:var(--muted);">${joined}</td>
+        <td style="display:flex;gap:5px;">
+          <button class="admin-btn admin-btn-gold" onclick="adminResetUserTips(${u.id},'${u.username}')">Tipps reset</button>
+          <button class="admin-btn admin-btn-red" onclick="adminDeleteUser(${u.id},'${u.username}')">Löschen</button>
+        </td>
+      </tr>`;
+    });
+    html+='</tbody></table>';
+    body.innerHTML=html;
+  }catch(e){console.error(e);}
+}
+
+async function adminDeleteUser(id,name){
+  if(!confirm(`Nutzer "${name}" wirklich löschen? Alle Tipps werden ebenfalls gelöscht!`))return;
+  try{
+    await api(`/api/admin/users/${id}`,{method:'DELETE'});
+    await loadAdminUsers();
+    if(state.user)state.rankings=await api('/api/rankings');
+    render();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminResetUserTips(id,name){
+  if(!confirm(`Alle Tipps von "${name}" zurücksetzen?`))return;
+  try{
+    await api(`/api/admin/reset-user-tips/${id}`,{method:'POST'});
+    await loadAdminUsers();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminResetTips(){
+  if(!confirm('ALLE Tipps aller Mitspieler zurücksetzen? Dies kann nicht rückgängig gemacht werden!'))return;
+  try{
+    await api('/api/admin/reset-tips',{method:'POST'});
+    state.tips={};state.rankings=[];state.results=[];
+    await loadAdminUsers();
+    render();
+    alert('Alle Tipps wurden zurückgesetzt!');
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminResetUsers(){
+  if(!confirm('ALLE Nutzer und Tipps löschen? Alle müssen sich neu anmelden!'))return;
+  if(!confirm('Wirklich sicher? Diese Aktion kann NICHT rückgängig gemacht werden!'))return;
+  try{
+    await api('/api/admin/reset-users',{method:'POST'});
+    state.tips={};state.rankings=[];state.results=[];state.user=null;
+    state.page='welcome';render();
+    alert('Alle Nutzer wurden gelöscht!');
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminSetResult(){
+  const matchId=document.getElementById('admin-match-sel')?.value;
+  const homeScore=parseInt(document.getElementById('admin-home-score')?.value);
+  const awayScore=parseInt(document.getElementById('admin-away-score')?.value);
+  if(!matchId){alert('Bitte ein Spiel auswählen!');return;}
+  if(isNaN(homeScore)||isNaN(awayScore)){alert('Bitte Ergebnis eingeben!');return;}
+  try{
+    await api('/api/admin/result',{method:'POST',body:JSON.stringify({match_id:parseInt(matchId),home_score:homeScore,away_score:awayScore})});
+    state.matches=await api('/api/matches');
+    state.rankings=await api('/api/rankings');
+    state.results=await api('/api/results');
+    render();
+    setTimeout(loadAdminUsers,500);
+    alert('Ergebnis eingetragen und Punkte vergeben!');
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
 function renderLogin(){
   if(state.authStep==='discord'){
     return`<div class="auth-scene"><div class="auth-card">
@@ -1018,6 +1326,7 @@ function render(){
   else if(state.page==='tabelle')content=renderTabelle();
   else if(state.page==='auswertung')content=renderAuswertung();
   else if(state.page==='profil')content=renderProfil();
+  else if(state.page==='admin')content=renderAdmin();
 
   const hasSidebar=state.page==='spielplan';
   root.innerHTML=renderHeader()+renderMobileGroupBar()+`
@@ -1025,6 +1334,7 @@ function render(){
       ${hasSidebar?renderSidebar():''}
       <main class="main">${content}</main>
     </div>`;
+  if(state.page==='admin')setTimeout(loadAdminUsers,100);
 }
 
 init();
