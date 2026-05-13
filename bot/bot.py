@@ -26,9 +26,7 @@ def get_ch(guild, ch_id):
 async def on_ready():
     await tree.sync()
     print(f"✅ Tippspiel Bot online als {bot.user}")
-    # Sofort beim Start neue Mitglieder prüfen
     await check_new_members()
-    # Dann loops starten
     reminder_loop.start()
     daily_standings.start()
 
@@ -181,6 +179,17 @@ async def spielplan(interaction: discord.Interaction):
     embed = discord.Embed(title="📅 Nächste Spiele", description=desc + f"\n🌐 [Alle Tipps abgeben]({WEB_URL})", color=0x0f2744)
     await interaction.response.send_message(embed=embed)
 
+@tree.command(name="reset_welcomed", description="Test: Begrüßung zurücksetzen (nur Admin)")
+async def reset_welcomed(interaction: discord.Interaction):
+    ADMIN_IDS = os.environ.get("ADMIN_DISCORD_IDS", "").split(",")
+    if str(interaction.user.id) not in ADMIN_IDS:
+        await interaction.response.send_message("❌ Kein Zugriff!", ephemeral=True)
+        return
+    async with aiosqlite.connect(DB) as db:
+        await db.execute("UPDATE users SET welcomed=0 WHERE discord_id=?", (str(interaction.user.id),))
+        await db.commit()
+    await interaction.response.send_message("✅ Deine Begrüßung wurde zurückgesetzt! In max. 5 Min kommt sie.", ephemeral=True)
+
 @tasks.loop(minutes=5)
 async def reminder_loop():
     await check_new_members()
@@ -250,5 +259,7 @@ async def before_daily():
 @reminder_loop.before_loop
 async def before_reminder():
     await bot.wait_until_ready()
+
+bot.run(DISCORD_TOKEN)
 
 bot.run(DISCORD_TOKEN)
