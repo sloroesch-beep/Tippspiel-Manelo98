@@ -184,6 +184,8 @@ async def init_db():
         # Sanfte Migrationen
         try: await db.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS welcomed INTEGER DEFAULT 0")
         except: pass
+        try: await db.execute("ALTER TABLE tips ADD COLUMN IF NOT EXISTS evaluated_at TIMESTAMP DEFAULT NULL")
+        except: pass
 
         # Version prüfen
         row = await db.fetchrow("SELECT MAX(version) as v FROM db_version")
@@ -266,7 +268,7 @@ async def evaluate_tips(db, match_id: int, home_score: int, away_score: int):
         if ht == home_score and at == away_score: pts = 3
         elif (ht>at and home_score>away_score) or (ht<at and home_score<away_score) or (ht==at and home_score==away_score): pts = 1
         else: pts = 0
-        await db.execute("UPDATE tips SET points=$1 WHERE id=$2", pts, tip['id'])
+        await db.execute("UPDATE tips SET points=$1, evaluated_at=NOW() WHERE id=$2", pts, tip["id"])
 
 async def close_expired_tips():
     now = datetime.now(timezone.utc)
@@ -577,7 +579,7 @@ async def admin_set_result(request: Request):
             if ht == home_score and at == away_score: pts = 3
             elif (ht>at and home_score>away_score) or (ht<at and home_score<away_score) or (ht==at and home_score==away_score): pts = 1
             else: pts = 0
-            await db.execute("UPDATE tips SET points=$1 WHERE id=$2", pts, tip['id'])
+            await db.execute("UPDATE tips SET points=$1, evaluated_at=NOW() WHERE id=$2", pts, tip["id"])
     return {"ok": True}
 
 @app.get("/api/admin/matches")
@@ -592,7 +594,5 @@ async def admin_get_matches(request: Request):
 @app.get("/api/admin/check")
 async def admin_check(request: Request):
     return {"is_admin": await is_admin(request)}
-
-app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
