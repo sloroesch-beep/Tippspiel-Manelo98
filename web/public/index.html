@@ -47,6 +47,45 @@ img{max-width:100%;}
 /* LAYOUT */
 .layout{display:flex;min-height:calc(100vh - 59px);}
 .sidebar{width:190px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;flex-shrink:0;}
+
+/* SPIELBAUM */
+.spielbaum-page{padding:4px 0;}
+.spielbaum-title{text-align:center;margin-bottom:20px;}
+.spielbaum-title h2{font-size:22px;font-weight:700;color:var(--black);}
+.spielbaum-title h2 span{color:var(--red);}
+.spielbaum-title p{font-size:13px;color:var(--muted);margin-top:4px;}
+
+.sb-runde{margin-bottom:24px;}
+.sb-runde-header{background:var(--dark);color:#fff;padding:10px 16px;border-radius:var(--radius) var(--radius) 0 0;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--gold);}
+.sb-runde-header h3{font-size:14px;font-weight:700;letter-spacing:.3px;}
+.sb-runde-header span{font-size:12px;color:rgba(255,255,255,.6);}
+
+.sb-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--radius) var(--radius);overflow:hidden;}
+.sb-table th{background:#f0f0f0;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);}
+.sb-table th:not(:first-child){text-align:center;}
+.sb-table td{padding:9px 12px;border-bottom:1px solid #f0f0f0;font-size:13px;vertical-align:middle;}
+.sb-table tr:last-child td{border-bottom:none;}
+.sb-table tr:hover td{background:#fafafa;}
+.sb-table td.nr{color:var(--hint);font-size:11px;width:28px;}
+.sb-table td.datum{color:var(--muted);font-size:12px;white-space:nowrap;width:80px;}
+.sb-table td.uhrzeit{color:var(--muted);font-size:12px;width:50px;}
+.sb-table td.ort{color:var(--muted);font-size:12px;width:120px;}
+.sb-table td.spiel{font-weight:600;}
+.sb-table td.ergebnis{text-align:center;width:80px;}
+.sb-score{display:inline-flex;align-items:center;gap:4px;background:var(--dark);color:#fff;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:700;}
+.sb-score.done{background:var(--green);}
+.sb-score.live{background:var(--red);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.7;}}
+.sb-score-open{color:var(--hint);font-size:12px;}
+
+.finale-card{background:var(--dark);border:3px solid var(--gold);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:24px;}
+.finale-card h3{color:var(--gold);font-size:18px;font-weight:700;margin-bottom:4px;}
+.finale-card .finale-datum{color:rgba(255,255,255,.6);font-size:13px;margin-bottom:16px;}
+.finale-teams{display:flex;align-items:center;justify-content:center;gap:20px;font-size:20px;font-weight:700;color:#fff;}
+.finale-vs{color:var(--gold);font-size:24px;}
+.finale-score{font-size:28px;font-weight:700;color:var(--gold);margin-top:12px;}
+.weltmeister-box{margin-top:16px;background:var(--gold);color:var(--black);padding:10px 20px;border-radius:var(--radius-sm);font-size:16px;font-weight:700;display:inline-block;}
+
 .sb-sec{font-size:10px;font-weight:700;color:var(--hint);letter-spacing:.6px;text-transform:uppercase;padding:12px 8px 5px;}
 .sb-sec:first-child{padding-top:4px;}
 .sb-link{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:var(--radius-sm);font-size:13px;color:var(--muted);cursor:pointer;transition:all .12s;border:none;background:none;width:100%;text-align:left;}
@@ -552,6 +591,7 @@ function renderHeader(){
   const navItems=[
     ['welcome','🏠 Start'],
     ['spielplan','⚽ Spielplan'],
+    ['spielbaum','🌳 Spielbaum'],
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
     ['profil','👤 Profil'],
@@ -1350,6 +1390,7 @@ function render(){
   else if(state.page==='auswertung')content=renderAuswertung();
   else if(state.page==='profil')content=renderProfil();
   else if(state.page==='admin')content=renderAdmin();
+  else if(state.page==='spielbaum')content=renderSpielbaum();
 
   const hasSidebar=state.page==='spielplan';
   root.innerHTML=renderHeader()+renderMobileGroupBar()+`
@@ -1358,6 +1399,85 @@ function render(){
       <main class="main">${content}</main>
     </div>`;
   if(state.page==='admin')setTimeout(loadAdminUsers,100);
+}
+
+
+function renderSpielbaum(){
+  const ms = state.matches || [];
+
+  function getSpiele(prefix){
+    return ms.filter(m=>m.group && m.group.startsWith(prefix)).sort((a,b)=>a.id-b.id);
+  }
+
+  function scoreHtml(m){
+    if(m.status==='done' && m.home_score!==null && m.away_score!==null){
+      return`<span class="sb-score done">${m.home_score} : ${m.away_score}</span>`;
+    } else if(m.status==='live' && m.home_score!==null){
+      return`<span class="sb-score live">🔴 ${m.home_score} : ${m.away_score}</span>`;
+    }
+    return`<span class="sb-score-open">– : –</span>`;
+  }
+
+  function renderRunde(titel, prefix, datum){
+    const spiele = getSpiele(prefix);
+    if(!spiele.length) return '';
+    const rows = spiele.map((m,i)=>`
+      <tr>
+        <td class="nr">${m.id}</td>
+        <td class="datum">${m.date||''}</td>
+        <td class="uhrzeit">${m.time||''}</td>
+        <td class="spiel">${m.home} <span style="color:var(--hint);font-weight:400;">vs</span> ${m.away}</td>
+        <td class="ergebnis">${scoreHtml(m)}</td>
+      </tr>`).join('');
+    return`
+    <div class="sb-runde">
+      <div class="sb-runde-header">
+        <h3>${titel}</h3>
+        <span>${datum}</span>
+      </div>
+      <table class="sb-table">
+        <thead><tr>
+          <th>#</th><th>Datum</th><th>Uhrzeit</th><th>Spiel</th><th>Ergebnis</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+
+  // Finale separat
+  const finale = ms.find(m=>m.group==='FIN');
+  let finaleHtml = '';
+  if(finale){
+    const isDone = finale.status==='done' && finale.home_score!==null;
+    finaleHtml=`
+    <div class="finale-card">
+      <h3>🏆 FINALE</h3>
+      <div class="finale-datum">19. Juli 2026 · 21:00 Uhr · New York/New Jersey</div>
+      <div class="finale-teams">
+        <span>${finale.home}</span>
+        <span class="finale-vs">vs</span>
+        <span>${finale.away}</span>
+      </div>
+      ${isDone
+        ?`<div class="finale-score">${finale.home_score} : ${finale.away_score}</div>
+          <div class="weltmeister-box">🏆 Weltmeister: ${finale.home_score > finale.away_score ? finale.home : finale.away}</div>`
+        :`<div style="color:rgba(255,255,255,.4);margin-top:12px;font-size:13px;">Ergebnis ausstehend</div>`}
+    </div>`;
+  }
+
+  return`<div class="spielbaum-page">
+    <div class="spielbaum-title">
+      <h2>🌳 WM 2026 — <span>Spielbaum</span></h2>
+      <p>Alle K.O.-Spiele der Fussball Weltmeisterschaft 2026</p>
+    </div>
+
+    ${renderRunde('Sechzehntelfinale', 'SF', '28. Juni – 4. Juli 2026')}
+    ${renderRunde('Achtelfinale', 'AF', '4. Juli – 8. Juli 2026')}
+    ${renderRunde('Viertelfinale', 'VF', '9. Juli – 11. Juli 2026')}
+    ${renderRunde('Halbfinale', 'HF', '14. – 15. Juli 2026')}
+    ${renderRunde('Spiel um Platz 3', 'P3', '18. Juli 2026')}
+    ${finaleHtml}
+  </div>`;
 }
 
 init();
