@@ -1611,7 +1611,7 @@ function renderSpielbaum(){
     .sb-tricolor div{height:3px;}
 
     /* DESKTOP BRACKET */
-    .sb-bracket{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:16px;min-height:600px;}
+    .sb-bracket{display:flex;align-items:flex-start;gap:0;overflow-x:scroll;padding-bottom:12px;min-height:600px;scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;}.sb-bracket::-webkit-scrollbar{height:8px;}.sb-bracket::-webkit-scrollbar-track{background:#1a1a1a;border-radius:4px;}.sb-bracket::-webkit-scrollbar-thumb{background:#ffd700;border-radius:4px;}
 
     .sb-gruppen-col{display:flex;flex-direction:column;gap:8px;flex-shrink:0;}
     .sb-gruppe{background:#111;border:1px solid #2a2a2a;border-radius:7px;overflow:hidden;width:200px;}
@@ -1700,30 +1700,34 @@ function renderSpielbaum(){
       <div class="sb-sep-lg"></div>
 
       <!-- SECHZEHNTELFINALE LINKS (8 Spiele) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Sechzehntelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:4px;">${sfL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">${sfL.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
 
-      <!-- ACHTELFINALE LINKS (4 Spiele) -->
-      <div style="flex-shrink:0;width:155px;">
+      <!-- ACHTELFINALE LINKS (4 Spiele, jedes zentriert zwischen 2 SF-Spielen) -->
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Achtelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:18px;padding-top:26px;">${afL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:28px;">
+          ${afL.map((m,i)=>`<div style="margin-bottom:${i<afL.length-1?'28px':'0'};">${matchCard(m)}</div>`).join('')}
+        </div>
       </div>
       <div class="sb-sep"></div>
 
       <!-- VIERTELFINALE LINKS (2 Spiele) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Viertelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:80px;padding-top:78px;">${vfL.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:80px;">
+          ${vfL.map((m,i)=>`<div style="margin-bottom:${i<vfL.length-1?'100px':'0'};">${matchCard(m)}</div>`).join('')}
+        </div>
       </div>
       <div class="sb-sep"></div>
 
       <!-- HALBFINALE LINKS (1 Spiel) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Halbfinale</div>
-        <div style="display:flex;flex-direction:column;padding-top:200px;">${hfL.map(m=>matchCard(m)).join('')}</div>
+        <div style="margin-top:195px;">${hfL.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep-lg"></div>
 
@@ -1732,30 +1736,34 @@ function renderSpielbaum(){
       <div class="sb-sep-lg"></div>
 
       <!-- HALBFINALE RECHTS (1 Spiel) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Halbfinale</div>
-        <div style="display:flex;flex-direction:column;padding-top:200px;">${hfR.map(m=>matchCard(m)).join('')}</div>
+        <div style="margin-top:195px;">${hfR.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep"></div>
 
       <!-- VIERTELFINALE RECHTS (2 Spiele) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Viertelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:80px;padding-top:78px;">${vfR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:80px;">
+          ${vfR.map((m,i)=>`<div style="margin-bottom:${i<vfR.length-1?'100px':'0'};">${matchCard(m)}</div>`).join('')}
+        </div>
       </div>
       <div class="sb-sep"></div>
 
       <!-- ACHTELFINALE RECHTS (4 Spiele) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Achtelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:18px;padding-top:26px;">${afR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:28px;">
+          ${afR.map((m,i)=>`<div style="margin-bottom:${i<afR.length-1?'28px':'0'};">${matchCard(m)}</div>`).join('')}
+        </div>
       </div>
       <div class="sb-sep"></div>
 
       <!-- SECHZEHNTELFINALE RECHTS (8 Spiele) -->
-      <div style="flex-shrink:0;width:155px;">
+      <div style="flex-shrink:0;width:158px;">
         <div class="sb-runde-label">Sechzehntelfinale</div>
-        <div style="display:flex;flex-direction:column;gap:4px;">${sfR.map(m=>matchCard(m)).join('')}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;">${sfR.map(m=>matchCard(m)).join('')}</div>
       </div>
       <div class="sb-sep-lg"></div>
 
