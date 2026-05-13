@@ -1074,6 +1074,14 @@ function renderAdmin(){
     </div>
 
     <div class="admin-card">
+      <div class="admin-head"><h2>🔄 Live-Scores</h2><span>Ergebnisse von football-data.org abrufen</span></div>
+      <div style="padding:16px 18px;">
+        <button class="save-btn" style="padding:9px 20px;font-size:13px;" onclick="adminFetchScores()">🌐 Scores jetzt abrufen</button>
+        <span id="fetch-scores-msg" style="margin-left:12px;font-size:13px;color:var(--muted);"></span>
+      </div>
+    </div>
+
+    <div class="admin-card">
       <div class="admin-head"><h2>⚽ Ergebnis eintragen</h2><span>Punkte werden automatisch vergeben</span></div>
       <div style="padding:16px 18px;">
         <div class="result-form">
@@ -1183,6 +1191,21 @@ async function adminSetResult(){
     setTimeout(loadAdminUsers,500);
     alert('Ergebnis eingetragen und Punkte vergeben!');
   }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminFetchScores(){
+  const msg=document.getElementById("fetch-scores-msg");
+  if(msg)msg.textContent="Wird abgerufen...";
+  try{
+    await api("/api/admin/fetch-scores",{method:"POST"});
+    state.matches=await api("/api/matches");
+    if(msg)msg.textContent="✅ Erfolgreich abgerufen!";
+    setTimeout(()=>{if(msg)msg.textContent="";},3000);
+    render();
+    setTimeout(loadAdminUsers,500);
+  }catch(e){
+    if(msg)msg.textContent="❌ Fehler: "+e.message;
+  }
 }
 
 function renderLogin(){
