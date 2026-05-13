@@ -169,6 +169,59 @@ async def spielplan(interaction: discord.Interaction):
     embed = discord.Embed(title="📅 Nächste Spiele", description=desc + f"\n🌐 [Alle Tipps abgeben]({WEB_URL})", color=0x0f2744)
     await interaction.response.send_message(embed=embed)
 
+@tree.command(name="test_stand", description="Test: Tagesstand sofort posten (nur Admin)")
+async def test_stand(interaction: discord.Interaction):
+    ADMIN_IDS = os.environ.get("ADMIN_DISCORD_IDS", "").split(",")
+    if str(interaction.user.id) not in ADMIN_IDS:
+        await interaction.response.send_message("❌ Kein Zugriff!", ephemeral=True)
+        return
+    await interaction.response.send_message("✅ Poste Stand jetzt...", ephemeral=True)
+    now = datetime.now(timezone.utc)
+    async with pool.acquire() as db:
+        rows = await db.fetch("""
+            SELECT u.username, COALESCE(SUM(t.points),0) as pts,
+                   COUNT(CASE WHEN t.points IS NOT NULL THEN 1 END) as tips
+            FROM users u LEFT JOIN tips t ON u.id=t.user_id
+            GROUP BY u.id ORDER BY pts DESC LIMIT 10""")
+        played = await db.fetchval("SELECT COUNT(*) FROM matches WHERE status='done'")
+        next_matches = await db.fetch(
+            "SELECT home_team, away_team, match_date, match_time FROM matches WHERE status='open' ORDER BY match_date, match_time LIMIT 3")
+        mvp = await db.fetchrow("""
+            SELECT u.username, COALESCE(SUM(t.points), 0) as tages_pts
+            FROM users u
+            JOIN tips t ON u.id = t.user_id
+            WHERE t.evaluated_at >= NOW() - INTERVAL '24 hours'
+              AND t.points IS NOT NULL
+            GROUP BY u.id
+            ORDER BY tages_pts DESC
+            LIMIT 1""")
+
+    if not rows:
+        return
+    medals = ["🥇","🥈","🥉"]
+    desc = ""
+    for i, r in enumerate(rows):
+        medal = medals[i] if i < 3 else f"`{i+1}.`"
+        desc += f"{medal} **{r['username']}** — {r['pts']} Punkte _{r['tips']} Tipps_\n"
+    embed = discord.Embed(title="📊 Test: Tippspiel-Stand", description=desc, color=0x0f2744)
+    if mvp and mvp['tages_pts'] > 0:
+        embed.add_field(
+            name="⭐ Tages-MVP (letzte 24h)",
+            value=f"**{mvp['username']}** mit {mvp['tages_pts']} Punkten! 🏆",
+            inline=False)
+    else:
+        embed.add_field(name="⭐ Tages-MVP", value="Noch keine Punkte in den letzten 24h vergeben.", inline=False)
+    embed.add_field(name="📈 Turnier", value=f"{played} Spiele gespielt", inline=True)
+    if next_matches:
+        next_str = "\n".join([f"⚽ **{m['home_team']}** vs **{m['away_team']}** — {m['match_date']} {m['match_time']} Uhr" for m in next_matches])
+        embed.add_field(name="📅 Nächste Spiele", value=next_str, inline=False)
+    embed.add_field(name="🌐 Vollständige Tabelle", value=f"[Zum Tippspiel]({WEB_URL})", inline=False)
+    embed.set_footer(text=f"Fanclub Manelo98 | {now.strftime('%d.%m.%Y %H:%M')} (TEST)")
+    for guild in bot.guilds:
+        channel = get_ch(guild, STAND_CHANNEL_ID)
+        if channel:
+            await channel.send(embed=embed)
+
 @tree.command(name="reset_welcomed", description="Test: Begrüßung zurücksetzen (nur Admin)")
 async def reset_welcomed(interaction: discord.Interaction):
     ADMIN_IDS = os.environ.get("ADMIN_DISCORD_IDS", "").split(",")
