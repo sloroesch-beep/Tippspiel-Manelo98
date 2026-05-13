@@ -14,7 +14,7 @@
   --green:#16a34a;--green-bg:#dcfce7;--orange:#ea580c;--discord:#5865f2;
   --radius:10px;--radius-sm:6px;
 }
-body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}body.spielbaum-page{overflow-x:hidden;}
 img{max-width:100%;}
 
 /* TOP BAR */
@@ -45,7 +45,7 @@ img{max-width:100%;}
 .de-stripe{height:5px;background:linear-gradient(to right, #1a1a1a 33.3%, #cc0000 33.3% 66.6%, #ffcc00 66.6%);}
 
 /* LAYOUT */
-.layout{display:flex;min-height:calc(100vh - 59px);}
+.layout{display:flex;min-height:calc(100vh - 59px);overflow-x:visible;}
 .sidebar{width:190px;background:var(--surface);border-right:1px solid var(--border);padding:12px 8px;flex-shrink:0;}
 
 /* SPIELBAUM LEGACY */
@@ -93,7 +93,7 @@ img{max-width:100%;}
 .sb-link.active{background:#fff8dc;color:#8b6914;font-weight:600;border-left:3px solid var(--gold);}
 .sb-link.locked{opacity:.4;cursor:default;}
 .sb-link.locked:hover{background:none;color:var(--muted);}
-.main{flex:1;padding:20px 24px;max-width:860px;overflow-x:hidden;}.main.full-width{max-width:100%;padding:0;overflow-x:visible;}
+.main{flex:1;padding:20px 24px;max-width:860px;}.main.full-width{max-width:100vw;padding:0;overflow:visible;width:100vw;margin-left:calc(-50vw + 50%);}
 
 /* WELCOME PAGE */
 .welcome-hero{background:var(--dark);border-radius:var(--radius);overflow:hidden;margin-bottom:20px;position:relative;}
@@ -1465,10 +1465,12 @@ function render(){
 
   // Spielbaum gets full page - no layout wrapper
   if(state.page==='spielbaum'){
-    root.innerHTML=renderHeader()+renderMobileGroupBar()+`<div style="width:100%;overflow:hidden;">${content}</div>`;
+    document.body.className='spielbaum-page';
+    root.innerHTML=renderHeader()+`<div style="width:100vw;overflow-x:hidden;overflow-y:auto;">${content}</div>`;
     setTimeout(updateSpielbaum,10);
     return;
   }
+  document.body.className='';
 
   root.innerHTML=renderHeader()+renderMobileGroupBar()+`
     <div class="layout">
@@ -1669,7 +1671,7 @@ function renderSpielbaum(){
     </div>
 
     <!-- DESKTOP BRACKET (>= 1100px) -->
-    <div id="sb-desktop" style="display:flex;align-items:flex-start;gap:6px;overflow-x:scroll;padding-bottom:12px;width:100%;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;position:relative;">
+    <div id="sb-desktop" style="display:flex;align-items:flex-start;gap:6px;overflow-x:auto;padding-bottom:16px;width:100%;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#ffd700 #1a1a1a;-webkit-overflow-scrolling:touch;">
 
       <!-- GRUPPEN LINKS -->
       <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;">
