@@ -191,11 +191,11 @@ async def check_new_members():
                             pass
 
                     embed = discord.Embed(
-                        title="🎉 Neuer Mitspieler im Tippspiel!",
+                        title="🎉 Neuer Mitspieler!",
                         description=(
-                            f"{'Willkommen ' + member.mention + '!' if member else '🏆'} "
-                            f"**{username}** ist dem WM Tippspiel 2026 beigetreten!\n\n"
-                            f"Viel Erfolg beim Tippen! ⚽\n"
+                            f"{member.mention + '!' if member else '**' + username + '**!'} "
+                            f"**{username}** ist dem WM 2026 Tippspiel von Manelo98 beigetreten. "
+                            f"Viel Glück und vor allem Spaß! 🍀⚽\n\n"
                             f"🌐 [Zum Tippspiel]({WEB_URL})"
                         ),
                         color=0x2ecc71
