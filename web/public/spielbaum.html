@@ -7,54 +7,58 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--gold:#ffd700;--red:#cc0000;--green:#16a34a;--orange:#ea580c;--bg:#0a0a0a;--card:#111;--border:#2a2a2a;--text:#ddd;--muted:#888}
-html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100%;display:flex;flex-direction:column}
+html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100%;display:flex;flex-direction:column;overflow:hidden}
 
-/* ── HEADER ── */
-.hdr{background:#0d0d0d;border-bottom:3px solid var(--gold);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:52px;flex-shrink:0;position:sticky;top:0;z-index:200}
+/* HEADER */
+.hdr{background:#0d0d0d;border-bottom:3px solid var(--gold);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:50px;flex-shrink:0}
 .hdr-l{display:flex;align-items:center;gap:10px}
 .flag{width:28px;height:19px;display:flex;flex-direction:column;border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,.15);flex-shrink:0}
 .flag s{flex:1;display:block}
 .hdr-brand h1{font-size:13px;font-weight:700;color:#fff;line-height:1.2}
 .hdr-brand p{font-size:10px;color:var(--gold)}
-.hdr-nav{display:flex;align-items:center;gap:4px}
-.hdr-nav a{color:var(--muted);font-size:12px;padding:5px 10px;border-radius:5px;text-decoration:none;border:1px solid transparent;transition:all .15s;white-space:nowrap}
+.hdr-nav{display:flex;align-items:center;gap:2px}
+.hdr-nav a{color:var(--muted);font-size:11px;padding:5px 9px;border-radius:5px;text-decoration:none;border:1px solid transparent;transition:all .15s;white-space:nowrap}
 .hdr-nav a:hover{color:#fff;border-color:var(--border);background:#1a1a1a}
 .hdr-nav a.active{color:var(--gold);border-color:var(--gold)}
-.hdr-nav .divider{width:1px;height:16px;background:var(--border);flex-shrink:0}
+.hdr-nav .div{width:1px;height:14px;background:var(--border);flex-shrink:0;margin:0 2px}
 
-/* ── PAGE TITLE ── */
-.pg{text-align:center;padding:12px 16px 8px;border-bottom:1px solid #1a1a1a;flex-shrink:0}
+/* PAGE TITLE */
+.pg{text-align:center;padding:10px 16px 7px;border-bottom:1px solid #1a1a1a;flex-shrink:0}
 .pg-eye{font-size:9px;letter-spacing:4px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:2px}
-.pg h2{font-size:clamp(14px,3.5vw,22px);font-weight:900;color:#fff}
+.pg h2{font-size:clamp(13px,3vw,21px);font-weight:900;color:#fff}
 .pg h2 span{color:var(--gold)}
-.pg p{color:#444;font-size:11px;margin-top:2px}
-.tri{display:flex;justify-content:center;margin-top:6px}
-.tri span{width:36px;height:3px}
+.pg p{color:#444;font-size:10px;margin-top:2px}
+.tri{display:flex;justify-content:center;margin-top:5px}
+.tri span{width:34px;height:3px}
 
-/* ── LEGEND ── */
-.legend{display:flex;flex-wrap:wrap;gap:10px;padding:6px 16px;background:#0d0d0d;border-bottom:1px solid #1a1a1a;font-size:10px;align-items:center;flex-shrink:0}
+/* LEGEND */
+.legend{display:flex;flex-wrap:wrap;gap:10px;padding:5px 16px;background:#0d0d0d;border-bottom:1px solid #1a1a1a;font-size:10px;align-items:center;flex-shrink:0}
 .ld{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;vertical-align:middle}
 
-/* ── MAIN BRACKET AREA ── */
-.bk-wrap{flex:1;overflow:auto;padding:12px 16px 16px;min-height:0;
-  scrollbar-width:thin;scrollbar-color:var(--gold) #1a1a1a}
-.bk-wrap::-webkit-scrollbar{height:8px;width:8px}
-.bk-wrap::-webkit-scrollbar-track{background:#1a1a1a;border-radius:4px}
-.bk-wrap::-webkit-scrollbar-thumb{background:var(--gold);border-radius:4px}
+/* MAIN AREA: groups left + bracket right, side by side */
+.main{flex:1;display:flex;overflow:hidden;min-height:0}
 
-/* ── BRACKET ROW ── */
-.bk{display:flex;align-items:flex-start;gap:0}
+/* LEFT: groups column, scrolls vertically */
+.groups-panel{width:210px;flex-shrink:0;overflow-y:auto;overflow-x:hidden;padding:10px 8px 10px 10px;border-right:1px solid #1a1a1a;scrollbar-width:thin;scrollbar-color:#333 #0d0d0d}
+.groups-panel::-webkit-scrollbar{width:4px}
+.groups-panel::-webkit-scrollbar-track{background:#0d0d0d}
+.groups-panel::-webkit-scrollbar-thumb{background:#333;border-radius:2px}
+.g-col{display:flex;flex-direction:column;gap:6px}
 
-/* ── COLUMN LABEL ── */
-.col-lbl{font-size:7px;font-weight:800;color:var(--gold);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:5px;white-space:nowrap}
+/* RIGHT: bracket area, scrolls horizontally */
+.bracket-panel{flex:1;overflow:auto;padding:10px 12px 12px;min-width:0;scrollbar-width:thin;scrollbar-color:var(--gold) #1a1a1a}
+.bracket-panel::-webkit-scrollbar{height:8px;width:8px}
+.bracket-panel::-webkit-scrollbar-track{background:#1a1a1a;border-radius:4px}
+.bracket-panel::-webkit-scrollbar-thumb{background:var(--gold);border-radius:4px}
 
-/* ── GRUPPE COLUMN ── */
-.g-col{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+/* BRACKET ROW */
+.bk{display:inline-flex;align-items:flex-start;gap:0;min-height:820px}
 
-/* ── KO COLUMN ── */
-.ko-col{position:relative;flex-shrink:0}
+/* COLUMN */
+.col-lbl{font-size:7px;font-weight:800;color:var(--gold);letter-spacing:2px;text-transform:uppercase;text-align:center;margin-bottom:4px;white-space:nowrap}
+.ko-wrap{position:relative;flex-shrink:0}
 
-/* ── MATCH CARD ── */
+/* MATCH CARD (absolute in bracket) */
 .mc{background:var(--card);border:1px solid var(--border);border-radius:5px;overflow:hidden;position:absolute;left:0}
 .mc-r{display:flex;align-items:center;gap:4px;padding:4px 6px;border-bottom:1px solid #1a1a1a}
 .mc-r:last-of-type{border-bottom:none}
@@ -63,32 +67,42 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .mc-s{font-size:10px;font-weight:700;min-width:12px;text-align:right}
 .mc-tip{font-size:8px;text-align:center;padding:2px 0;border-top:1px solid #1a1a1a}
 
-/* ── GRUPPE CARD ── */
-.gc{background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden;width:195px}
-.gc-h{background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid var(--gold);padding:4px 8px;display:flex;align-items:center;justify-content:space-between}
+/* GRUPPE CARD */
+.gc{background:var(--card);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.gc-h{background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid var(--gold);padding:4px 7px;display:flex;align-items:center;justify-content:space-between}
 .gc-n{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:1px}
 .gc table{width:100%;border-collapse:collapse;font-size:8px}
 .gc th{background:#0a0a0a;padding:2px 4px;color:#444;text-align:left}
 .gc td{padding:2px 4px;border-bottom:1px solid #161616;vertical-align:middle}
 .gc-sp{background:#0a0a0a;border-top:1px solid #1a1a1a}
-.gs{display:flex;align-items:center;gap:3px;padding:1px 5px;border-bottom:1px solid #0d0d0d;font-size:7px}
+.gs{display:flex;align-items:center;gap:2px;padding:1px 4px;border-bottom:1px solid #0d0d0d;font-size:7px}
 
-/* ── FINALE CARD ── */
-.fin{background:linear-gradient(180deg,#1a1200,#0d0d0d);border:2px solid var(--gold);border-radius:10px;padding:10px;text-align:center;width:175px}
-.fin-l{font-size:8px;letter-spacing:3px;color:var(--gold);font-weight:800;margin-bottom:3px}
-.fin-d{font-size:7px;color:#444;margin-bottom:7px}
+/* FINALE + P3 combined column */
+.fin-col{flex-shrink:0;position:relative}
+
+/* FINALE BOX */
+.fin-box{background:linear-gradient(180deg,#1a1200,#0d0d0d);border:2px solid var(--gold);border-radius:10px;padding:10px;text-align:center;width:172px;position:absolute;left:0}
+.fin-lbl{font-size:8px;letter-spacing:3px;color:var(--gold);font-weight:800;margin-bottom:3px}
+.fin-date{font-size:7px;color:#444;margin-bottom:6px}
 .fin-c{background:#0d0d0d;border:1px solid var(--border);border-radius:5px;overflow:hidden;margin-bottom:6px}
 .fin-r{display:flex;align-items:center;gap:4px;padding:5px 7px;border-bottom:1px solid #1a1a1a}
 .fin-r:last-child{border-bottom:none}
 .fin-r.W{background:#0d1a0d}
 .fin-t{flex:1;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fin-s{font-size:13px;font-weight:800;color:var(--gold)}
-.fin-w{background:var(--gold);color:#000;padding:5px;border-radius:5px;font-size:9px;font-weight:900;margin-bottom:5px}
-.fin-tbd{border:1px dashed var(--gold);color:var(--gold);padding:5px;border-radius:5px;font-size:7px;letter-spacing:1px;margin-bottom:5px}
-.p3{border-top:1px solid #1a1a1a;padding-top:6px;margin-top:6px;font-size:7px}
+.fin-s{font-size:12px;font-weight:800;color:var(--gold)}
+.fin-winner{background:var(--gold);color:#000;padding:5px;border-radius:5px;font-size:9px;font-weight:900}
+.fin-tbd{border:1px dashed var(--gold);color:var(--gold);padding:5px;border-radius:5px;font-size:7px;letter-spacing:1px}
 
-/* ── MOBILE ── */
-.mob{display:none;padding:10px;overflow-y:auto;flex:1}
+/* PLATZ 3 BOX */
+.p3-box{border:1px solid #333;border-radius:8px;padding:8px;text-align:center;width:172px;position:absolute;left:0;background:#0d0d0d}
+.p3-lbl{font-size:7px;letter-spacing:2px;color:#888;font-weight:800;margin-bottom:3px;text-transform:uppercase}
+.p3-c{background:#111;border:1px solid #222;border-radius:4px;overflow:hidden;margin-bottom:5px}
+.p3-r{display:flex;align-items:center;gap:4px;padding:4px 6px;border-bottom:1px solid #1a1a1a;font-size:9px}
+.p3-r:last-child{border-bottom:none}
+.p3-score{font-size:11px;font-weight:700;color:#888;text-align:center}
+
+/* MOBILE */
+.mob-wrap{display:none;flex:1;overflow-y:auto;padding:10px}
 .mob-r{background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
 .mob-h{background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid var(--gold);padding:7px 12px;display:flex;justify-content:space-between;align-items:center}
 .mob-h h3{font-size:12px;font-weight:700;color:var(--gold)}
@@ -96,12 +110,14 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
 .mob-b{padding:8px;display:flex;flex-wrap:wrap;gap:6px}
 .mob-gg{padding:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:8px}
 
-@media(max-width:899px){.bk-wrap{display:none!important}.mob{display:block!important}.hdr-nav a[data-hide]{display:none}}
+@media(max-width:899px){
+  .main{display:none}
+  .mob-wrap{display:flex;flex-direction:column}
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-l">
     <div class="flag"><s style="background:#000"></s><s style="background:var(--red)"></s><s style="background:var(--gold)"></s></div>
@@ -109,16 +125,15 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
   </div>
   <nav class="hdr-nav">
     <a href="/">&#127968; Start</a>
-    <div class="divider"></div>
-    <a href="/?page=spielplan" data-hide>&#9917; Spielplan</a>
+    <div class="div"></div>
+    <a href="/?page=spielplan">&#9917; Spielplan</a>
     <a href="/spielbaum.html" class="active">&#127923; Spielbaum</a>
-    <a href="/?page=tabelle" data-hide>&#127942; Tabelle</a>
-    <a href="/?page=auswertung" data-hide>&#128202; Auswertung</a>
-    <a href="/?page=profil" data-hide>&#128100; Profil</a>
+    <a href="/?page=tabelle">&#127942; Tabelle</a>
+    <a href="/?page=auswertung">&#128202; Auswertung</a>
+    <a href="/?page=profil">&#128100; Profil</a>
   </nav>
 </div>
 
-<!-- PAGE TITLE -->
 <div class="pg">
   <div class="pg-eye">Fanclub Manelo98</div>
   <h2>FUSSBALL WM 2026 <span>&mdash; SPIELBAUM</span></h2>
@@ -126,59 +141,64 @@ html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-u
   <div class="tri"><span style="background:#000;border:1px solid #222"></span><span style="background:var(--red)"></span><span style="background:var(--gold)"></span></div>
 </div>
 
-<!-- LEGEND -->
 <div class="legend" id="leg">
   <span style="color:var(--muted)">Deine Tipps:</span>
   <span><span class="ld" style="background:var(--green)"></span><span style="color:var(--green)">&#10003; Exakt (3 Pkt)</span></span>
   <span><span class="ld" style="background:var(--orange)"></span><span style="color:var(--orange)">&#9675; Tendenz (1 Pkt)</span></span>
   <span><span class="ld" style="background:var(--red)"></span><span style="color:var(--red)">&#10007; Falsch (0 Pkt)</span></span>
-  <span style="color:#444;font-size:9px">(Nur nach Login sichtbar)</span>
+  <span id="leg-hint" style="color:#444;font-size:9px">(Nur nach Login sichtbar)</span>
 </div>
 
-<!-- DESKTOP BRACKET -->
-<div class="bk-wrap" id="desk"></div>
+<!-- DESKTOP: two-panel layout -->
+<div class="main">
+  <!-- LEFT: Groups -->
+  <div class="groups-panel">
+    <div class="g-col" id="groupsL"></div>
+  </div>
+  <!-- RIGHT: KO Bracket -->
+  <div class="bracket-panel">
+    <div class="bk" id="bracket"></div>
+  </div>
+</div>
 
 <!-- MOBILE -->
-<div class="mob" id="mob"></div>
+<div class="mob-wrap" id="mobWrap"></div>
 
 <script>
 const F={Mexiko:'mx',Suedafrika:'za',Suedkorea:'kr',Tschechien:'cz',Kanada:'ca','Bosnien-Herzegowina':'ba',Katar:'qa',Schweiz:'ch',Brasilien:'br',Marokko:'ma',Haiti:'ht',Schottland:'gb-sct',USA:'us',Paraguay:'py',Australien:'au',Tuerkei:'tr',Deutschland:'de',Curacao:'cw',Elfenbeinkueste:'ci',Ecuador:'ec',Niederlande:'nl',Japan:'jp',Schweden:'se',Tunesien:'tn',Belgien:'be',Aegypten:'eg',Iran:'ir',Neuseeland:'nz',Spanien:'es','Kap Verde':'cv','Saudi-Arabien':'sa',Uruguay:'uy',Frankreich:'fr',Senegal:'sn',Irak:'iq',Norwegen:'no',Argentinien:'ar',Algerien:'dz',Oesterreich:'at',Jordanien:'jo',Portugal:'pt','DR Kongo':'cd',Usbekistan:'uz',Kolumbien:'co',England:'gb-eng',Kroatien:'hr',Ghana:'gh',Panama:'pa'};
 let M=[],T={},U=null;
 
-// ── BRACKET MATH ──
-// Total height = 720px, 8 SF slots of 90px each
-// Cards are 52px, centered in each slot with 19px padding top/bottom
-const TOTAL_H=720,CARD_H=52,CARD_W=148,SLOT=90;
-const SF_TOPS=[19,109,199,289,379,469,559,649];
-const AF_TOPS=[64,244,424,604];
-const VF_TOPS=[154,514];
-const HF_TOP=334;
-// Finale vertically centered at TOTAL_H/2 = 360, card top = 360-CARD_H/2 = 334 ✓
+// Bracket math: TOTAL_H=800, 8 slots of 100px each, CARD_H=52
+const TOTAL_H=800,CARD_H=52,CARD_W=148,SLOT=100;
+const SF_T=[24,124,224,324,424,524,624,724];
+const AF_T=[74,274,474,674];
+const VF_T=[174,574];
+const HF_T=374;
+const FIN_T=374; // center=400=TOTAL_H/2 ✓
+const P3_T=446;  // below finale: 374+52+20
 
-// ── HELPERS ──
 const api=async u=>{try{const r=await fetch(u,{credentials:'include'});return r.ok?r.json():null}catch{return null}};
 const byG=g=>M.filter(m=>m.group===g||(g.length>=2&&m.group.startsWith(g))).sort((a,b)=>a.id-b.id);
 const fl=(t,w=20,h=13)=>{const c=F[t];if(!c||!t)return`<span style="display:inline-block;width:${w}px;height:${h}px;background:#2a2a2a;border-radius:2px;flex-shrink:0"></span>`;return`<img style="width:${w}px;height:${h}px;object-fit:cover;border-radius:2px;flex-shrink:0" src="https://flagcdn.com/w40/${c}.png" alt="${t}" onerror="this.style.opacity=0">`};
 const sc=m=>{if(!m)return'&#8211;:&#8211;';if(m.status==='done'&&m.home_score!==null)return`${m.home_score}:${m.away_score}`;if(m.status==='live'&&m.home_score!==null)return`&#128308;${m.home_score}:${m.away_score}`;return'&#8211;:&#8211;'};
 const tc=m=>{if(!U)return null;const t=T[m.id];if(!t||t.home===undefined)return null;return t.points===3?'#16a34a':t.points===1?'#ea580c':t.points===0?'#cc0000':null};
 
-// ── MATCH CARD (desktop, absolute positioned) ──
+// Match card with absolute positioning
 function mc(m,top,w=CARD_W){
-  const wpx=w+'px';
-  if(!m)return`<div style="position:absolute;top:${top}px;left:0;width:${wpx};height:${CARD_H}px;border:1px dashed #2a2a2a;border-radius:5px;background:#0d0d0d"></div>`;
+  if(!m)return`<div style="position:absolute;top:${top}px;left:0;width:${w}px;height:${CARD_H}px;border:1px dashed #2a2a2a;border-radius:5px;background:#0d0d0d"></div>`;
   const dn=m.status==='done'&&m.home_score!==null,lv=m.status==='live'&&m.home_score!==null;
   const hs=dn||lv?m.home_score:null,as=dn||lv?m.away_score:null;
   const hw=dn&&hs>as,aw=dn&&as>hs;
   const col=tc(m),bc=col||(lv?'#cc0000':dn?'#ffd700':'#2a2a2a');
   const t=U?T[m.id]:null;
   const tip=t&&t.home!==undefined&&col?`<div class="mc-tip" style="color:${col}">${t.points===3?'&#10003;':t.points===1?'&#9675;':'&#10007;'} ${t.home}:${t.away}</div>`:'';
-  return`<div class="mc" style="top:${top}px;width:${wpx};border-color:${bc}">
+  return`<div class="mc" style="top:${top}px;width:${w}px;border-color:${bc}">
 <div class="mc-r${hw?' W':''}"><span>${fl(m.home)}</span><span class="mc-n" style="color:${hw?'#ffd700':'#ccc'};font-weight:${hw?700:400}">${m.home||'?'}</span><span class="mc-s" style="color:${hw?'#ffd700':'#555'}">${hs!==null?hs:''}</span></div>
 <div class="mc-r${aw?' W':''}"><span>${fl(m.away)}</span><span class="mc-n" style="color:${aw?'#ffd700':'#ccc'};font-weight:${aw?700:400}">${m.away||'?'}</span><span class="mc-s" style="color:${aw?'#ffd700':'#555'}">${as!==null?as:''}</span></div>
 ${tip}</div>`;
 }
 
-// ── MATCH CARD (mobile, inline) ──
+// Inline card for mobile
 function mcInline(m,w=155){
   if(!m)return`<div style="width:${w}px;height:${CARD_H}px;border:1px dashed #2a2a2a;border-radius:5px;background:#0d0d0d"></div>`;
   const dn=m.status==='done'&&m.home_score!==null,lv=m.status==='live'&&m.home_score!==null;
@@ -193,7 +213,49 @@ function mcInline(m,w=155){
 ${tip}</div>`;
 }
 
-// ── GRUPPE CARD ──
+// KO column
+function koCol(items,tops,lbl,w=CARD_W){
+  const H=TOTAL_H+20;
+  const cards=items.map((m,i)=>mc(m,tops[i]||0,w)).join('');
+  return`<div style="flex-shrink:0;display:flex;flex-direction:column">
+<div class="col-lbl">${lbl}</div>
+<div class="ko-wrap" style="height:${H}px;width:${w}px">${cards}</div>
+</div>`;
+}
+
+// Finale + Platz 3 combined column
+function finCol(){
+  const fin=M.find(m=>m.group==='FIN');
+  const p3=M.find(m=>m.group==='P3');
+  const dn=fin&&fin.status==='done'&&fin.home_score!==null;
+  const w=dn?(fin.home_score>fin.away_score?fin.home:fin.away):'';
+  const p3dn=p3&&p3.status==='done'&&p3.home_score!==null;
+
+  const finHtml=`<div class="fin-box" style="top:${FIN_T}px">
+<div class="fin-lbl">&#127942; FINALE</div>
+<div class="fin-date">19. Juli 2026 &middot; New York/New Jersey</div>
+${fin?`<div class="fin-c">
+<div class="fin-r${dn&&fin.home_score>fin.away_score?' W':''}">${fl(fin.home,20,13)}<span class="fin-t">${fin.home||'?'}</span><span class="fin-s">${dn?fin.home_score:''}</span></div>
+<div class="fin-r${dn&&fin.away_score>fin.home_score?' W':''}">${fl(fin.away,20,13)}<span class="fin-t">${fin.away||'?'}</span><span class="fin-s">${dn?fin.away_score:''}</span></div>
+</div>${dn?`<div class="fin-winner">&#127942; Weltmeister: ${w}</div>`:`<div class="fin-tbd">WELTMEISTER 2026</div>`}`:`<div style="color:#333;padding:8px;font-size:10px">Ausstehend</div>`}
+</div>`;
+
+  const p3Html=`<div class="p3-box" style="top:${P3_T+CARD_H+10}px">
+<div class="p3-lbl">&#129351; Spiel um Platz 3 &middot; 18. Juli</div>
+${p3?`<div class="p3-c">
+<div class="p3-r${p3dn&&p3.home_score>p3.away_score?' W':''}">${fl(p3.home,18,12)}<span class="mc-n" style="color:${p3dn&&p3.home_score>p3.away_score?'#ffd700':'#bbb'}">${p3.home||'?'}</span><span style="font-size:10px;font-weight:700;color:#888">${p3dn?p3.home_score:''}</span></div>
+<div class="p3-r${p3dn&&p3.away_score>p3.home_score?' W':''}">${fl(p3.away,18,12)}<span class="mc-n" style="color:${p3dn&&p3.away_score>p3.home_score?'#ffd700':'#bbb'}">${p3.away||'?'}</span><span style="font-size:10px;font-weight:700;color:#888">${p3dn?p3.away_score:''}</span></div>
+</div>${p3dn?`<div style="font-size:8px;color:#888;text-align:center">&#129351; ${p3.home_score>p3.away_score?p3.home:p3.away}</div>`:''}`:`<div style="color:#333;font-size:9px;padding:4px">Ausstehend</div>`}
+</div>`;
+
+  const totalH=TOTAL_H+120;
+  return`<div style="flex-shrink:0;display:flex;flex-direction:column">
+<div class="col-lbl">Finale &amp; Platz 3</div>
+<div class="fin-col" style="height:${totalH}px;width:176px">${finHtml}${p3Html}</div>
+</div>`;
+}
+
+// Gruppe card
 function gcCard(g){
   const sp=byG(g);
   if(!sp.length)return`<div class="gc"><div class="gc-h"><span class="gc-n">GRUPPE ${g}</span></div></div>`;
@@ -208,89 +270,54 @@ function gcCard(g){
     else{st[m.home].p++;st[m.away].p++}
   });
   const srt=[...teams].sort((a,b)=>st[b].p-st[a].p||st[b].gd-st[a].gd||st[b].gf-st[a].gf);
-  const tR=srt.map((t,i)=>`<tr><td style="color:${i<2?'#ffd700':'#555'};text-align:center;width:14px">${i+1}</td><td style="width:19px">${fl(t,15,10)}</td><td style="max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#bbb">${t}</td><td style="text-align:center;color:#555">${st[t].s}</td><td style="text-align:center;font-weight:700;color:${i<2?'#ffd700':'#888'}">${st[t].p}</td></tr>`).join('');
-  const sR=sp.map(m=>{const col=tc(m);const t2=U?T[m.id]:null;return`<div class="gs" style="${col?`background:${col}15`:''}"><span style="color:#444;width:26px;flex-shrink:0">${(m.date||'').slice(0,6)}</span><span style="flex:1;text-align:right;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.home}</span><span style="width:30px;text-align:center;font-weight:700;color:${m.status==='done'?'#ffd700':'#333'};flex-shrink:0">${sc(m)}</span><span style="flex:1;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.away}</span>${U&&t2&&t2.home!==undefined?`<span style="width:13px;flex-shrink:0;text-align:right;color:${col||'#555'}">${t2.points===3?'&#10003;':t2.points===1?'&#9675;':t2.points===0?'&#10007;':''}</span>`:'<span style="width:13px"></span>'}</div>`}).join('');
-  return`<div class="gc"><div class="gc-h"><span class="gc-n">GRUPPE ${g}</span><div style="display:flex;gap:2px">${teams.slice(0,4).map(t=>fl(t,15,10)).join('')}</div></div><table><thead><tr><th style="width:14px">#</th><th style="width:19px"></th><th>Team</th><th style="text-align:center">Sp</th><th style="text-align:center">Pkt</th></tr></thead><tbody>${tR}</tbody></table><div class="gc-sp">${sR}</div></div>`;
-}
-
-// ── FINALE CARD ──
-function finCard(){
-  const fin=M.find(m=>m.group==='FIN'),p3=M.find(m=>m.group==='P3');
-  const dn=fin&&fin.status==='done'&&fin.home_score!==null;
-  const w=dn?(fin.home_score>fin.away_score?fin.home:fin.away):'';
-  return`<div class="fin">
-<div class="fin-l">&#127942; FINALE</div>
-<div class="fin-d">19. Juli 2026 &middot; New York / New Jersey</div>
-${fin?`<div class="fin-c">
-<div class="fin-r${dn&&fin.home_score>fin.away_score?' W':''}">${fl(fin.home,20,13)}<span class="fin-t">${fin.home||'?'}</span><span class="fin-s">${dn?fin.home_score:''}</span></div>
-<div class="fin-r${dn&&fin.away_score>fin.home_score?' W':''}">${fl(fin.away,20,13)}<span class="fin-t">${fin.away||'?'}</span><span class="fin-s">${dn?fin.away_score:''}</span></div>
-</div>${dn?`<div class="fin-w">&#127942; Weltmeister: ${w}</div>`:`<div class="fin-tbd">WELTMEISTER 2026</div>`}`:`<div style="color:#333;padding:8px;font-size:10px">Ausstehend</div>`}
-${p3?`<div class="p3"><div style="color:#444;margin-bottom:2px">&#129351; Platz 3 &middot; 18. Juli</div><div style="color:#666;margin-bottom:1px">${p3.home||'?'} &ndash; ${p3.away||'?'}</div><div style="font-weight:700;color:var(--gold)">${sc(p3)}</div></div>`:''}
-</div>`;
-}
-
-// ── KO COLUMN BUILDER ──
-function koCol(items,tops,lbl,w=CARD_W){
-  const cards=items.map((m,i)=>mc(m,tops[i]||0,w)).join('');
-  return`<div style="flex-shrink:0;display:flex;flex-direction:column">
-<div class="col-lbl">${lbl}</div>
-<div style="position:relative;height:${TOTAL_H}px;width:${w}px">${cards}</div>
-</div>`;
+  const tR=srt.map((t,i)=>`<tr><td style="color:${i<2?'#ffd700':'#555'};text-align:center;width:12px">${i+1}</td><td style="width:18px">${fl(t,14,9)}</td><td style="max-width:75px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#bbb">${t}</td><td style="text-align:center;color:#555">${st[t].s}</td><td style="text-align:center;font-weight:700;color:${i<2?'#ffd700':'#888'}">${st[t].p}</td></tr>`).join('');
+  const sR=sp.map(m=>{const col=tc(m);const t2=U?T[m.id]:null;return`<div class="gs" style="${col?`background:${col}15`:''}"><span style="color:#444;width:24px;flex-shrink:0">${(m.date||'').slice(0,6)}</span><span style="flex:1;text-align:right;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.home}</span><span style="width:28px;text-align:center;font-weight:700;color:${m.status==='done'?'#ffd700':'#333'};flex-shrink:0">${sc(m)}</span><span style="flex:1;color:#666;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.away}</span>${U&&t2&&t2.home!==undefined?`<span style="width:12px;flex-shrink:0;text-align:right;color:${col||'#555'}">${t2.points===3?'&#10003;':t2.points===1?'&#9675;':t2.points===0?'&#10007;':''}</span>`:'<span style="width:12px"></span>'}</div>`}).join('');
+  return`<div class="gc"><div class="gc-h"><span class="gc-n">GRUPPE ${g}</span><div style="display:flex;gap:2px">${teams.slice(0,4).map(t=>fl(t,14,9)).join('')}</div></div><table><thead><tr><th style="width:12px">#</th><th style="width:18px"></th><th>Team</th><th style="text-align:center">Sp</th><th style="text-align:center">Pkt</th></tr></thead><tbody>${tR}</tbody></table><div class="gc-sp">${sR}</div></div>`;
 }
 
 const sep=w=>`<div style="width:${w}px;flex-shrink:0"></div>`;
 
-// ── BUILD DESKTOP BRACKET ──
-function buildDesk(){
+function buildBracket(){
   const sf=byG('SF'),af=byG('AF'),vf=byG('VF'),hf=byG('HF');
   const sfL=sf.slice(0,8),sfR=sf.slice(8);
   const afL=af.slice(0,4),afR=af.slice(4);
   const vfL=vf.slice(0,2),vfR=vf.slice(2);
   const hfL=hf.slice(0,1),hfR=hf.slice(1,2);
-  const gL=['A','B','C','D','E','F'],gR=['G','H','I','J','K','L'];
+  const gR=['G','H','I','J','K','L'];
 
-  // Finale col: fixed height container with card centered at TOTAL_H/2
-  const finTop=Math.round(TOTAL_H/2-CARD_H/2); // =334
-  const finColHtml=`<div style="flex-shrink:0;display:flex;flex-direction:column">
-<div class="col-lbl">Finale</div>
-<div style="position:relative;height:${TOTAL_H}px;width:175px">
-  <div style="position:absolute;top:${finTop}px;left:0">${finCard()}</div>
-</div></div>`;
-
-  return`<div class="bk">
-<div class="g-col">${gL.map(g=>gcCard(g)).join('')}</div>
+  return`
+${koCol(sfL,SF_T,'Sechzehntelfinale')}
+${sep(5)}
+${koCol(afL,AF_T,'Achtelfinale')}
+${sep(5)}
+${koCol(vfL,VF_T,'Viertelfinale')}
+${sep(5)}
+${koCol(hfL,[HF_T],'Halbfinale')}
 ${sep(8)}
-${koCol(sfL,SF_TOPS,'Sechzehntelfinale')}
-${sep(5)}
-${koCol(afL,AF_TOPS,'Achtelfinale')}
-${sep(5)}
-${koCol(vfL,VF_TOPS,'Viertelfinale')}
-${sep(5)}
-${koCol(hfL,[HF_TOP],'Halbfinale')}
+${finCol()}
 ${sep(8)}
-${finColHtml}
+${koCol(hfR,[HF_T],'Halbfinale')}
+${sep(5)}
+${koCol(vfR,VF_T,'Viertelfinale')}
+${sep(5)}
+${koCol(afR,AF_T,'Achtelfinale')}
+${sep(5)}
+${koCol(sfR,SF_T,'Sechzehntelfinale')}
 ${sep(8)}
-${koCol(hfR,[HF_TOP],'Halbfinale')}
-${sep(5)}
-${koCol(vfR,VF_TOPS,'Viertelfinale')}
-${sep(5)}
-${koCol(afR,AF_TOPS,'Achtelfinale')}
-${sep(5)}
-${koCol(sfR,SF_TOPS,'Sechzehntelfinale')}
-${sep(8)}
-<div class="g-col">${gR.map(g=>gcCard(g)).join('')}</div>
+<div style="flex-shrink:0;display:flex;flex-direction:column">
+<div class="col-lbl">Gruppen G&#8211;L</div>
+<div style="display:flex;flex-direction:column;gap:6px">${gR.map(g=>gcCard(g)).join('')}</div>
 </div>`;
 }
 
-// ── BUILD MOBILE ──
-function buildMob(){
+function buildMobile(){
   const sf=byG('SF'),af=byG('AF'),vf=byG('VF'),hf=byG('HF'),p3=byG('P3');
   const fin=M.find(m=>m.group==='FIN');
   const dn=fin&&fin.status==='done'&&fin.home_score!==null;
   const w=dn?(fin.home_score>fin.away_score?fin.home:fin.away):'';
   let h=`<div style="background:#111;border:2px solid #ffd700;border-radius:10px;padding:12px;text-align:center;margin-bottom:10px">
 <div style="font-size:9px;letter-spacing:3px;color:#ffd700;font-weight:800;margin-bottom:5px">&#127942; FINALE &middot; 19. Juli 2026</div>
-${fin?`<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:5px;overflow:hidden;max-width:290px;margin:0 auto 7px">
+${fin?`<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:5px;overflow:hidden;max-width:280px;margin:0 auto 7px">
 <div style="display:flex;align-items:center;gap:5px;padding:6px 9px;border-bottom:1px solid #1a1a1a;${dn&&fin.home_score>fin.away_score?'background:#0d1a0d':''}">${fl(fin.home,20,13)}<span style="flex:1;font-size:12px;color:#ddd">${fin.home||'?'}</span><span style="font-size:14px;font-weight:800;color:#ffd700">${dn?fin.home_score:''}</span></div>
 <div style="display:flex;align-items:center;gap:5px;padding:6px 9px;${dn&&fin.away_score>fin.home_score?'background:#0d1a0d':''}">${fl(fin.away,20,13)}<span style="flex:1;font-size:12px;color:#ddd">${fin.away||'?'}</span><span style="font-size:14px;font-weight:800;color:#ffd700">${dn?fin.away_score:''}</span></div>
 </div>${dn?`<div style="background:#ffd700;color:#000;padding:6px 14px;border-radius:5px;font-size:11px;font-weight:900;display:inline-block">&#127942; Weltmeister: ${w}</div>`:`<div style="border:1px dashed #ffd700;color:#ffd700;padding:6px 14px;border-radius:5px;font-size:9px;display:inline-block">WELTMEISTER 2026</div>`}`:`<div style="color:#333">Ausstehend</div>`}
@@ -303,17 +330,17 @@ ${fin?`<div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:5px
   return h;
 }
 
-// ── RENDER ──
 function render(){
-  document.getElementById('desk').innerHTML=buildDesk();
-  document.getElementById('mob').innerHTML=buildMob();
+  // Desktop: groups left panel + bracket right
+  document.getElementById('groupsL').innerHTML='ABCDEF'.split('').map(g=>gcCard(g)).join('');
+  document.getElementById('bracket').innerHTML=buildBracket();
+  document.getElementById('mobWrap').innerHTML=buildMobile();
 }
 
-// ── LOAD DATA ──
 async function load(){
   const [mD,tD,uD]=await Promise.all([api('/api/matches'),api('/api/tips'),api('/api/me')]);
   if(mD)M=mD;
-  if(uD){U=uD;document.getElementById('leg').querySelector('span:last-child').style.display='none'}
+  if(uD){U=uD;const h=document.getElementById('leg-hint');if(h)h.style.display='none'}
   if(tD)T=tD;
   render();
 }
