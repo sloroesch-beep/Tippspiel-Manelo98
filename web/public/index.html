@@ -681,7 +681,9 @@ function renderHeader(){
       <div class="logo-text"><span class="logo-main">Fanclub Manelo98</span><span class="logo-sub">WM Tippspiel 2026</span></div>
     </a>
     <nav class="topnav">
-      ${navItems.filter(Boolean).map(([id,label])=>`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`).join('')}
+      ${navItems.filter(Boolean).map(([id,label])=>id==='spielbaum'
+    ?`<a href="/spielbaum.html" style="text-decoration:none;">${label}</a>`
+    :`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`).join('')}
     </nav>
     <div class="user-area">${uArea}</div>
   </header>
@@ -1186,6 +1188,7 @@ function renderAdmin(){
       <div class="admin-head"><h2>🔄 Live-Scores</h2><span>Ergebnisse von football-data.org abrufen</span></div>
       <div style="padding:16px 18px;">
         <button class="save-btn" style="padding:9px 20px;font-size:13px;" onclick="adminFetchScores()">🌐 Scores jetzt abrufen</button>
+        <button class="save-btn" style="padding:9px 20px;font-size:13px;margin-left:8px;background:#1a3a1a;" onclick="adminUpdateBrackets()">🔄 KO-Brackets aktualisieren</button>
         <span id="fetch-scores-msg" style="margin-left:12px;font-size:13px;color:var(--muted);"></span>
       </div>
     </div>
@@ -1300,6 +1303,16 @@ async function adminSetResult(){
     setTimeout(loadAdminUsers,500);
     alert('Ergebnis eingetragen und Punkte vergeben!');
   }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminUpdateBrackets(){
+  const msg=document.getElementById("fetch-scores-msg");
+  if(msg)msg.textContent="Aktualisiere KO-Brackets...";
+  try{
+    const r=await api("/api/admin/update-brackets",{method:"POST"});
+    if(msg)msg.textContent=`✅ Aktualisiert: ${(r.updated||[]).join(', ')||'Keine Änderungen'}`;
+    setTimeout(()=>{if(msg)msg.textContent="";},4000);
+  }catch(e){if(msg)msg.textContent="❌ Fehler: "+e.message;}
 }
 
 async function adminFetchScores(){
