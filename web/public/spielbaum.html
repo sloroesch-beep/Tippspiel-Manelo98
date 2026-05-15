@@ -157,7 +157,7 @@ const HF_TOP=334;
 
 // ── HELPERS ──
 const api=async u=>{try{const r=await fetch(u,{credentials:'include'});return r.ok?r.json():null}catch{return null}};
-const byG=g=>M.filter(m=>m.group===g||(g.length>=2&&m.group.startsWith(g)&&!/^\d/.test(m.group.slice(g.length)))).sort((a,b)=>a.id-b.id);
+const byG=g=>M.filter(m=>m.group===g||(g.length>=2&&m.group.startsWith(g))).sort((a,b)=>a.id-b.id);
 const fl=(t,w=20,h=13)=>{const c=F[t];if(!c||!t)return`<span style="display:inline-block;width:${w}px;height:${h}px;background:#2a2a2a;border-radius:2px;flex-shrink:0"></span>`;return`<img style="width:${w}px;height:${h}px;object-fit:cover;border-radius:2px;flex-shrink:0" src="https://flagcdn.com/w40/${c}.png" alt="${t}" onerror="this.style.opacity=0">`};
 const sc=m=>{if(!m)return'&#8211;:&#8211;';if(m.status==='done'&&m.home_score!==null)return`${m.home_score}:${m.away_score}`;if(m.status==='live'&&m.home_score!==null)return`&#128308;${m.home_score}:${m.away_score}`;return'&#8211;:&#8211;'};
 const tc=m=>{if(!U)return null;const t=T[m.id];if(!t||t.home===undefined)return null;return t.points===3?'#16a34a':t.points===1?'#ea580c':t.points===0?'#cc0000':null};
