@@ -1804,6 +1804,8 @@ function updateSpielbaum(){
 window.addEventListener('resize', updateSpielbaum);
 var _origRender=render;
 render=function(){_origRender();setTimeout(updateSpielbaum,10);};
+
+init();
 </script>
 </body>
 </html>
