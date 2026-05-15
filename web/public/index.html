@@ -478,6 +478,75 @@ img{max-width:100%;}
 .sb2-gruppe-team{display:flex;align-items:center;gap:4px;background:#f8f8f8;border-radius:4px;padding:3px 7px;font-size:11px;font-weight:600;}
 .sb2-gruppe-team img{width:20px;height:13px;object-fit:cover;border-radius:2px;}
 
+
+/* ── SPIELPLAN NEU ── */
+.sp-wrap{padding:0}
+.sp-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;flex-wrap:wrap;gap:6px}
+.sp-hint{font-size:11px;color:var(--muted)}
+.sp-filters{display:flex;gap:5px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.sp-filters::-webkit-scrollbar{display:none}
+.sp-flt{background:transparent;border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:inherit}
+.sp-flt:hover{border-color:var(--gold);color:var(--gold)}
+.sp-flt.active{background:var(--gold);border-color:var(--gold);color:#000}
+.sp-day{margin-bottom:4px}
+.sp-day-hd{display:flex;align-items:center;gap:8px;padding:10px 0 6px;position:sticky;top:0;background:var(--bg);z-index:10}
+.sp-day-date{font-size:13px;font-weight:800;color:var(--gold)}
+.sp-day-line{flex:1;height:1px;background:var(--border)}
+.sp-card{background:#111;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;overflow:hidden;transition:border-color .2s}
+.sp-card.live{border-color:#cc0000}
+.sp-card.done{border-color:#2a2a2a}
+.sp-card.tipped{border-color:#1a2a1a}
+.sp-card-top{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;background:#0d0d0d;border-bottom:1px solid #1a1a1a;font-size:10px;gap:6px}
+.sp-card-time{color:var(--muted);font-weight:600;white-space:nowrap}
+.sp-card-round{color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-pill{padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.sp-pill.open{background:#1a1400;color:#888;border:1px solid #2a2200}
+.sp-pill.live{background:#2a0000;color:#ff4444;border:1px solid #cc0000;animation:pulse 1.5s infinite}
+.sp-pill.done{background:#111;color:#555;border:1px solid #222}
+.sp-pill.tipped{background:#0d1a0d;color:#16a34a;border:1px solid #16a34a}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.sp-card-body{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:10px 10px;gap:8px}
+.sp-team{display:flex;align-items:center;gap:6px}
+.sp-team.away{flex-direction:row-reverse;text-align:right}
+.sp-team-name{font-size:13px;font-weight:600;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-flag{width:22px;height:15px;object-fit:cover;border-radius:2px;flex-shrink:0}
+.sp-flag-ph{width:22px;height:15px;background:#2a2a2a;border-radius:2px;flex-shrink:0;display:inline-block}
+.sp-center{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:90px}
+.sp-score{display:flex;align-items:center;gap:6px}
+.sp-score-n{font-size:22px;font-weight:900;color:var(--gold);min-width:24px;text-align:center}
+.sp-score-n.win{color:#ffd700}
+.sp-score-n.lose{color:#555}
+.sp-score-sep{font-size:18px;color:#444;font-weight:300}
+.sp-score-live{color:#ff4444}
+.sp-tip-row{display:flex;align-items:center;gap:4px}
+.sp-tip-btn{width:28px;height:28px;border:1px solid var(--border);background:#1a1a1a;color:#ddd;border-radius:6px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;font-family:inherit;line-height:1}
+.sp-tip-btn:hover{border-color:var(--gold);color:var(--gold);background:#1a1200}
+.sp-tip-btn:active{transform:scale(.9)}
+.sp-tip-n{font-size:20px;font-weight:900;color:#fff;min-width:24px;text-align:center}
+.sp-tip-n.unset{color:#444}
+.sp-tip-sep{font-size:18px;color:#444}
+.sp-result-tip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-align:center}
+.sp-result-tip.exact{background:#0d2a0d;color:#16a34a;border:1px solid #16a34a}
+.sp-result-tip.tend{background:#2a1200;color:#ea580c;border:1px solid #ea580c}
+.sp-result-tip.wrong{background:#2a0000;color:#cc0000;border:1px solid #cc0000}
+.sp-locked{display:flex;flex-direction:column;align-items:center;gap:3px}
+.sp-locked-score{font-size:18px;font-weight:700;color:#333}
+.sp-login-btn{font-size:10px;color:var(--gold);background:none;border:1px solid var(--gold);border-radius:10px;padding:2px 8px;cursor:pointer;font-family:inherit}
+@media(max-width:500px){
+  .sp-team-name{font-size:11px}
+  .sp-score-n{font-size:18px}
+  .sp-tip-n{font-size:16px}
+  .sp-tip-btn{width:24px;height:24px;font-size:14px}
+  .sp-center{min-width:76px}
+  .sp-card-body{padding:8px 6px;gap:4px}
+}
+@media(max-width:500px){
+  .sp-team-name{font-size:11px}
+  .sp-result-num,.sp-tip-num{font-size:18px}
+  .sp-center{width:110px}
+  .sp-btn{width:24px;height:24px;font-size:14px}
+}
+
 </style>
 </head>
 <body>
@@ -763,161 +832,156 @@ function renderWelcome(){
 }
 
 function renderSpielplan(){
-  const koGroups={'SF':'Sechzehntelfinale','AF':'Achtelfinale','VF':'Viertelfinale','HF':'Halbfinale','P3':'Spiel um Platz 3','FIN':'🏆 Finale'};
-  const isKO=!!koGroups[state.group];
-  const matches=state.matches.filter(m=>isKO?m.group.startsWith(state.group)||m.group===state.group:m.group===state.group);
-  let html='';
+  const FLAG_MAP={Mexiko:'mx',Suedafrika:'za',Suedkorea:'kr',Tschechien:'cz',Kanada:'ca','Bosnien-Herzegowina':'ba',Katar:'qa',Schweiz:'ch',Brasilien:'br',Marokko:'ma',Haiti:'ht',Schottland:'gb-sct',USA:'us',Paraguay:'py',Australien:'au',Tuerkei:'tr',Deutschland:'de',Curacao:'cw',Elfenbeinkueste:'ci',Ecuador:'ec',Niederlande:'nl',Japan:'jp',Schweden:'se',Tunesien:'tn',Belgien:'be',Aegypten:'eg',Iran:'ir',Neuseeland:'nz',Spanien:'es','Kap Verde':'cv','Saudi-Arabien':'sa',Uruguay:'uy',Frankreich:'fr',Senegal:'sn',Irak:'iq',Norwegen:'no',Argentinien:'ar',Algerien:'dz',Oesterreich:'at',Jordanien:'jo',Portugal:'pt','DR Kongo':'cd',Usbekistan:'uz',Kolumbien:'co',England:'gb-eng',Kroatien:'hr',Ghana:'gh',Panama:'pa'};
+  const spFlag=t=>{const c=FLAG_MAP[t];return c?`<img class="sp-flag" src="https://flagcdn.com/w40/${c}.png" alt="${t}" onerror="this.style.opacity=0">`:`<span class="sp-flag-ph"></span>`};
+  const ROUND={'SF':'Sechzehntelfinale','AF':'Achtelfinale','VF':'Viertelfinale','HF':'Halbfinale','P3':'Platz 3','FIN':'Finale'};
 
+  const all=[...(state.matches||[])].sort((a,b)=>{
+    const da=a.date.split('.').reverse().join('')+a.time.replace(':','');
+    const db=b.date.split('.').reverse().join('')+b.time.replace(':','');
+    return da<db?-1:da>db?1:0;
+  });
+  if(!all.length)return`<div style="text-align:center;padding:40px;color:var(--muted)">Keine Spiele geladen</div>`;
+
+  const f=state.spFilter||'';
+  let filtered=all;
+  if(f==='open')filtered=all.filter(m=>m.status==='open');
+  else if(f==='live')filtered=all.filter(m=>m.status==='live');
+  else if(f==='done')filtered=all.filter(m=>m.status==='done');
+  else if(f==='gruppe')filtered=all.filter(m=>/^[A-L]$/.test(m.group));
+  else if(f==='ko')filtered=all.filter(m=>!/^[A-L]$/.test(m.group));
+
+  // Count live for filter badge
+  const liveCount=all.filter(m=>m.status==='live').length;
+
+  let html=`<div class="sp-wrap">`;
+
+  // Status hint
+  const now=new Date();
   if(!state.user){
-    html+=`<div class="bot-bar">💬 <span>Melde dich an um Tipps abzugeben. <a href="#" onclick="setPage('login');return false;" style="color:#5865f2;font-weight:700;">Jetzt anmelden →</a></span></div>`;
-  }else{
-    html+=`<div class="bot-bar">🤖 <span>Ergebnisse werden automatisch live aktualisiert. Tipps sind nur bis Anpfiff möglich.</span></div>`;
-  }
-  if(state.lastUpdate){
-    html+=`<div class="last-update" id="last-update">Aktualisiert: ${state.lastUpdate.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})}</div>`;
-  }
-
-  const groupLabel=isKO?(koGroups[state.group]||state.group):`Gruppe ${state.group}`;
-  html+=`<div class="group-label">⚽ ${groupLabel}</div>`;
-
-  if(!matches.length){
-    html+=`<div class="empty-state"><p>📅 Keine Spiele in dieser Gruppe</p></div>`;
-    if(!isKO)html+=renderGroupTable(state.group);
-    return html;
+    html+=`<div class="sp-bar"><span class="sp-hint">💡 <a href="#" onclick="setPage('login');return false" style="color:var(--gold)">Anmelden</a> um Tipps abzugeben</span></div>`;
+  } else {
+    const tipped=Object.keys(state.tips||{}).length;
+    const open=all.filter(m=>m.status==='open').length;
+    html+=`<div class="sp-bar"><span class="sp-hint">🔄 Live-Update alle 30s &middot; Tipps bis Anpfiff möglich</span><span class="sp-hint" style="color:var(--green)">${tipped} Tipps abgegeben &middot; ${open} Spiele offen</span></div>`;
   }
 
-  if(isKO){
-    for(const m of matches){
-      const t=state.tips[m.id]||{};
-      const hv=t.home,av=t.away;
-      const set=hv!==null&&hv!==undefined&&av!==null&&av!==undefined;
-      // canTip is now canTipNow (defined below)
-      const isPlaceholder=m.home.includes('.')||m.home.includes('Sieger')||m.home.includes('Verlierer');
-      html+=`<div class="ko-card${set?' tipped':''}">
-        <div class="ko-team">
-          ${!isPlaceholder?flagEl(m.home,'team-flag'):''}
-          <span class="${isPlaceholder?'ko-placeholder':''}">${m.home}</span>
-        </div>
-        <div class="score-center" style="flex-shrink:0;">
-          <div class="ko-date">${m.date} · ${m.time} Uhr</div>
-          <div class="score-row">
-            ${canTip?`<button class="ctrl minus" onclick="saveTip(${m.id},'h',-1)">−</button>`:''}
-            <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${hv!==null&&hv!==undefined?hv:'?'}</div>
-            <span class="score-colon">:</span>
-            <div class="score-box${av!==null&&av!==undefined?' filled':''}">${av!==null&&av!==undefined?av:'?'}</div>
-            ${canTip?`<button class="ctrl plus" onclick="saveTip(${m.id},'a',1)">+</button>`:''}
+  // Filter bar
+  html+=`<div class="sp-filters">
+    <button class="sp-flt${!f?' active':''}" onclick="setSpFilter('')">Alle (${all.length})</button>
+    <button class="sp-flt${f==='open'?' active':''}" onclick="setSpFilter('open')">Offen (${all.filter(m=>m.status==='open').length})</button>
+    <button class="sp-flt${f==='live'?' active':''}" onclick="setSpFilter('live')">${liveCount?'🔴 ':''}Live${liveCount?` (${liveCount})`:''}</button>
+    <button class="sp-flt${f==='done'?' active':''}" onclick="setSpFilter('done')">Gespielt (${all.filter(m=>m.status==='done').length})</button>
+    <button class="sp-flt${f==='gruppe'?' active':''}" onclick="setSpFilter('gruppe')">Gruppen</button>
+    <button class="sp-flt${f==='ko'?' active':''}" onclick="setSpFilter('ko')">K.O.-Runde</button>
+  </div>`;
+
+  if(!filtered.length){
+    html+=`<div style="text-align:center;padding:30px;color:var(--muted)">Keine Spiele für diesen Filter</div>`;
+    html+=`</div>`;return html;
+  }
+
+  // Group by date
+  const byDate={};
+  filtered.forEach(m=>{if(!byDate[m.date])byDate[m.date]=[];byDate[m.date].push(m);});
+
+  for(const [date,dayMs] of Object.entries(byDate)){
+    const [d,mo,y]=date.split('.');
+    const dateObj=new Date(+y,+mo-1,+d);
+    const dayStr=dateObj.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+    html+=`<div class="sp-day">
+      <div class="sp-day-hd"><span class="sp-day-date">${dayStr}</span><div class="sp-day-line"></div></div>`;
+
+    for(const m of dayMs){
+      const tip=state.tips?.[m.id]||{};
+      const hv=tip.home,av=tip.away;
+      const tipped=hv!=null&&av!=null;
+      const isDone=m.status==='done'&&m.home_score!=null;
+      const isLive=m.status==='live'&&m.home_score!=null;
+      const canTip=!!state.user&&m.status==='open';
+      const isKO=!/^[A-L]$/.test(m.group);
+      const roundName=isKO?(ROUND[m.group.replace(/\d+$/,'')]||m.group.replace(/\d+$/,'')):`Gruppe ${m.group}`;
+
+      // Pill
+      let pill='';
+      if(isLive)pill=`<span class="sp-pill live">🔴 LIVE</span>`;
+      else if(isDone&&tipped){
+        if(tip.points===3)pill=`<span class="sp-pill tipped">✅ +3 Pkt</span>`;
+        else if(tip.points===1)pill=`<span class="sp-pill tipped" style="color:#ea580c;border-color:#ea580c">🟠 +1 Pkt</span>`;
+        else if(tip.points===0)pill=`<span class="sp-pill done" style="color:#cc0000;border-color:#cc0000">❌ +0 Pkt</span>`;
+        else pill=`<span class="sp-pill done">Gespielt</span>`;
+      } else if(isDone)pill=`<span class="sp-pill done">Gespielt</span>`;
+      else if(tipped)pill=`<span class="sp-pill tipped">✓ Getippt</span>`;
+      else pill=`<span class="sp-pill open">Offen</span>`;
+
+      // Center content
+      let center='';
+      if(isDone){
+        const hw=m.home_score>m.away_score,aw=m.away_score>m.home_score;
+        center=`<div class="sp-score">
+          <span class="sp-score-n ${hw?'win':aw?'lose':''}">${m.home_score}</span>
+          <span class="sp-score-sep">:</span>
+          <span class="sp-score-n ${aw?'win':hw?'lose':''}">${m.away_score}</span>
+        </div>`;
+        if(tipped){
+          const cls=tip.points===3?'exact':tip.points===1?'tend':'wrong';
+          const lbl=tip.points===3?`✅ ${hv}:${av} Exakt`:tip.points===1?`🟠 ${hv}:${av} Tendenz`:`❌ ${hv}:${av} Falsch`;
+          center+=`<div class="sp-result-tip ${cls}">${lbl}</div>`;
+        }
+      } else if(isLive){
+        center=`<div class="sp-score">
+          <span class="sp-score-n sp-score-live">${m.home_score}</span>
+          <span class="sp-score-sep" style="color:#cc0000">:</span>
+          <span class="sp-score-n sp-score-live">${m.away_score}</span>
+        </div>`;
+        if(tipped)center+=`<div style="font-size:10px;color:#888">Tipp: ${hv}:${av}</div>`;
+      } else if(canTip){
+        center=`<div class="sp-tip-row">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <button class="sp-tip-btn" onclick="saveTip(${m.id},'h',1)">+</button>
+            <div class="sp-tip-n${hv==null?' unset':''}">${hv!=null?hv:'?'}</div>
+            <button class="sp-tip-btn" onclick="saveTip(${m.id},'h',-1)">−</button>
           </div>
-          ${m.status==='done'?`<div style="font-size:11px;color:var(--muted);">${m.home_score}:${m.away_score}</div>`:''}
+          <span class="sp-tip-sep">:</span>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <button class="sp-tip-btn" onclick="saveTip(${m.id},'a',1)">+</button>
+            <div class="sp-tip-n${av==null?' unset':''}">${av!=null?av:'?'}</div>
+            <button class="sp-tip-btn" onclick="saveTip(${m.id},'a',-1)">−</button>
+          </div>
+        </div>`;
+      } else {
+        center=`<div class="sp-locked">
+          <div class="sp-locked-score">${tipped?`${hv} : ${av}`:'– : –'}</div>
+          ${!state.user?`<button class="sp-login-btn" onclick="setPage('login')">Anmelden</button>`:''}
+        </div>`;
+      }
+
+      const cardClass=`sp-card${isLive?' live':isDone?' done':tipped?' tipped':''}`;
+      html+=`<div class="${cardClass}">
+        <div class="sp-card-top">
+          <span class="sp-card-time">${m.time} Uhr</span>
+          <span class="sp-card-round">${roundName}</span>
+          ${pill}
         </div>
-        <div class="ko-team right">
-          <span class="${isPlaceholder?'ko-placeholder':''}">${m.away}</span>
-          ${!isPlaceholder?flagEl(m.away,'team-flag'):''}
+        <div class="sp-card-body">
+          <div class="sp-team">
+            ${spFlag(m.home)}
+            <span class="sp-team-name">${m.home||'?'}</span>
+          </div>
+          <div class="sp-center">${center}</div>
+          <div class="sp-team away">
+            ${spFlag(m.away)}
+            <span class="sp-team-name">${m.away||'?'}</span>
+          </div>
         </div>
       </div>`;
     }
-  }else{
-    for(const m of matches){
-      const t=state.tips[m.id]||{};
-      const hv=t.home,av=t.away;
-      const set=hv!==null&&hv!==undefined&&av!==null&&av!==undefined;
-      const canTip=state.user&&m.status==='open';
-      html+=`<div class="match-card${set?' tipped':''}">
-        <div class="match-top">
-          <span style="font-size:11px;">🕐</span>
-          <span class="match-time">${m.date} · ${m.time} Uhr</span>
-          <span class="status-pill ${m.status==='done'?'pill-done':set?'pill-done':'pill-open'}">${m.status==='done'?'Gespielt':set?'✓ Getippt':'Offen'}</span>
-        </div>
-        <div class="teams-row">
-          <div class="team-col">
-            ${flagEl(m.home)}
-            <span class="team-name">${m.home}</span>
-            ${canTip?`<div class="ctrl-row"><button class="ctrl minus" onclick="saveTip(${m.id},'h',-1)">−</button><button class="ctrl plus" onclick="saveTip(${m.id},'h',1)">+</button></div>`:`<div style="height:22px;"></div>`}
-          </div>
-          <div class="score-center">
-            <div class="score-label">${m.status==='done'?'ERGEBNIS':'TIPP'}</div>
-            <div class="score-row">
-              <div class="score-box${hv!==null&&hv!==undefined?' filled':''}">${m.status==='done'?m.home_score:(hv!==null&&hv!==undefined?hv:'?')}</div>
-              <span class="score-colon">:</span>
-              <div class="score-box${av!==null&&av!==undefined?' filled':''}">${m.status==='done'?m.away_score:(av!==null&&av!==undefined?av:'?')}</div>
-            </div>
-            ${m.status==='done'&&state.user&&hv!==null?`<div style="font-size:11px;color:var(--muted);">Tipp: ${hv}:${av}</div>`:''}
-          </div>
-          <div class="team-col">
-            ${flagEl(m.away)}
-            <span class="team-name">${m.away}</span>
-            ${canTip?`<div class="ctrl-row"><button class="ctrl minus" onclick="saveTip(${m.id},'a',-1)">−</button><button class="ctrl plus" onclick="saveTip(${m.id},'a',1)">+</button></div>`:`<div style="height:22px;"></div>`}
-          </div>
-        </div>
-      </div>`;
-    }
-    html+=renderGroupTable(state.group);
+    html+=`</div>`;
   }
+  html+=`</div>`;
   return html;
 }
 
-
-function wmTrophy(place){
-  const configs = {
-    1: {
-      cup: ['#FFD700','#FFA500','#FFE55C','#CC8800'],
-      stem: ['#DAA520','#B8860B'],
-      base: ['#FFD700','#CC8800'],
-      textColor: '#7A4F00',
-      size: 72
-    },
-    2: {
-      cup: ['#E8E8E8','#A0A0A0','#F5F5F5','#888888'],
-      stem: ['#C0C0C0','#909090'],
-      base: ['#C0C0C0','#909090'],
-      textColor: '#444444',
-      size: 62
-    },
-    3: {
-      cup: ['#CD7F32','#8B4513','#E8A46A','#7B3F00'],
-      stem: ['#B87333','#8B4513'],
-      base: ['#CD7F32','#8B4513'],
-      textColor: '#5C2800',
-      size: 54
-    }
-  };
-  const c = configs[place];
-  const s = c.size;
-  const label = place === 1 ? '1.' : place === 2 ? '2.' : '3.';
-  const fontSize = place === 1 ? 13 : place === 2 ? 12 : 11;
-  return `<svg width="${s}" height="${s}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="cup${place}" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="${c.cup[0]}"/>
-        <stop offset="50%" stop-color="${c.cup[1]}"/>
-        <stop offset="100%" stop-color="${c.cup[2]}"/>
-      </linearGradient>
-      <linearGradient id="stem${place}" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="${c.stem[0]}"/>
-        <stop offset="100%" stop-color="${c.stem[1]}"/>
-      </linearGradient>
-      <linearGradient id="base${place}" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="${c.base[0]}"/>
-        <stop offset="100%" stop-color="${c.base[1]}"/>
-      </linearGradient>
-    </defs>
-    <!-- Henkel links -->
-    <path d="M22 32 Q8 32 8 48 Q8 62 22 62" fill="none" stroke="url(#cup${place})" stroke-width="5" stroke-linecap="round"/>
-    <!-- Henkel rechts -->
-    <path d="M78 32 Q92 32 92 48 Q92 62 78 62" fill="none" stroke="url(#cup${place})" stroke-width="5" stroke-linecap="round"/>
-    <!-- Pokal-Körper (WM-Form: oben breiter, Taille, unten breiter) -->
-    <path d="M22 18 Q50 12 78 18 L72 55 Q65 72 58 76 L58 90 L42 90 Q35 72 28 55 Z" fill="url(#cup${place})"/>
-    <!-- Glanzeffekt -->
-    <path d="M30 22 Q40 18 52 20 L48 40 Q40 36 32 38 Z" fill="white" opacity="0.25"/>
-    <!-- Fuß/Stiel -->
-    <rect x="42" y="90" width="16" height="8" rx="2" fill="url(#stem${place})"/>
-    <!-- Basis -->
-    <rect x="28" y="98" width="44" height="10" rx="3" fill="url(#base${place})"/>
-    <!-- Platz-Nummer im Pokal -->
-    <text x="50" y="52" text-anchor="middle" dominant-baseline="central"
-      font-family="Arial,sans-serif" font-size="${fontSize}" font-weight="900"
-      fill="${c.textColor}" opacity="0.85">${label}</text>
-  </svg>`;
-}
 function renderTabelle(){
   if(!state.user){
     return`<div class="locked-overlay">
@@ -1458,6 +1522,7 @@ function setPage(p){
   render();
 }
 function setGroup(g){state.group=g;state.page='spielplan';render();}
+function setSpFilter(f){state.spFilter=f;render();}
 
 function render(){
   const root=document.getElementById('root');
@@ -1474,7 +1539,7 @@ function render(){
   else if(state.page==='admin')content=renderAdmin();
   else if(state.page==='spielbaum')content=renderSpielbaum();
 
-  const hasSidebar=state.page==='spielplan';
+  const hasSidebar=false;
 
   // Spielbaum: full width, no sidebar, no max-width
   if(state.page==='spielbaum'){
