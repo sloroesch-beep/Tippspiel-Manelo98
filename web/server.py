@@ -257,8 +257,198 @@ async def fetch_live_scores():
                             db_status, home_score, away_score, match_id)
                         if db_status == "done":
                             await evaluate_tips(db, match_id, home_score, away_score)
+                            await update_ko_brackets(db)
     except Exception as e:
         print(f"Live score fetch error: {e}")
+
+
+# ─── KO Advancement Logic ─────────────────────────────────────────────────────
+
+# WM 2026 Sechzehntelfinale Mapping
+# Basierend auf dem offiziellen WM 2026 Spielplan
+# Format: (SF_group_name, 'home'|'away', source_type, source_id)
+# source_type: 'gruppe_1', 'gruppe_2', 'beste_3'
+# Die besten 3. der Gruppen werden nach Punkten/Tordifferenz vergeben
+
+SF_MAPPING = {
+    # SF1: 1.A vs 2.J
+    'SF1': [('gruppe_1', 'A'), ('gruppe_2', 'J')],
+    # SF2: 1.B vs 2.K
+    'SF2': [('gruppe_1', 'B'), ('gruppe_2', 'K')],
+    # SF3: 1.C vs beste_3
+    'SF3': [('gruppe_1', 'C'), ('beste_3', None)],
+    # SF4: 1.D vs 2.G
+    'SF4': [('gruppe_1', 'D'), ('gruppe_2', 'G')],
+    # SF5: 1.E vs beste_3
+    'SF5': [('gruppe_1', 'E'), ('beste_3', None)],
+    # SF6: 1.F vs 2.I
+    'SF6': [('gruppe_1', 'F'), ('gruppe_2', 'I')],
+    # SF7: 1.G vs 2.D
+    'SF7': [('gruppe_1', 'G'), ('gruppe_2', 'D')],
+    # SF8: 1.H vs beste_3
+    'SF8': [('gruppe_1', 'H'), ('beste_3', None)],
+    # SF9: 1.I vs 2.E
+    'SF9': [('gruppe_1', 'I'), ('gruppe_2', 'E')],
+    # SF10: 1.J vs 2.A
+    'SF10': [('gruppe_1', 'J'), ('gruppe_2', 'A')],
+    # SF11: 1.K vs 2.B
+    'SF11': [('gruppe_1', 'K'), ('gruppe_2', 'B')],
+    # SF12: 1.L vs beste_3
+    'SF12': [('gruppe_1', 'L'), ('beste_3', None)],
+    # SF13: 2.C vs beste_3
+    'SF13': [('gruppe_2', 'C'), ('beste_3', None)],
+    # SF14: 2.F vs beste_3
+    'SF14': [('gruppe_2', 'F'), ('beste_3', None)],
+    # SF15: 2.H vs beste_3
+    'SF15': [('gruppe_2', 'H'), ('beste_3', None)],
+    # SF16: 2.L vs beste_3
+    'SF16': [('gruppe_2', 'L'), ('beste_3', None)],
+}
+
+# KO Advancement: welcher Sieger/Verlierer kommt in welches nächste Spiel
+# Format: {ziel_group: [(quelle_group, 'home'|'away', 'winner'|'loser'), ...]}
+KO_ADVANCEMENT = {
+    'AF1':  [('SF1',  'home', 'winner'), ('SF2',  'away', 'winner')],
+    'AF2':  [('SF3',  'home', 'winner'), ('SF4',  'away', 'winner')],
+    'AF3':  [('SF5',  'home', 'winner'), ('SF6',  'away', 'winner')],
+    'AF4':  [('SF7',  'home', 'winner'), ('SF8',  'away', 'winner')],
+    'AF5':  [('SF9',  'home', 'winner'), ('SF10', 'away', 'winner')],
+    'AF6':  [('SF11', 'home', 'winner'), ('SF12', 'away', 'winner')],
+    'AF7':  [('SF13', 'home', 'winner'), ('SF14', 'away', 'winner')],
+    'AF8':  [('SF15', 'home', 'winner'), ('SF16', 'away', 'winner')],
+    'VF1':  [('AF1',  'home', 'winner'), ('AF2',  'away', 'winner')],
+    'VF2':  [('AF3',  'home', 'winner'), ('AF4',  'away', 'winner')],
+    'VF3':  [('AF5',  'home', 'winner'), ('AF6',  'away', 'winner')],
+    'VF4':  [('AF7',  'home', 'winner'), ('AF8',  'away', 'winner')],
+    'HF1':  [('VF1',  'home', 'winner'), ('VF3',  'away', 'winner')],
+    'HF2':  [('VF2',  'home', 'winner'), ('VF4',  'away', 'winner')],
+    'P3':   [('HF1',  'home', 'loser'),  ('HF2',  'away', 'loser')],
+    'FIN':  [('HF1',  'home', 'winner'), ('HF2',  'away', 'winner')],
+}
+
+async def get_gruppe_standing(db, gruppe: str):
+    """Berechnet die Tabelle einer Gruppe und gibt sie sortiert zurück."""
+    matches = await db.fetch(
+        "SELECT home_team, away_team, home_score, away_score FROM matches WHERE group_name=$1 AND status='done'",
+        gruppe
+    )
+    all_teams = await db.fetch(
+        "SELECT DISTINCT home_team FROM matches WHERE group_name=$1 UNION SELECT DISTINCT away_team FROM matches WHERE group_name=$1",
+        gruppe
+    )
+    teams = [r[0] for r in all_teams]
+    st = {t: {'pts':0,'gd':0,'gf':0,'sp':0} for t in teams}
+    for m in matches:
+        h, a = m['home_team'], m['away_team']
+        hs, as_ = m['home_score'], m['away_score']
+        st[h]['sp']+=1; st[a]['sp']+=1
+        st[h]['gf']+=hs; st[h]['gd']+=hs-as_
+        st[a]['gf']+=as_; st[a]['gd']+=as_-hs
+        if hs>as_: st[h]['pts']+=3
+        elif hs<as_: st[a]['pts']+=3
+        else: st[h]['pts']+=1; st[a]['pts']+=1
+    sorted_teams = sorted(teams, key=lambda t: (st[t]['pts'], st[t]['gd'], st[t]['gf']), reverse=True)
+    # Prüfen ob alle Gruppenspiele fertig sind (jede Gruppe hat 6 Spiele)
+    total = await db.fetchval("SELECT COUNT(*) FROM matches WHERE group_name=$1", gruppe)
+    done = await db.fetchval("SELECT COUNT(*) FROM matches WHERE group_name=$1 AND status='done'", gruppe)
+    complete = (done == total)
+    return sorted_teams, st, complete
+
+async def get_ko_winner(db, group_name: str):
+    """Gibt den Sieger eines abgeschlossenen KO-Spiels zurück."""
+    match = await db.fetchrow(
+        "SELECT home_team, away_team, home_score, away_score, status FROM matches WHERE group_name=$1",
+        group_name
+    )
+    if not match or match['status'] != 'done': return None, None
+    if match['home_score'] > match['away_score']:
+        return match['home_team'], match['away_team']
+    elif match['away_score'] > match['home_score']:
+        return match['away_team'], match['home_team']
+    return None, None  # Unentschieden (sollte in KO nicht vorkommen)
+
+async def update_ko_brackets(db):
+    """
+    Aktualisiert alle KO-Spiele basierend auf abgeschlossenen Gruppen/KO-Spielen.
+    Wird nach jedem Ergebnis-Update aufgerufen.
+    """
+    updated = []
+
+    # 1. Sechzehntelfinale aus Gruppenphase befüllen
+    for sf_group, sources in SF_MAPPING.items():
+        sf_match = await db.fetchrow(
+            "SELECT id, home_team, away_team FROM matches WHERE group_name=$1", sf_group
+        )
+        if not sf_match: continue
+
+        new_home = sf_match['home_team']
+        new_away = sf_match['away_team']
+        changed = False
+
+        for i, (src_type, src_gruppe) in enumerate(sources):
+            team = None
+            if src_type in ('gruppe_1', 'gruppe_2'):
+                sorted_teams, st, complete = await get_gruppe_standing(db, src_gruppe)
+                if complete and sorted_teams:
+                    rank = 0 if src_type == 'gruppe_1' else 1
+                    if len(sorted_teams) > rank:
+                        team = sorted_teams[rank]
+            elif src_type == 'beste_3':
+                # Beste Dritte: komplexe Logik, erstmal Platzhalter
+                team = None  # Wird separat berechnet
+
+            if team:
+                if i == 0 and sf_match['home_team'] != team:
+                    new_home = team
+                    changed = True
+                elif i == 1 and sf_match['away_team'] != team:
+                    new_away = team
+                    changed = True
+
+        if changed:
+            await db.execute(
+                "UPDATE matches SET home_team=$1, away_team=$2 WHERE group_name=$3",
+                new_home, new_away, sf_group
+            )
+            updated.append(sf_group)
+
+    # 2. KO-Runden aus vorherigen KO-Spielen befüllen
+    for target_group, sources in KO_ADVANCEMENT.items():
+        target = await db.fetchrow(
+            "SELECT id, home_team, away_team FROM matches WHERE group_name=$1", target_group
+        )
+        if not target: continue
+
+        new_home = target['home_team']
+        new_away = target['away_team']
+        changed = False
+
+        for src_group, slot, result_type in sources:
+            winner, loser = await get_ko_winner(db, src_group)
+            team = winner if result_type == 'winner' else loser
+            if not team: continue
+
+            placeholder = f"Sieger {src_group}" if result_type == 'winner' else f"Verlierer {src_group}"
+
+            if slot == 'home' and (target['home_team'] == placeholder or target['home_team'] != team):
+                if target['home_team'] != team:
+                    new_home = team
+                    changed = True
+            elif slot == 'away' and (target['away_team'] == placeholder or target['away_team'] != team):
+                if target['away_team'] != team:
+                    new_away = team
+                    changed = True
+
+        if changed:
+            await db.execute(
+                "UPDATE matches SET home_team=$1, away_team=$2 WHERE group_name=$3",
+                new_home, new_away, target_group
+            )
+            updated.append(target_group)
+
+    if updated:
+        print(f"KO-Brackets aktualisiert: {updated}")
+    return updated
 
 async def evaluate_tips(db, match_id: int, home_score: int, away_score: int):
     tips = await db.fetch(
@@ -508,7 +698,16 @@ async def manual_fetch(request: Request):
     user = await get_user(request.cookies.get("session"))
     if not user: raise HTTPException(401, "Nicht angemeldet")
     await fetch_live_scores()
+    async with pool.acquire() as db:
+        await update_ko_brackets(db)
     return {"ok": True, "message": "Scores aktualisiert"}
+
+@app.post("/api/admin/update-brackets")
+async def manual_update_brackets(request: Request):
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with pool.acquire() as db:
+        updated = await update_ko_brackets(db)
+    return {"ok": True, "updated": updated}
 
 # ─── Admin ────────────────────────────────────────────────────────
 ADMIN_DISCORD_IDS = os.environ.get("ADMIN_DISCORD_IDS", "").split(",")
@@ -580,6 +779,7 @@ async def admin_set_result(request: Request):
             elif (ht>at and home_score>away_score) or (ht<at and home_score<away_score) or (ht==at and home_score==away_score): pts = 1
             else: pts = 0
             await db.execute("UPDATE tips SET points=$1, evaluated_at=NOW() WHERE id=$2", pts, tip["id"])
+        await update_ko_brackets(db)
     return {"ok": True}
 
 @app.get("/api/admin/matches")
