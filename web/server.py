@@ -666,7 +666,9 @@ async def evaluate_champion(request: Request):
     return {"ok": True, "evaluated": len(tips)}
 
 @app.get("/api/rankings")
-async def rankings():
+async def rankings(request: Request):
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401, "Nicht angemeldet")
     async with pool.acquire() as db:
         rows = await db.fetch("""SELECT u.username,u.avatar,
             COALESCE(SUM(t.points),0) + COALESCE(MAX(wc.points),0) as pts,
