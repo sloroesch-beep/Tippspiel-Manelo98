@@ -186,6 +186,13 @@ async def init_db():
         except: pass
         try: await db.execute("ALTER TABLE tips ADD COLUMN IF NOT EXISTS evaluated_at TIMESTAMP DEFAULT NULL")
         except: pass
+        # wm_champion table
+        await db.execute("""CREATE TABLE IF NOT EXISTS wm_champions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL UNIQUE,
+            champion TEXT NOT NULL,
+            tipped_at TIMESTAMP DEFAULT NOW(),
+            points INTEGER DEFAULT NULL)""")
 
         # Version prüfen
         row = await db.fetchrow("SELECT MAX(version) as v FROM db_version")
@@ -617,14 +624,64 @@ async def save_tip(body: TipBody, request: Request):
             user['id'], body.match_id, body.home_tip, body.away_tip)
     return {"ok": True}
 
+@app.get("/api/wm-champion")
+async def get_wm_champion(request: Request):
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401)
+    async with pool.acquire() as db:
+        row = await db.fetchrow("SELECT champion, points FROM wm_champions WHERE user_id=$1", user["id"])
+        # Check if opening match has started (first match in DB by date)
+        first = await db.fetchrow("SELECT status FROM matches ORDER BY id LIMIT 1")
+        locked = first and first["status"] != "open"
+        return {"champion": row["champion"] if row else None, "points": row["points"] if row else None, "locked": locked}
+
+@app.post("/api/wm-champion")
+async def set_wm_champion(request: Request):
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401)
+    data = await request.json()
+    champion = data.get("champion", "").strip()
+    if not champion: raise HTTPException(400, "Kein Team angegeben")
+    async with pool.acquire() as db:
+        # Check if opening match has started
+        first = await db.fetchrow("SELECT status FROM matches ORDER BY id LIMIT 1")
+        if first and first["status"] != "open":
+            raise HTTPException(400, "Tippabgabe geschlossen – Eröffnungsspiel hat begonnen")
+        await db.execute("""INSERT INTO wm_champions (user_id, champion)
+            VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET champion=$2, tipped_at=NOW()""",
+            user["id"], champion)
+    return {"ok": True}
+
+@app.post("/api/admin/evaluate-champion")
+async def evaluate_champion(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    data = await request.json()
+    actual_winner = data.get("winner", "")
+    if not actual_winner: raise HTTPException(400)
+    async with pool.acquire() as db:
+        tips = await db.fetch("SELECT id, user_id, champion FROM wm_champions")
+        for t in tips:
+            pts = 15 if t["champion"] == actual_winner else 0
+            await db.execute("UPDATE wm_champions SET points=$1 WHERE id=$2", pts, t["id"])
+    return {"ok": True, "evaluated": len(tips)}
+
 @app.get("/api/rankings")
 async def rankings():
     async with pool.acquire() as db:
-        rows = await db.fetch("""SELECT u.username,u.avatar,COALESCE(SUM(t.points),0) as pts,
-            COUNT(CASE WHEN t.points IS NOT NULL THEN 1 END) as evaluated,COUNT(t.id) as total
-            FROM users u LEFT JOIN tips t ON u.id=t.user_id GROUP BY u.id ORDER BY pts DESC""")
+        rows = await db.fetch("""SELECT u.username,u.avatar,
+            COALESCE(SUM(t.points),0) + COALESCE(MAX(wc.points),0) as pts,
+            COALESCE(SUM(t.points),0) as tip_pts,
+            COALESCE(MAX(wc.points),0) as champion_pts,
+            COUNT(CASE WHEN t.points IS NOT NULL THEN 1 END) as evaluated,
+            COUNT(t.id) as total,
+            wc.champion as wm_tip
+            FROM users u
+            LEFT JOIN tips t ON u.id=t.user_id
+            LEFT JOIN wm_champions wc ON u.id=wc.user_id
+            GROUP BY u.id, wc.champion ORDER BY pts DESC""")
     return [{"username":r['username'],"avatar":r['avatar'],"points":r['pts'],
-             "evaluated":r['evaluated'],"total":r['total']} for r in rows]
+             "tip_points":r['tip_pts'],"champion_points":r['champion_pts'],
+             "evaluated":r['evaluated'],"total":r['total'],"wm_tip":r['wm_tip']} for r in rows]
 
 @app.get("/api/results")
 async def results():
