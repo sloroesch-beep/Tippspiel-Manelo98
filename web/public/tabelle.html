@@ -139,6 +139,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <script>
 let tState={user:null,rankings:[],matches:[],tips:{}};
 const state={get user(){return tState.user},get rankings(){return tState.rankings},get matches(){return tState.matches},get tips(){return tState.tips}};
+const COLORS=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6','#1abc9c','#f39c12'];
 
 function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
 
@@ -220,8 +221,16 @@ function renderTabelle(){
   }
   return html;
 }
-function onUserLoaded(u){tState.user=u;renderTab();}
-function renderTab(){document.getElementById('tabContent').innerHTML=renderTabelle();}
+let _initDone=false;
+function onUserLoaded(u){
+  // Always update user from shared header (authoritative source)
+  tState.user=u;
+  if(_initDone) renderTab(); // re-render if init already ran
+  // if init hasn't run yet, it will render when done
+}
+function renderTab(){
+  document.getElementById('tabContent').innerHTML=renderTabelle();
+}
 async function loadData(){
   const[rD,mD]=await Promise.all([
     fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]),
@@ -231,7 +240,25 @@ async function loadData(){
   renderTab();
 }
 function setPage(p){if(p==='profil')location.href='/profil.html';if(p==='login')location.href='/login.html';}
-loadData();
+
+// Don't call loadData() immediately - wait for user session from shared header
+// onUserLoaded() is called by shared header after /api/me check
+// But load rankings in parallel anyway, then re-render when user is known
+async function init(){
+  // Fetch data (don't override user - let onUserLoaded handle that)
+  const[uD,rD,mD]=await Promise.all([
+    fetch('/api/me',{credentials:'include',cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+    fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+  ]);
+  // Only set user from our own fetch if not already set by onUserLoaded
+  if(!tState.user && uD) tState.user=uD;
+  tState.rankings=rD||[];
+  tState.matches=mD||[];
+  _initDone=true;
+  renderTab();
+}
+init();
 </script>
 </div>
 

@@ -98,6 +98,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .prof-inner{max-width:600px;margin:0 auto;padding:12px}</style>
 <div class="prof-inner" id="profContent"><div style="text-align:center;padding:40px;color:#888">Wird geladen…</div></div>
 <script>
+const COLORS=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6','#1abc9c','#f39c12'];
 let pState={user:null,rankings:[]};
 const state={get user(){return pState.user},get rankings(){return pState.rankings}};
 
@@ -221,10 +222,16 @@ async function doSaveProfile(e){
   if(r.ok){const u=await r.json();pState.user=u;document.getElementById('profContent').innerHTML=renderProfil();}
 }
 function setPage(p){if(p==='login')location.href='/login.html';}
-function onUserLoaded(u){pState.user=u;if(u)loadData();else{document.getElementById('profContent').innerHTML=renderProfil();}}
+let _initDone=false;
+function onUserLoaded(u){pState.user=u;if(_initDone){if(u)loadData();else{document.getElementById('profContent').innerHTML=renderProfil();}}}
 async function loadData(){
-  const rD=await fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():null);
-  if(rD)pState.rankings=rD;
+  const[uD,rD]=await Promise.all([
+    fetch('/api/me',{credentials:'include'}).then(r=>r.ok?r.json():null).catch(()=>null),
+    fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
+  ]);
+  if(!pState.user && uD) pState.user=uD;
+  pState.rankings=rD||[];
+  _initDone=true;
   document.getElementById('profContent').innerHTML=renderProfil();
 }
 // Show something immediately
