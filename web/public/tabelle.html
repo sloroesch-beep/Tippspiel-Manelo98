@@ -129,8 +129,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .podium-2 .podium-base{background:rgba(0,0,0,.12);margin:-14px;}
 .podium-3 .podium-base{background:rgba(0,0,0,.12);margin:-12px;}
 .tab-inner{max-width:700px;margin:0 auto;padding:12px}
+.tab-head{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;text-align:center}
+.tab-eye{font-size:8px;letter-spacing:4px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.tab-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
+.tab-h span{color:var(--gold)}
 </style>
-<div class="tab-inner" id="tabContent"><div style="text-align:center;padding:40px;color:#888">Wird geladen…</div></div>
+<div class="tab-head"><div class="tab-eye">Fanclub Manelo98</div><div class="tab-h">RANGLISTE <span>/ TABELLE</span></div></div>
+<div class="tab-inner" id="tabContent"><div style="text-align:center;padding:40px;color:#888">⏳ Wird geladen…</div></div>
 <script>
 let tState={user:null,rankings:[],matches:[],tips:{}};
 const state={get user(){return tState.user},get rankings(){return tState.rankings},get matches(){return tState.matches},get tips(){return tState.tips}};
@@ -215,25 +220,31 @@ function renderTabelle(){
   }
   return html;
 }
-function onUserLoaded(u){tState.user=u;if(u)loadData();else document.getElementById('tabContent').innerHTML=renderTabelle()}
+function onUserLoaded(u){tState.user=u;renderTab();}
+function renderTab(){document.getElementById('tabContent').innerHTML=renderTabelle();}
 async function loadData(){
-  const[rD,mD]=await Promise.all([fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():null),fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():null)]);
-  if(rD)tState.rankings=rD;if(mD)tState.matches=mD;
-  document.getElementById('tabContent').innerHTML=renderTabelle();
+  const[rD,mD]=await Promise.all([
+    fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]),
+    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]),
+  ]);
+  tState.rankings=rD||[];tState.matches=mD||[];
+  renderTab();
 }
-function setPage(p){if(p==='profil')location.href='/profil.html'}
+function setPage(p){if(p==='profil')location.href='/profil.html';if(p==='login')location.href='/login.html';}
+loadData();
 </script>
 </div>
 
 <script>
 const G_PAGES=[
   {id:'index',label:'Start',icon:'🏠',url:'/'},
-  {id:'spielplan',label:'Spielplan',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielplan',label:'Spielplan/Tipps',icon:'⚽',url:'/spielplan.html'},
   {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
   {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
   {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
   {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
 ];
+// Admin page added after user check
 const G_CURRENT='tabelle';
 
 // Build desktop nav
@@ -266,6 +277,25 @@ G_PAGES.forEach(p=>{
       const initials=u.username.slice(0,2).toUpperCase();
       const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
       el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      // Check admin
+      try{
+        const ar=await fetch('/api/admin/check',{credentials:'include'});
+        if(ar.ok){
+          const aa=await ar.json();
+          if(aa.is_admin){
+            const nav=document.getElementById('gNav');
+            const mob=document.getElementById('gMobNav');
+            const div=document.createElement('div');div.className='g-nav-div';nav.appendChild(div);
+            const a=document.createElement('a');
+            a.textContent='🔧 Admin';
+            a.href='/';
+            a.onclick=(e)=>{e.preventDefault();window._goAdmin=true;location.href='/';}
+            nav.appendChild(a);
+            const ma=document.createElement('a');ma.href='/';ma.innerHTML='<span>🔧</span><span>Admin</span>';
+            ma.onclick=a.onclick;mob.appendChild(ma);
+          }
+        }
+      }catch{}
       if(typeof onUserLoaded==='function')onUserLoaded(u);
     } else {
       if(typeof onUserLoaded==='function')onUserLoaded(null);

@@ -72,8 +72,19 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="g-content">
 
 <style>
-.aus-inner{max-width:800px;margin:0 auto;padding:12px}</style>
-<div class="aus-inner" id="ausContent"><div style="text-align:center;padding:40px;color:#888">Wird geladen…</div></div>
+.status-pill{margin-left:auto;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+.stat-v{font-size:22px;font-weight:700;color:var(--black);}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px;}
+.aus-inner{max-width:800px;margin:0 auto;padding:12px}
+.aus-head{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;text-align:center}
+.aus-eye{font-size:8px;letter-spacing:4px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.aus-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
+.aus-h span{color:var(--gold)}
+</style>
+<div class="aus-head"><div class="aus-eye">Fanclub Manelo98</div><div class="aus-h">AUSWERTUNG <span>/ STATISTIK</span></div></div>
+<div class="aus-inner" id="ausContent"><div style="text-align:center;padding:40px;color:#888">⏳ Wird geladen…</div></div>
 <script>
 let aState={user:null,rankings:[],results:[],matches:[],tips:{}};
 const state={get user(){return aState.user},get rankings(){return aState.rankings},get results(){return aState.results},get matches(){return aState.matches},get tips(){return aState.tips}};
@@ -114,30 +125,33 @@ function renderAuswertung(){
   }
   return html;
 }
-function onUserLoaded(u){aState.user=u;if(u)loadData();else document.getElementById('ausContent').innerHTML=renderAuswertung()}
+function onUserLoaded(u){aState.user=u;renderAus();}
+function renderAus(){document.getElementById('ausContent').innerHTML=renderAuswertung();}
 async function loadData(){
   const[rD,resD,mD,tD]=await Promise.all([
-    fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():null),
-    fetch('/api/results',{credentials:'include'}).then(r=>r.ok?r.json():null),
-    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():null),
-    fetch('/api/tips',{credentials:'include'}).then(r=>r.ok?r.json():null),
+    fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]),
+    fetch('/api/results',{credentials:'include'}).then(r=>r.ok?r.json():[]),
+    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]),
+    fetch('/api/tips',{credentials:'include'}).then(r=>r.ok?r.json():{}),
   ]);
-  if(rD)aState.rankings=rD;if(resD)aState.results=resD;if(mD)aState.matches=mD;if(tD)aState.tips=tD;
-  document.getElementById('ausContent').innerHTML=renderAuswertung();
+  aState.rankings=rD||[];aState.results=resD||[];aState.matches=mD||[];aState.tips=tD||{};
+  renderAus();
 }
-function setPage(p){if(p==='profil')location.href='/profil.html'}
+function setPage(p){if(p==='profil')location.href='/profil.html';if(p==='login')location.href='/login.html';}
+loadData();
 </script>
 </div>
 
 <script>
 const G_PAGES=[
   {id:'index',label:'Start',icon:'🏠',url:'/'},
-  {id:'spielplan',label:'Spielplan',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielplan',label:'Spielplan/Tipps',icon:'⚽',url:'/spielplan.html'},
   {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
   {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
   {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
   {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
 ];
+// Admin page added after user check
 const G_CURRENT='auswertung';
 
 // Build desktop nav
@@ -170,6 +184,25 @@ G_PAGES.forEach(p=>{
       const initials=u.username.slice(0,2).toUpperCase();
       const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
       el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      // Check admin
+      try{
+        const ar=await fetch('/api/admin/check',{credentials:'include'});
+        if(ar.ok){
+          const aa=await ar.json();
+          if(aa.is_admin){
+            const nav=document.getElementById('gNav');
+            const mob=document.getElementById('gMobNav');
+            const div=document.createElement('div');div.className='g-nav-div';nav.appendChild(div);
+            const a=document.createElement('a');
+            a.textContent='🔧 Admin';
+            a.href='/';
+            a.onclick=(e)=>{e.preventDefault();window._goAdmin=true;location.href='/';}
+            nav.appendChild(a);
+            const ma=document.createElement('a');ma.href='/';ma.innerHTML='<span>🔧</span><span>Admin</span>';
+            ma.onclick=a.onclick;mob.appendChild(ma);
+          }
+        }
+      }catch{}
       if(typeof onUserLoaded==='function')onUserLoaded(u);
     } else {
       if(typeof onUserLoaded==='function')onUserLoaded(null);

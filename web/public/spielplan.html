@@ -72,6 +72,74 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="g-content">
 
 <style>
+/* === SPIELPLAN PAGE === */
+.sp-page-wrap{background:var(--bg);min-height:100%}
+.sp-inner{max-width:900px;margin:0 auto;padding:0 12px 24px}
+
+/* WM CHAMPION TIP BOX */
+.wm-box{
+  margin:16px 0;
+  background:linear-gradient(135deg,#1c1400,#0d0d0d);
+  border:2px solid var(--gold);
+  border-radius:12px;
+  overflow:hidden
+}
+.wm-box-header{
+  background:linear-gradient(90deg,#2a1e00,#1a1200);
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  border-bottom:1px solid rgba(255,215,0,.2)
+}
+.wm-box-title{font-size:16px;font-weight:900;color:var(--gold)}
+.wm-box-badge{
+  background:rgba(22,163,74,.15);
+  border:1px solid var(--green);
+  color:var(--green);
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap
+}
+.wm-box-body{padding:14px 16px}
+.wm-box-desc{font-size:12px;color:#888;margin-bottom:12px;line-height:1.5}
+.wm-box-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.wm-select{
+  flex:1;min-width:160px;
+  background:#0d0d0d;border:1px solid #333;color:var(--text);
+  padding:10px 14px;border-radius:8px;font-size:13px;font-family:inherit;
+  cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23ffd700' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px
+}
+.wm-select:disabled{color:#444;cursor:default}
+.wm-save-btn{
+  background:var(--gold);color:#000;border:none;
+  padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;
+  transition:opacity .2s,transform .1s
+}
+.wm-save-btn:hover{opacity:.9}
+.wm-save-btn:active{transform:scale(.97)}
+.wm-save-btn:disabled{opacity:.4;cursor:default}
+.wm-current{
+  margin-top:10px;padding:8px 12px;
+  background:#111;border-radius:6px;border-left:3px solid var(--gold);
+  font-size:12px;color:#bbb
+}
+.wm-current strong{color:var(--gold)}
+.wm-locked-box{
+  display:flex;align-items:center;gap:10px;
+  background:#111;border:1px solid #2a2a2a;border-radius:8px;
+  padding:12px 14px;font-size:13px;color:#888
+}
+.wm-locked-box strong{color:#ddd}
+
+/* SP-* from index */
 .sp-wrap{padding:0}
 .sp-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 0;flex-wrap:wrap;gap:6px}
 .sp-hint{font-size:11px;color:var(--muted)}
@@ -128,51 +196,51 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 @keyframes pulse{0%,100%{opacity:1;}
 @keyframes blink{0%,100%{opacity:1}
 
-.wm-tip-box{background:linear-gradient(135deg,#1a1200,#0d0d0d);border:2px solid var(--gold);border-radius:10px;padding:16px;margin-bottom:16px}
-.wm-tip-title{font-size:14px;font-weight:800;color:var(--gold);margin-bottom:4px}
-.wm-tip-sub{font-size:11px;color:#888;margin-bottom:12px}
-.wm-tip-bonus{font-size:11px;color:var(--green);font-weight:700;margin-bottom:12px}
-.wm-tip-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.wm-select{flex:1;min-width:140px;background:#0d0d0d;border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:6px;font-size:13px;font-family:inherit;cursor:pointer;appearance:none;-webkit-appearance:none}
-.wm-select:disabled{color:#444;cursor:default}
-.wm-save-btn{background:var(--gold);color:#000;border:none;padding:8px 16px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:opacity .2s}
-.wm-save-btn:disabled{opacity:.4;cursor:default}
-.wm-status{font-size:11px;margin-top:8px}
-.wm-locked{display:flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:#888}
-.sp-page-head{padding:10px 16px 6px;border-bottom:1px solid #1a1a1a;background:#0d0d0d}
-.sp-page-title{font-size:9px;letter-spacing:4px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:2px}
+/* Override for cleaner look */
+.sp-page-head{
+  background:linear-gradient(180deg,#0d0d0d,#0a0a0a);
+  padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;
+  text-align:center
+}
+.sp-page-eye{font-size:8px;letter-spacing:4px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:2px}
 .sp-page-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
 .sp-page-h span{color:var(--gold)}
-.sp-inner{max-width:900px;margin:0 auto;padding:12px 12px 20px}
 </style>
 
 <div class="sp-page-head">
-  <div class="sp-page-title">Fanclub Manelo98</div>
+  <div class="sp-page-eye">Fanclub Manelo98</div>
   <div class="sp-page-h">SPIELPLAN <span>/ TIPPS</span></div>
 </div>
 
 <div class="sp-inner">
-  
-<div class="wm-tip-box" id="wmBox" style="display:none">
-  <div class="wm-tip-title">🏆 Weltmeister-Tipp</div>
-  <div class="wm-tip-sub">Tippe wer Weltmeister wird — nur bis zum Anpfiff des Eröffnungsspiels möglich</div>
-  <div class="wm-tip-bonus">🎁 Bonus: +15 Punkte bei richtiger Vorhersage</div>
-  <div id="wmContent"></div>
-</div>
+  <!-- WM CHAMPION TIP -->
+  <div class="wm-box" id="wmBox" style="display:none">
+    <div class="wm-box-header">
+      <div>
+        <div class="wm-box-title">🏆 Weltmeister-Tipp</div>
+      </div>
+      <span class="wm-box-badge">🎁 +15 Bonuspunkte</span>
+    </div>
+    <div class="wm-box-body">
+      <div class="wm-box-desc">Tippe wer die Fußball-Weltmeisterschaft 2026 gewinnt.<br>Dieser Tipp ist nur bis zum Anpfiff des Eröffnungsspiels möglich.</div>
+      <div id="wmContent"></div>
+    </div>
+  </div>
+
+  <!-- SPIELPLAN -->
   <div id="spContent"></div>
 </div>
 
 <script>
+const TEAMS=['Aegypten', 'Algerien', 'Argentinien', 'Australien', 'Belgien', 'Bosnien-Herzegowina', 'Brasilien', 'Curacao', 'DR Kongo', 'Deutschland', 'Ecuador', 'Elfenbeinkueste', 'England', 'Frankreich', 'Ghana', 'Haiti', 'Irak', 'Iran', 'Japan', 'Jordanien', 'Kanada', 'Kap Verde', 'Katar', 'Kolumbien', 'Kroatien', 'Marokko', 'Mexiko', 'Neuseeland', 'Niederlande', 'Norwegen', 'Oesterreich', 'Panama', 'Paraguay', 'Portugal', 'Saudi-Arabien', 'Schottland', 'Schweden', 'Schweiz', 'Senegal', 'Spanien', 'Suedafrika', 'Suedkorea', 'Tschechien', 'Tuerkei', 'Tunesien', 'USA', 'Uruguay', 'Usbekistan'];
 let spState={matches:[],tips:{},user:null,spFilter:'',wmChampion:null,wmLocked:false};
-
-const TEAMS=['Mexiko','Suedkorea','Suedafrika','Tschechien','Kanada','Bosnien-Herzegowina','Katar','Schweiz','Brasilien','Marokko','Schottland','Haiti','USA','Paraguay','Australien','Tuerkei','Deutschland','Curacao','Elfenbeinkueste','Ecuador','Niederlande','Japan','Schweden','Tunesien','Belgien','Aegypten','Iran','Neuseeland','Spanien','Kap Verde','Saudi-Arabien','Uruguay','Frankreich','Senegal','Irak','Norwegen','Argentinien','Algerien','Oesterreich','Jordanien','Portugal','DR Kongo','Usbekistan','Kolumbien','England','Kroatien','Ghana','Panama'].sort();
-
-async function apiFetch(url, opts={}){
-  try{const r=await fetch(url,{credentials:'include',headers:{'Content-Type':'application/json'},...opts});return r.ok?r.json():null}catch{return null}
-}
-
-// Mock state for extracted functions
-const state={get matches(){return spState.matches},get tips(){return spState.tips},get user(){return spState.user},get spFilter(){return spState.spFilter},set spFilter(v){spState.spFilter=v}}
+const state={
+  get matches(){return spState.matches},
+  get tips(){return spState.tips},
+  get user(){return spState.user},
+  get spFilter(){return spState.spFilter},
+  set spFilter(v){spState.spFilter=v}
+};
 
 
 function isMatchLocked(m){
@@ -389,7 +457,7 @@ async function saveTip(mid,side,delta){
 
 function setSpFilter(f){spState.spFilter=f;renderPage()}
 
-async function saveTip(matchId, side, delta){
+async function saveTip(matchId,side,delta){
   if(!spState.user){location.href='/login.html';return}
   const tips=spState.tips;
   if(!tips[matchId])tips[matchId]={};
@@ -408,19 +476,21 @@ async function saveWmChampion(){
   const sel=document.getElementById('wmSelect');
   if(!sel||!sel.value)return;
   const btn=document.getElementById('wmSaveBtn');
-  btn.disabled=true;btn.textContent='Speichere...';
-  const r=await apiFetch('/api/wm-champion',{method:'POST',body:JSON.stringify({champion:sel.value})});
-  if(r&&r.ok){
-    spState.wmChampion=sel.value;
-    document.getElementById('wmStatus').textContent='✅ Gespeichert!';
-    document.getElementById('wmStatus').style.color='#16a34a';
-    btn.textContent='Gespeichert ✓';
-    setTimeout(()=>{btn.disabled=false;btn.textContent='Speichern'},2000);
-  }else{
-    btn.disabled=false;btn.textContent='Speichern';
-    document.getElementById('wmStatus').textContent='❌ Fehler beim Speichern';
-    document.getElementById('wmStatus').style.color='#cc0000';
-  }
+  const status=document.getElementById('wmStatus');
+  btn.disabled=true;btn.textContent='Speichert…';
+  try{
+    const r=await fetch('/api/wm-champion',{method:'POST',credentials:'include',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({champion:sel.value})});
+    if(r.ok){
+      spState.wmChampion=sel.value;
+      btn.textContent='✓ Gespeichert';
+      if(status){status.innerHTML=`Aktueller Tipp: <strong>${sel.value}</strong>`;}
+      setTimeout(()=>{btn.disabled=false;btn.textContent='Speichern'},2000);
+    }else{
+      btn.disabled=false;btn.textContent='Speichern';
+      if(status)status.textContent='❌ Fehler beim Speichern';
+    }
+  }catch{btn.disabled=false;btn.textContent='Speichern';}
 }
 
 function renderWmBox(){
@@ -429,16 +499,21 @@ function renderWmBox(){
   if(!spState.user){box.style.display='none';return}
   box.style.display='block';
   if(spState.wmLocked){
-    const pts=spState.wmChampion?` — Tipp: <b>${spState.wmChampion}</b>`:'';
-    cnt.innerHTML=`<div class="wm-locked">🔒 Tippabgabe geschlossen${pts}</div>`;
+    cnt.innerHTML=`<div class="wm-locked-box">🔒 Tippabgabe geschlossen${spState.wmChampion?` — Dein Tipp: <strong>${spState.wmChampion}</strong>`:' — Kein Tipp abgegeben'}</div>`;
     return;
   }
   const opts=TEAMS.map(t=>`<option value="${t}"${t===spState.wmChampion?' selected':''}>${t}</option>`).join('');
-  cnt.innerHTML=`<div class="wm-tip-row">
-    <select class="wm-select" id="wmSelect"><option value="">— Team wählen —</option>${opts}</select>
-    <button class="wm-save-btn" id="wmSaveBtn" onclick="saveWmChampion()">Speichern</button>
-  </div>
-  <div class="wm-status" id="wmStatus">${spState.wmChampion?`Aktueller Tipp: <b>${spState.wmChampion}</b>`:'Noch kein Tipp abgegeben'}</div>`;
+  cnt.innerHTML=`
+    <div class="wm-box-row">
+      <select class="wm-select" id="wmSelect">
+        <option value="">— Team wählen —</option>
+        ${opts}
+      </select>
+      <button class="wm-save-btn" id="wmSaveBtn" onclick="saveWmChampion()">Speichern</button>
+    </div>
+    <div class="wm-current" id="wmStatus">
+      ${spState.wmChampion?`Aktueller Tipp: <strong>${spState.wmChampion}</strong>`:'Noch kein Tipp abgegeben'}
+    </div>`;
 }
 
 function renderPage(){
@@ -446,30 +521,31 @@ function renderPage(){
   document.getElementById('spContent').innerHTML=renderSpielplan();
 }
 
-function onUserLoaded(u){
-  spState.user=u;
-  renderPage();
-}
+function onUserLoaded(u){spState.user=u;renderPage();}
 
 async function loadData(){
-  const [mD,tD,wmD]=await Promise.all([
-    apiFetch('/api/matches'),
-    apiFetch('/api/tips'),
-    apiFetch('/api/wm-champion'),
+  const[mD,tD,wmD]=await Promise.all([
+    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():null),
+    fetch('/api/tips',{credentials:'include'}).then(r=>r.ok?r.json():null),
+    fetch('/api/wm-champion',{credentials:'include'}).then(r=>r.ok?r.json():null),
   ]);
   if(mD)spState.matches=mD;
   if(tD)spState.tips=tD;
-  if(wmD){spState.wmChampion=wmD.champion;spState.wmLocked=wmD.locked||false}
+  if(wmD){spState.wmChampion=wmD.champion;spState.wmLocked=wmD.locked||false;}
   renderPage();
 }
 
 loadData();
 setInterval(async()=>{
-  const[mD,tD]=await Promise.all([apiFetch('/api/matches'),apiFetch('/api/tips')]);
+  const[mD,tD]=await Promise.all([
+    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():null),
+    fetch('/api/tips',{credentials:'include'}).then(r=>r.ok?r.json():null),
+  ]);
   if(mD)spState.matches=mD;if(tD)spState.tips=tD;renderPage();
 },30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadData()});
 </script>
+
 </div>
 
 <script>
