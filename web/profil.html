@@ -222,18 +222,21 @@ async function doSaveProfile(e){
   if(r.ok){const u=await r.json();pState.user=u;document.getElementById('profContent').innerHTML=renderProfil();}
 }
 function setPage(p){if(p==='login')location.href='/login.html';}
-function onUserLoaded(u){pState.user=u;if(u)loadData();else{document.getElementById('profContent').innerHTML=renderProfil();}}
+let _initDone=false;
+function onUserLoaded(u){pState.user=u;if(_initDone){if(u)loadData();else{document.getElementById('profContent').innerHTML=renderProfil();}}}
 async function loadData(){
   const[uD,rD]=await Promise.all([
     fetch('/api/me',{credentials:'include'}).then(r=>r.ok?r.json():null).catch(()=>null),
     fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
   ]);
-  pState.user=uD;
+  if(!pState.user && uD) pState.user=uD;
   pState.rankings=rD||[];
+  _initDone=true;
   document.getElementById('profContent').innerHTML=renderProfil();
 }
-// Show something immediately
-document.getElementById('profContent').innerHTML='<div style="text-align:center;padding:40px;color:#888">Profil wird geladen…</div>';
+// Show loading state immediately, then load data
+document.getElementById('profContent').innerHTML='<div style="text-align:center;padding:40px;color:#888">⏳ Profil wird geladen…</div>';
+loadData();
 </script>
 </div>
 
