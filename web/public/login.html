@@ -71,158 +71,221 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <div class="g-content">
 
-<style>.login-btn{background:var(--gold);border:none;color:var(--black);padding:6px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
-.login-btn:hover{background:var(--gold-light);}
-.login-teaser{background:var(--dark);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:20px;}
-.login-teaser-text h3{color:#fff;font-size:15px;font-weight:600;margin-bottom:4px;}
-.login-teaser-text p{color:rgba(255,255,255,.55);font-size:13px;}
-.login-teaser-btn{background:var(--gold);border:none;color:var(--black);padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
-.login-teaser-btn:hover{background:var(--gold-light);}
-.auth-scene{min-height:calc(100vh - 59px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px 16px;}
-.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:390px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);}
-.auth-top{background:var(--dark);padding:0;}
-.auth-top-stripe{height:5px;background:linear-gradient(to right,#1a1a1a 33.3%,#cc0000 33.3% 66.6%,#ffcc00 66.6%);}
-.auth-top-body{padding:24px;text-align:center;}
-.auth-top-flag{display:flex;flex-direction:column;width:42px;height:28px;border-radius:4px;overflow:hidden;margin:0 auto 12px;border:1px solid rgba(255,255,255,.2);}
-.auth-top-flag span{flex:1;display:block;}
-.auth-top h1{color:#fff;font-size:18px;font-weight:700;margin-bottom:3px;}
-.auth-top h1 span{color:var(--gold);}
-.auth-top p{color:rgba(255,255,255,.5);font-size:12px;}
-.auth-tabs{display:flex;border-bottom:1px solid var(--border);}
-.auth-tab{flex:1;padding:11px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;color:var(--muted);border:none;border-bottom:3px solid transparent;background:none;transition:all .15s;}
-.auth-tab.active{color:var(--black);border-bottom-color:var(--gold);}
-.auth-body{padding:22px 24px;}
-.auth-hint{font-size:11px;color:var(--hint);text-align:center;margin-top:14px;line-height:1.5;}
-.auth-hint a{color:var(--discord);cursor:pointer;text-decoration:none;}
-.login-inner{max-width:480px;margin:40px auto;padding:0 12px}</style>
-<div class="login-inner" id="loginContent"></div>
+<style>
+.l-wrap{max-width:440px;margin:0 auto;padding:20px 16px 40px}
+/* CARD */
+.l-card{background:#111;border:1px solid #2a2a2a;border-radius:14px;overflow:hidden}
+.l-card-hero{background:linear-gradient(180deg,#1a1200,#0d0d0d);padding:24px 20px 20px;text-align:center;border-bottom:2px solid #ffd700}
+.l-flag{width:48px;height:32px;display:flex;flex-direction:column;border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.2);margin:0 auto 12px}
+.l-flag s{flex:1;display:block}
+.l-title{font-size:22px;font-weight:900;color:#fff;margin-bottom:3px}
+.l-title span{color:#ffd700}
+.l-sub{font-size:12px;color:#888}
+/* TABS */
+.l-tabs{display:flex;border-bottom:1px solid #2a2a2a}
+.l-tab{flex:1;padding:12px;text-align:center;font-size:14px;font-weight:600;color:#888;cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.l-tab.on{color:#ffd700;border-bottom-color:#ffd700}
+/* FORM */
+.l-body{padding:20px}
+.l-discord-btn{width:100%;background:#5865F2;color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px;transition:opacity .2s}
+.l-discord-btn:hover{opacity:.9}
+.l-divider{display:flex;align-items:center;gap:10px;margin-bottom:16px;color:#555;font-size:12px}
+.l-divider::before,.l-divider::after{content:'';flex:1;height:1px;background:#2a2a2a}
+.l-label{display:block;font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.l-input{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;color:#ddd;padding:11px 14px;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;margin-bottom:14px;-webkit-appearance:none}
+.l-input:focus{border-color:#ffd700}
+.l-pw-wrap{position:relative;margin-bottom:14px}
+.l-pw-wrap .l-input{margin-bottom:0;padding-right:44px}
+.l-pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#888;cursor:pointer;font-size:18px;padding:4px;font-family:inherit}
+.l-submit{width:100%;background:#ffd700;color:#000;border:none;padding:13px;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;transition:opacity .2s;margin-top:4px}
+.l-submit:hover{opacity:.9}
+.l-submit:disabled{opacity:.5;cursor:default}
+.l-err{background:#2a0000;border:1px solid #cc0000;color:#ff6666;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.l-ok{background:#0d2a0d;border:1px solid #16a34a;color:#4ade80;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.l-hint{text-align:center;font-size:12px;color:#555;margin-top:12px}
+.l-hint a{color:#ffd700;text-decoration:none}
+.l-forgot{text-align:right;margin-top:-10px;margin-bottom:14px}
+.l-forgot a{font-size:12px;color:#888;text-decoration:none}
+.l-forgot a:hover{color:#ffd700}
+.l-discord-info{background:#1a1c3a;border:1px solid #5865F2;border-radius:8px;padding:10px 14px;font-size:12px;color:#a5b4fc;margin-bottom:16px;line-height:1.5}
+@media(max-width:500px){
+  .l-wrap{padding:12px 10px 80px}
+  .l-card{border-radius:10px}
+  .l-body{padding:16px}
+  .l-title{font-size:18px}
+}
+</style>
+
+<div class="l-wrap">
+  <div class="l-card">
+    <div class="l-card-hero">
+      <div class="l-flag">
+        <s style="background:#000"></s>
+        <s style="background:#cc0000"></s>
+        <s style="background:#ffd700"></s>
+      </div>
+      <div class="l-title">Fanclub <span>Manelo98</span></div>
+      <div class="l-sub">WM Tippspiel 2026</div>
+    </div>
+
+    <div class="l-tabs">
+      <button class="l-tab on" id="tabLogin" onclick="switchTab('login')">Anmelden</button>
+      <button class="l-tab" id="tabReg" onclick="switchTab('register')">Registrieren</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="l-body" id="loginForm">
+      <button class="l-discord-btn" onclick="doDiscord()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Mit Discord anmelden
+      </button>
+      <div class="l-discord-info">💬 Bei Discord-Login wird dein Discord-Name als Anzeigename verwendet — automatisch und privat.</div>
+      <div class="l-divider">oder mit E-Mail</div>
+      <div class="l-err" id="loginErr"></div>
+      <div class="l-ok" id="loginOk"></div>
+      <label class="l-label">E-Mail-Adresse</label>
+      <input class="l-input" id="loginEmail" type="email" placeholder="name@beispiel.de" autocomplete="email" inputmode="email">
+      <label class="l-label">Passwort</label>
+      <div class="l-pw-wrap">
+        <input class="l-input" id="loginPw" type="password" placeholder="Dein Passwort" autocomplete="current-password">
+        <button class="l-pw-eye" onclick="togglePw('loginPw',this)" type="button" aria-label="Passwort anzeigen">👁</button>
+      </div>
+      <div class="l-forgot"><a href="#">Passwort vergessen?</a></div>
+      <button class="l-submit" id="loginBtn" onclick="doLogin()">Anmelden</button>
+      <div class="l-hint">Noch kein Konto? <a onclick="switchTab('register')">Registrieren</a></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="l-body" id="regForm" style="display:none">
+      <div class="l-err" id="regErr"></div>
+      <div class="l-ok" id="regOk"></div>
+      <label class="l-label">Anzeigename</label>
+      <input class="l-input" id="regName" type="text" placeholder="Dein Name im Fanclub" autocomplete="username" maxlength="30">
+      <label class="l-label">E-Mail-Adresse</label>
+      <input class="l-input" id="regEmail" type="email" placeholder="name@beispiel.de" autocomplete="email" inputmode="email">
+      <label class="l-label">Passwort (min. 8 Zeichen)</label>
+      <div class="l-pw-wrap">
+        <input class="l-input" id="regPw" type="password" placeholder="Sicheres Passwort wählen" autocomplete="new-password">
+        <button class="l-pw-eye" onclick="togglePw('regPw',this)" type="button" aria-label="Passwort anzeigen">👁</button>
+      </div>
+      <label class="l-label">Passwort bestätigen</label>
+      <div class="l-pw-wrap">
+        <input class="l-input" id="regPw2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password">
+        <button class="l-pw-eye" onclick="togglePw('regPw2',this)" type="button" aria-label="Passwort anzeigen">👁</button>
+      </div>
+      <button class="l-submit" id="regBtn" onclick="doRegister()">Konto erstellen</button>
+      <div class="l-hint">Bereits registriert? <a onclick="switchTab('login')">Anmelden</a></div>
+    </div>
+  </div>
+</div>
+
 <script>
-let lState={user:null,authTab:'login',authStep:'form',authError:'',authSuccess:''};
-const state={get user(){return lState.user},get authTab(){return lState.authTab},get authStep(){return lState.authStep},get authError(){return lState.authError},get authSuccess(){return lState.authSuccess}};
+function onUserLoaded(u){if(u)location.href='/';}
 
-function initials(n){return n.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function switchTab(t){
+  const isLogin=t==='login';
+  document.getElementById('tabLogin').className='l-tab'+(isLogin?' on':'');
+  document.getElementById('tabReg').className='l-tab'+(isLogin?'':' on');
+  document.getElementById('loginForm').style.display=isLogin?'block':'none';
+  document.getElementById('regForm').style.display=isLogin?'none':'block';
+}
 
-function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
+function togglePw(id,btn){
+  const inp=document.getElementById(id);
+  const show=inp.type==='password';
+  inp.type=show?'text':'password';
+  btn.textContent=show?'🙈':'👁';
+}
 
-function renderLogin(){
-  if(state.authStep==='discord'){
-    return`<div class="auth-scene"><div class="auth-card">
-      <div class="auth-top"><div class="auth-top-stripe"></div>
-        <div class="auth-top-body">
-          <div class="auth-top-flag"><span class="de-f1"></span><span class="de-f2"></span><span class="de-f3"></span></div>
-          <h1>Fanclub <span>Manelo98</span></h1><p>WM Tippspiel 2026</p>
-        </div>
-      </div>
-      <div class="dc-modal">
-        <div style="font-size:40px;margin-bottom:10px;">💬</div>
-        <h2>Mit Discord verbinden</h2>
-        <p>Du wirst kurz zu Discord weitergeleitet.<br>Dein <strong>Discord-Anzeigename</strong> und <strong>Profilbild</strong> werden automatisch übernommen.</p>
-        <div class="perm-list">
-          <div class="perm-row"><span class="perm-ok">✓</span> Discord-Anzeigename übernehmen</div>
-          <div class="perm-row"><span class="perm-ok">✓</span> Discord-Profilbild automatisch übernehmen</div>
-          <div class="perm-row"><span class="perm-ok">✓</span> Serverzugehörigkeit prüfen</div>
-          <div class="perm-row"><span class="perm-no">✗</span> Keine Nachrichten lesen oder senden</div>
-        </div>
-        <button class="dc-auth-btn" onclick="window.location='/auth/discord'">💬 Weiter zu Discord</button>
-        <a class="back-link" onclick="state.authStep='form';render()">← Zurück</a>
-      </div>
-    </div></div>`;
+function showErr(id,msg){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=msg;el.style.display='block';
+  document.getElementById(id.replace('Err','Ok')).style.display='none';
+}
+function showOk(id,msg){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=msg;el.style.display='block';
+  document.getElementById(id.replace('Ok','Err')).style.display='none';
+}
+
+function doDiscord(){location.href='/auth/discord';}
+
+async function doLogin(){
+  const btn=document.getElementById('loginBtn');
+  const email=document.getElementById('loginEmail').value.trim();
+  const pw=document.getElementById('loginPw').value;
+  if(!email||!pw){showErr('loginErr','Bitte alle Felder ausfüllen.');return;}
+  btn.disabled=true;btn.textContent='Wird angemeldet…';
+  try{
+    const r=await fetch('/api/login',{method:'POST',credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pw})});
+    if(r.ok){
+      showOk('loginOk','✅ Erfolgreich angemeldet! Weiterleitung…');
+      setTimeout(()=>location.href='/',800);
+    }else{
+      const d=await r.json().catch(()=>({}));
+      showErr('loginErr',d.detail||'E-Mail oder Passwort falsch.');
+      btn.disabled=false;btn.textContent='Anmelden';
+    }
+  }catch(e){
+    showErr('loginErr','Netzwerkfehler. Bitte erneut versuchen.');
+    btn.disabled=false;btn.textContent='Anmelden';
   }
-
-  const isLogin=state.authTab==='login';
-  return`<div class="auth-scene"><div class="auth-card">
-    <div class="auth-top">
-      <div class="auth-top-stripe"></div>
-      <div class="auth-top-body">
-        <div class="auth-top-flag"><span class="de-f1"></span><span class="de-f2"></span><span class="de-f3"></span></div>
-        <h1>Fanclub <span>Manelo98</span></h1><p>WM Tippspiel 2026</p>
-      </div>
-    </div>
-    <div class="auth-tabs">
-      <button class="auth-tab${isLogin?' active':''}" onclick="state.authTab='login';render()">Anmelden</button>
-      <button class="auth-tab${!isLogin?' active':''}" onclick="state.authTab='register';render()">Registrieren</button>
-    </div>
-    <div class="auth-body">
-      <div class="err-msg" id="err-msg"></div>
-      <button class="disc-btn" onclick="state.authStep='discord';render()">
-        💬 Mit Discord ${isLogin?'anmelden':'registrieren'}
-      </button>
-      <div class="info-box info-discord" style="margin-top:8px;">
-        💬 Bei Discord-Login wird dein Discord-Name als Anzeigename verwendet — automatisch und privat.
-      </div>
-      <div class="divider"><div class="div-line"></div><span class="div-text">oder mit E-Mail</span><div class="div-line"></div></div>
-      ${!isLogin?`
-      <div class="field">
-        <label>Anzeigename <span class="hint-tag">(sichtbar für andere Mitspieler)</span></label>
-        <input type="text" id="f-name" placeholder="z. B. Lars_K">
-      </div>
-      <div class="info-box info-privacy">
-        🔒 Deine E-Mail-Adresse bleibt privat und ist für andere Mitspieler niemals sichtbar.
-      </div>`:''}
-      <div class="field">
-        <label>E-Mail-Adresse <span class="hint-tag">(bleibt privat)</span></label>
-        <input type="email" id="f-email" placeholder="name@beispiel.de">
-      </div>
-      <div class="field">
-        <label>Passwort</label>
-        <div class="pw-wrap">
-          <input type="password" id="f-pw" placeholder="${isLogin?'Dein Passwort':'Mindestens 8 Zeichen'}" ${!isLogin?'oninput="checkStr(this.value)"':''}>
-          <button class="eye-btn" onclick="togglePw()" type="button">👁</button>
-        </div>
-        ${!isLogin?`<div class="str-bar"><div class="str-fill" id="str-fill" style="width:0%;background:#dc2626;"></div></div>`:''}
-      </div>
-      ${isLogin?`<div style="text-align:right;margin-bottom:14px;margin-top:-6px;"><a style="font-size:11px;color:var(--discord);cursor:pointer;">Passwort vergessen?</a></div>`:''}
-      <button class="submit-btn" onclick="${isLogin?'doLogin()':'doRegister()'}">
-        ${isLogin?'Anmelden':'Konto erstellen'}
-      </button>
-      <p class="auth-hint">${isLogin
-        ?`Noch kein Konto? <a onclick="state.authTab='register';render()">Registrieren</a>`
-        :`Bereits ein Konto? <a onclick="state.authTab='login';render()">Anmelden</a>`}
-      </p>
-    </div>
-  </div></div>`;
 }
 
-function togglePw(){const i=document.getElementById('f-pw');if(i)i.type=i.type==='password'?'text':'password';}
+// Allow Enter key
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const lf=document.getElementById('loginForm');
+  const rf=document.getElementById('regForm');
+  if(lf&&lf.style.display!=='none')doLogin();
+  else if(rf&&rf.style.display!=='none')doRegister();
+});
 
-function checkStr(v){
-  const f=document.getElementById('str-fill');if(!f)return;
-  let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
-  f.style.width=(s*25)+'%';f.style.background=s<=1?'#dc2626':s===2?'#ea580c':s===3?'#ca8a04':'#16a34a';
+async function doRegister(){
+  const btn=document.getElementById('regBtn');
+  const name=document.getElementById('regName').value.trim();
+  const email=document.getElementById('regEmail').value.trim();
+  const pw=document.getElementById('regPw').value;
+  const pw2=document.getElementById('regPw2').value;
+  if(!name||!email||!pw){showErr('regErr','Bitte alle Felder ausfüllen.');return;}
+  if(name.length<2){showErr('regErr','Name muss mindestens 2 Zeichen haben.');return;}
+  if(pw.length<8){showErr('regErr','Passwort muss mindestens 8 Zeichen haben.');return;}
+  if(pw!==pw2){showErr('regErr','Passwörter stimmen nicht überein.');return;}
+  btn.disabled=true;btn.textContent='Konto wird erstellt…';
+  try{
+    const r=await fetch('/api/register',{method:'POST',credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:name,email,password:pw})});
+    if(r.ok){
+      showOk('regOk','✅ Konto erstellt! Du kannst dich jetzt anmelden.');
+      setTimeout(()=>switchTab('login'),1500);
+    }else{
+      const d=await r.json().catch(()=>({}));
+      showErr('regErr',d.detail||'Registrierung fehlgeschlagen.');
+    }
+    btn.disabled=false;btn.textContent='Konto erstellen';
+  }catch(e){
+    showErr('regErr','Netzwerkfehler. Bitte erneut versuchen.');
+    btn.disabled=false;btn.textContent='Konto erstellen';
+  }
 }
-
-function showErr(m){const e=document.getElementById('err-msg');if(e){e.textContent=m;e.style.display='block';}}
-function render(){document.getElementById('loginContent').innerHTML=renderLogin();}
-function setPage(p){if(p==='welcome')location.href='/';}
-async function doDiscordLogin(){location.href='/auth/discord';}
-async function doLogin(e){
-  e&&e.preventDefault();
-  const username=document.getElementById('login-username')?.value||'';
-  const password=document.getElementById('login-pw')?.value||'';
-  const r=await fetch('/api/login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-  if(r.ok){location.href='/';}else{lState.authError='Ungültige Anmeldedaten';render();}
-}
-async function doRegister(e){
-  e&&e.preventDefault();
-  const username=document.getElementById('reg-username')?.value||'';
-  const password=document.getElementById('reg-pw')?.value||'';
-  const r=await fetch('/api/register',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
-  if(r.ok){lState.authStep='success';lState.authSuccess='Registrierung erfolgreich! Du kannst dich jetzt anmelden.';lState.authTab='login';render();}else{const d=await r.json();lState.authError=d.detail||'Fehler';render();}
-}
-function onUserLoaded(u){if(u)location.href='/';else render();}
-function switchTab(t){lState.authTab=t;lState.authError='';render();}
 </script>
 </div>
 
 <script>
 const G_PAGES=[
   {id:'index',label:'Start',icon:'🏠',url:'/'},
-  {id:'spielplan',label:'Spielplan',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielplan',label:'Spielplan/Tipps',icon:'⚽',url:'/spielplan.html'},
   {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
   {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
   {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
   {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
 ];
+// Admin page added after user check
 const G_CURRENT='login';
 
 // Build desktop nav
@@ -255,6 +318,25 @@ G_PAGES.forEach(p=>{
       const initials=u.username.slice(0,2).toUpperCase();
       const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
       el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      // Check admin
+      try{
+        const ar=await fetch('/api/admin/check',{credentials:'include'});
+        if(ar.ok){
+          const aa=await ar.json();
+          if(aa.is_admin){
+            const nav=document.getElementById('gNav');
+            const mob=document.getElementById('gMobNav');
+            const div=document.createElement('div');div.className='g-nav-div';nav.appendChild(div);
+            const a=document.createElement('a');
+            a.textContent='🔧 Admin';
+            a.href='/';
+            a.onclick=(e)=>{e.preventDefault();window._goAdmin=true;location.href='/';}
+            nav.appendChild(a);
+            const ma=document.createElement('a');ma.href='/';ma.innerHTML='<span>🔧</span><span>Admin</span>';
+            ma.onclick=a.onclick;mob.appendChild(ma);
+          }
+        }
+      }catch{}
       if(typeof onUserLoaded==='function')onUserLoaded(u);
     } else {
       if(typeof onUserLoaded==='function')onUserLoaded(null);
