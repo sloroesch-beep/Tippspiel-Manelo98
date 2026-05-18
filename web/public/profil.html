@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0a0a0a">
-<title>Profil — WM Tippspiel 2026</title>
+<title>Mein Profil — WM Tippspiel 2026</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--gold:#ffd700;--red:#cc0000;--green:#16a34a;--orange:#ea580c;--bg:#0a0a0a;--card:#111;--border:#2a2a2a;--text:#ddd;--muted:#888}
@@ -71,171 +71,238 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 <div class="g-content">
 
-<style>.auth-top-stripe{height:5px;background:linear-gradient(to right,#1a1a1a 33.3%,#cc0000 33.3% 66.6%,#ffcc00 66.6%);}
-.auth-top-body{padding:24px;text-align:center;}
-.auth-top-flag{display:flex;flex-direction:column;width:42px;height:28px;border-radius:4px;overflow:hidden;margin:0 auto 12px;border:1px solid rgba(255,255,255,.2);}
-.auth-top-flag span{flex:1;display:block;}
-.auth-top h1{color:#fff;font-size:18px;font-weight:700;margin-bottom:3px;}
-.auth-top h1 span{color:var(--gold);}
-.auth-top p{color:rgba(255,255,255,.5);font-size:12px;}
-.pw-wrap{position:relative;}
-.pw-wrap input{padding-right:38px;}
-.profile-page{max-width:540px;}
-.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
-.profile-head{background:var(--dark);border-bottom:3px solid var(--gold);padding:14px 20px;display:flex;align-items:center;gap:10px;}
-.profile-head h2{color:#fff;font-size:14px;font-weight:700;}
-.profile-body{padding:22px 24px;}
-.avatar-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);flex-shrink:0;}
-.avatar-preview-ph{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;border:3px solid var(--gold);flex-shrink:0;}
-.avatar-section{display:flex;align-items:center;gap:20px;margin-bottom:20px;}
-.avatar-info h3{font-size:15px;font-weight:700;margin-bottom:4px;}
-.avatar-info p{font-size:12px;color:var(--muted);line-height:1.5;}
-.avatar-methods{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
-.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:0;}
-.profile-stat{background:#f9f9f9;border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;text-align:center;}
-.profile-stat .val{font-size:20px;font-weight:700;color:var(--black);}
-.profile-stat .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
-.prof-inner{max-width:600px;margin:0 auto;padding:12px}</style>
-<div class="prof-inner" id="profContent"><div style="text-align:center;padding:40px;color:#888">Wird geladen…</div></div>
+<style>
+.p-wrap{max-width:600px;margin:0 auto;padding:16px 12px 40px}
+.p-head{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;text-align:center;margin-bottom:16px}
+.p-eye{font-size:8px;letter-spacing:4px;color:#cc0000;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.p-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
+.p-h span{color:#ffd700}
+
+/* AVATAR SECTION */
+.p-avatar-section{display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:#111;border:1px solid #2a2a2a;border-radius:12px;margin-bottom:16px}
+.p-avatar{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #ffd700;margin-bottom:12px}
+.p-avatar-ph{width:90px;height:90px;border-radius:50%;border:3px solid #ffd700;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;color:#000;margin-bottom:12px;flex-shrink:0}
+.p-name{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px}
+.p-sub{font-size:12px;color:#888}
+
+/* STATS */
+.p-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.p-stat{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:12px;text-align:center}
+.p-stat-v{font-size:24px;font-weight:900;color:#ffd700}
+.p-stat-l{font-size:11px;color:#888;margin-top:2px}
+
+/* CARD */
+.p-card{background:#111;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.p-card-head{background:linear-gradient(135deg,#1a1200,#0d0d0d);border-bottom:2px solid #ffd700;padding:10px 16px;font-size:13px;font-weight:700;color:#ffd700}
+.p-card-body{padding:16px}
+
+/* FORM */
+.p-label{font-size:11px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;display:block}
+.p-input{width:100%;background:#0d0d0d;border:1px solid #2a2a2a;color:#ddd;padding:10px 12px;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;margin-bottom:12px}
+.p-input:focus{border-color:#ffd700}
+
+/* UPLOAD */
+.p-upload-area{border:2px dashed #2a2a2a;border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px;background:#0d0d0d}
+.p-upload-area:hover{border-color:#ffd700;background:#1a1200}
+.p-upload-area.drag{border-color:#ffd700;background:#1a1200}
+.p-upload-icon{font-size:32px;margin-bottom:8px}
+.p-upload-text{font-size:13px;color:#888}
+.p-upload-text strong{color:#ffd700}
+.p-upload-sub{font-size:11px;color:#555;margin-top:4px}
+.p-upload-input{display:none}
+.p-progress{display:none;height:4px;background:#1a1a1a;border-radius:2px;margin-bottom:12px;overflow:hidden}
+.p-progress-bar{height:100%;background:linear-gradient(90deg,#ffd700,#ff9500);border-radius:2px;width:0%;transition:width .3s}
+.p-url-row{display:flex;gap:8px;margin-bottom:12px}
+.p-url-input{flex:1;background:#0d0d0d;border:1px solid #2a2a2a;color:#ddd;padding:10px 12px;border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.p-url-input:focus{border-color:#ffd700}
+.p-url-btn{background:#1a1200;border:1px solid #ffd700;color:#ffd700;padding:10px 14px;border-radius:8px;font-size:13px;cursor:pointer;white-space:nowrap;font-family:inherit}
+
+/* BUTTONS */
+.p-save-btn{width:100%;background:#ffd700;color:#000;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.p-save-btn:hover{opacity:.9}
+.p-save-btn:disabled{opacity:.5;cursor:default}
+.p-logout-btn{width:100%;background:transparent;border:1px solid #cc0000;color:#cc0000;padding:10px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px;transition:all .2s}
+.p-logout-btn:hover{background:#cc0000;color:#fff}
+.p-msg{padding:8px 12px;border-radius:6px;font-size:12px;font-weight:600;margin-bottom:12px;display:none}
+.p-msg.ok{background:#0d2a0d;color:#16a34a;border:1px solid #16a34a}
+.p-msg.err{background:#2a0000;color:#cc0000;border:1px solid #cc0000}
+@media(max-width:500px){.p-stats{grid-template-columns:repeat(3,1fr)}.p-stat-v{font-size:18px}}
+</style>
+
+<div class="p-head">
+  <div class="p-eye">Fanclub Manelo98</div>
+  <div class="p-h">MEIN <span>PROFIL</span></div>
+</div>
+
+<div class="p-wrap" id="pWrap">
+  <div style="text-align:center;padding:40px;color:#888">⏳ Wird geladen…</div>
+</div>
+
 <script>
 const COLORS=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6','#1abc9c','#f39c12'];
-let pState={user:null,rankings:[]};
-const state={get user(){return pState.user},get rankings(){return pState.rankings}};
+function avatarColor(n){let h=0;for(let c of(n||''))h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
+function initials(n){return(n||'?').split(/[\s_]/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
 
-function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
+let pUser=null,pRankings=[];
 
-function initials(n){return n.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
-
-function renderProfil(){
-  if(!state.user){
-    return`<div class="locked-overlay">
-      <div class="lock-icon">🔒</div>
-      <h3>Bitte anmelden</h3>
-      <p>Melde dich an um dein Profil zu bearbeiten.</p>
-      <button onclick="setPage('login')">Jetzt anmelden</button>
+function renderProfile(){
+  const u=pUser;
+  if(!u){
+    document.getElementById('pWrap').innerHTML=`<div style="text-align:center;padding:40px">
+      <div style="font-size:48px;margin-bottom:12px">🔒</div>
+      <p style="color:#888;margin-bottom:16px">Bitte anmelden um dein Profil zu sehen</p>
+      <a href="/login.html" style="background:#ffd700;color:#000;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700">Anmelden</a>
     </div>`;
+    return;
   }
-  const col=avatarColor(state.user.username);
-  const avHTML=state.user.avatar
-    ?`<img class="avatar-preview" src="${state.user.avatar}" alt="${state.user.username}" id="av-preview">`
-    :`<div class="avatar-preview-ph" style="background:${col};" id="av-preview">${initials(state.user.username)}</div>`;
+  const col=avatarColor(u.username);
+  const ini=initials(u.username);
+  const rank=pRankings.findIndex(r=>r.username===u.username)+1;
+  const myRank=pRankings.find(r=>r.username===u.username);
+  const pts=myRank?.points||0;
+  const tipped=myRank?.total||0;
 
-  return`<div class="profile-page">
-    <div class="profile-card">
-      <div class="profile-head"><h2>👤 Mein Profil</h2></div>
-      <div class="profile-body">
-        <div class="success-msg" id="prof-success">✓ Profil erfolgreich gespeichert!</div>
-        <div class="err-msg" id="prof-err"></div>
-        <div class="avatar-section">
-          ${avHTML}
-          <div class="avatar-info">
-            <h3>${state.user.username}</h3>
-            <p style="font-size:12px;color:var(--muted);">Klick auf "Bild hochladen" um ein Foto von deinem Gerät zu wählen — funktioniert auf Windows, iPhone, Android und Mac.</p>
-          </div>
-        </div>
+  document.getElementById('pWrap').innerHTML=`
+    <!-- AVATAR CARD -->
+    <div class="p-avatar-section">
+      ${u.avatar
+        ?`<img class="p-avatar" src="${u.avatar}" id="avImg" alt="${u.username}">`
+        :`<div class="p-avatar-ph" style="background:${col}" id="avImg">${ini}</div>`}
+      <div class="p-name">${u.username}</div>
+      <div class="p-sub">Fanclub Manelo98 · WM Tippspiel 2026</div>
+    </div>
 
-        <div class="field">
-          <label>Anzeigename <span class="hint-tag">(sichtbar für alle Mitspieler)</span></label>
-          <input type="text" id="prof-name" value="${state.user.username}" placeholder="Dein Anzeigename">
-        </div>
+    <!-- STATS -->
+    <div class="p-stats">
+      <div class="p-stat"><div class="p-stat-v">${pts}</div><div class="p-stat-l">Punkte</div></div>
+      <div class="p-stat"><div class="p-stat-v">${tipped}</div><div class="p-stat-l">Tipps</div></div>
+      <div class="p-stat"><div class="p-stat-v">${rank||'–'}</div><div class="p-stat-l">Platz</div></div>
+    </div>
 
-        <div class="field">
-          <div class="method-label">Profilbild</div>
-          <div class="avatar-methods">
-            <div>
-              <label class="method-label" style="margin-bottom:6px;">📁 Vom Gerät hochladen</label>
-              <label class="upload-btn" for="prof-file-input">
-                📷 Bild auswählen
-                <span style="font-size:11px;color:var(--muted);">(JPG, PNG, GIF — max. 5MB)</span>
-              </label>
-              <input type="file" id="prof-file-input" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
-              <div class="upload-progress" id="upload-progress">⏳ Wird hochgeladen…</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;"><div style="flex:1;height:1px;background:var(--border);"></div><span style="font-size:11px;color:var(--hint);">oder</span><div style="flex:1;height:1px;background:var(--border);"></div></div>
-            <div>
-              <label class="method-label" style="margin-bottom:6px;">🔗 Bild-URL eingeben</label>
-              <input type="url" id="prof-avatar" value="${state.user.avatar&&!state.user.avatar.startsWith('data:')?state.user.avatar:''}" placeholder="https://beispiel.com/meinbild.jpg" oninput="previewAvatar(this.value)" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:13px;outline:none;">
-            </div>
-          </div>
-        </div>
-
-        <button class="save-btn" onclick="saveProfile()">💾 Profil speichern</button>
+    <!-- PROFILE EDIT -->
+    <div class="p-card">
+      <div class="p-card-head">✏️ Profil bearbeiten</div>
+      <div class="p-card-body">
+        <div class="p-msg" id="pMsg"></div>
+        <label class="p-label">Anzeigename</label>
+        <input class="p-input" id="pName" type="text" value="${u.username}" maxlength="30" placeholder="Dein Name">
+        <button class="p-save-btn" onclick="saveProfile()">💾 Name speichern</button>
       </div>
     </div>
 
-    <div class="profile-card">
-      <div class="profile-head"><h2>📊 Meine Statistiken</h2></div>
-      <div class="profile-body">
-        <div class="profile-stats">
-          <div class="profile-stat">
-            <div class="val">${state.rankings.find(r=>r.username===state.user.username)?.points||0}</div>
-            <div class="lbl">Punkte</div>
-          </div>
-          <div class="profile-stat">
-            <div class="val">${state.rankings.find(r=>r.username===state.user.username)?.total||0}</div>
-            <div class="lbl">Tipps abgegeben</div>
-          </div>
-          <div class="profile-stat">
-            <div class="val">${(state.rankings.findIndex(r=>r.username===state.user.username)+1)||'-'}</div>
-            <div class="lbl">Platz in Tabelle</div>
-          </div>
+    <!-- AVATAR UPLOAD -->
+    <div class="p-card">
+      <div class="p-card-head">📷 Profilbild ändern</div>
+      <div class="p-card-body">
+        <div class="p-msg" id="upMsg"></div>
+
+        <!-- File Upload -->
+        <div class="p-upload-area" id="dropZone" onclick="document.getElementById('fileIn').click()"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="handleDrop(event)">
+          <div class="p-upload-icon">📤</div>
+          <div class="p-upload-text">Klicken oder Bild hierher ziehen<br><strong>vom PC, Smartphone oder Tablet</strong></div>
+          <div class="p-upload-sub">JPG, PNG, GIF, WebP — max. 5MB</div>
+        </div>
+        <input type="file" id="fileIn" accept="image/*" class="p-upload-input" onchange="uploadFile(this.files[0])">
+        <div class="p-progress" id="upProg"><div class="p-progress-bar" id="upProgBar"></div></div>
+
+        <!-- URL Input -->
+        <div style="text-align:center;color:#555;font-size:11px;margin:8px 0">— oder Bild-URL eingeben —</div>
+        <div class="p-url-row">
+          <input class="p-url-input" id="urlIn" type="url" placeholder="https://example.com/bild.jpg" oninput="previewUrl(this.value)">
+          <button class="p-url-btn" onclick="saveUrl()">Speichern</button>
         </div>
       </div>
     </div>
 
-    ${state.user.avatar?'':`<div class="profile-card">
-      <div class="profile-head"><h2>💡 Tipp: Discord-Login für automatisches Profilbild</h2></div>
-      <div class="profile-body">
-        <p style="font-size:13px;color:var(--muted);line-height:1.6;">
-          Wenn du dich über Discord anmeldest, wird dein Discord-Profilbild automatisch übernommen — ohne URL eintippen zu müssen.
-        </p>
+    <!-- LOGOUT -->
+    <div class="p-card">
+      <div class="p-card-head">⚙️ Account</div>
+      <div class="p-card-body">
+        <button class="p-logout-btn" onclick="doLogout()">🚪 Abmelden</button>
       </div>
-    </div>`}
-  </div>`;
+    </div>`;
 }
 
-function previewAvatar(url){
-  const el=document.getElementById('av-preview');
+function showMsg(id, text, type){
+  const el=document.getElementById(id);
   if(!el)return;
-  if(url&&url.startsWith('http')){
-    el.outerHTML=`<img class="avatar-preview" src="${url}" alt="Vorschau" id="av-preview" onerror="this.style.opacity='.3'">`;
-  }
+  el.textContent=text;el.className=`p-msg ${type}`;el.style.display='block';
+  setTimeout(()=>{el.style.display='none'},4000);
 }
 
-function togglePw(){const i=document.getElementById('f-pw');if(i)i.type=i.type==='password'?'text':'password';}
-
-function checkStr(v){
-  const f=document.getElementById('str-fill');if(!f)return;
-  let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
-  f.style.width=(s*25)+'%';f.style.background=s<=1?'#dc2626':s===2?'#ea580c':s===3?'#ca8a04':'#16a34a';
+async function saveProfile(){
+  const name=document.getElementById('pName')?.value?.trim();
+  if(!name){showMsg('pMsg','Name darf nicht leer sein','err');return;}
+  const r=await fetch('/api/profile',{method:'POST',credentials:'include',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({username:name})});
+  if(r.ok){const u=await r.json();pUser=u;renderProfile();showMsg('pMsg','✅ Gespeichert!','ok');}
+  else showMsg('pMsg','❌ Fehler beim Speichern','err');
 }
 
-function showErr(m){const e=document.getElementById('err-msg');if(e){e.textContent=m;e.style.display='block';}}
+async function uploadFile(file){
+  if(!file)return;
+  if(file.size>5*1024*1024){showMsg('upMsg','❌ Bild zu groß (max. 5MB)','err');return;}
+  const prog=document.getElementById('upProg');
+  const bar=document.getElementById('upProgBar');
+  if(prog)prog.style.display='block';
+  if(bar){bar.style.width='30%';}
+  const fd=new FormData();fd.append('file',file);
+  try{
+    const r=await fetch('/api/upload-avatar',{method:'POST',credentials:'include',body:fd});
+    if(bar)bar.style.width='100%';
+    if(r.ok){
+      const d=await r.json();
+      if(pUser)pUser.avatar=d.avatar;
+      setTimeout(()=>{if(prog)prog.style.display='none';renderProfile();showMsg('upMsg','✅ Profilbild gespeichert!','ok');},500);
+    }else{
+      if(prog)prog.style.display='none';
+      showMsg('upMsg','❌ Upload fehlgeschlagen','err');
+    }
+  }catch(e){if(prog)prog.style.display='none';showMsg('upMsg','❌ Netzwerkfehler','err');}
+}
+
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('dropZone')?.classList.remove('drag');
+  const file=e.dataTransfer?.files?.[0];
+  if(file&&file.type.startsWith('image/'))uploadFile(file);
+  else showMsg('upMsg','❌ Nur Bilddateien erlaubt','err');
+}
+
+function previewUrl(url){
+  // Just validate URL format
+}
+
+async function saveUrl(){
+  const url=document.getElementById('urlIn')?.value?.trim();
+  if(!url){showMsg('upMsg','Bitte eine URL eingeben','err');return;}
+  const r=await fetch('/api/profile',{method:'POST',credentials:'include',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({avatar:url})});
+  if(r.ok){const u=await r.json();pUser=u;renderProfile();showMsg('upMsg','✅ Bild gespeichert!','ok');}
+  else showMsg('upMsg','❌ Fehler','err');
+}
+
 async function doLogout(){
   await fetch('/api/logout',{method:'POST',credentials:'include'});
   location.href='/';
 }
-async function doSaveProfile(e){
-  e&&e.preventDefault();
-  const username=document.getElementById('prof-username')?.value||'';
-  const r=await fetch('/api/profile',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username})});
-  if(r.ok){const u=await r.json();pState.user=u;document.getElementById('profContent').innerHTML=renderProfil();}
-}
+
+function onUserLoaded(u){pUser=u;renderProfile();}
+
 function setPage(p){if(p==='login')location.href='/login.html';}
-let _initDone=false;
-function onUserLoaded(u){pState.user=u;if(_initDone){if(u)loadData();else{document.getElementById('profContent').innerHTML=renderProfil();}}}
+
 async function loadData(){
   const[uD,rD]=await Promise.all([
     fetch('/api/me',{credentials:'include'}).then(r=>r.ok?r.json():null).catch(()=>null),
     fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
   ]);
-  if(!pState.user && uD) pState.user=uD;
-  pState.rankings=rD||[];
-  _initDone=true;
-  document.getElementById('profContent').innerHTML=renderProfil();
+  if(uD)pUser=uD;
+  pRankings=rD||[];
+  renderProfile();
 }
-// Show loading state immediately, then load data
-document.getElementById('profContent').innerHTML='<div style="text-align:center;padding:40px;color:#888">⏳ Profil wird geladen…</div>';
 loadData();
 </script>
 </div>
@@ -243,12 +310,13 @@ loadData();
 <script>
 const G_PAGES=[
   {id:'index',label:'Start',icon:'🏠',url:'/'},
-  {id:'spielplan',label:'Spielplan',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielplan',label:'Spielplan/Tipps',icon:'⚽',url:'/spielplan.html'},
   {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
   {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
   {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
   {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
 ];
+// Admin page added after user check
 const G_CURRENT='profil';
 
 // Build desktop nav
@@ -281,6 +349,25 @@ G_PAGES.forEach(p=>{
       const initials=u.username.slice(0,2).toUpperCase();
       const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
       el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      // Check admin
+      try{
+        const ar=await fetch('/api/admin/check',{credentials:'include'});
+        if(ar.ok){
+          const aa=await ar.json();
+          if(aa.is_admin){
+            const nav=document.getElementById('gNav');
+            const mob=document.getElementById('gMobNav');
+            const div=document.createElement('div');div.className='g-nav-div';nav.appendChild(div);
+            const a=document.createElement('a');
+            a.textContent='🔧 Admin';
+            a.href='/';
+            a.onclick=(e)=>{e.preventDefault();window._goAdmin=true;location.href='/';}
+            nav.appendChild(a);
+            const ma=document.createElement('a');ma.href='/';ma.innerHTML='<span>🔧</span><span>Admin</span>';
+            ma.onclick=a.onclick;mob.appendChild(ma);
+          }
+        }
+      }catch{}
       if(typeof onUserLoaded==='function')onUserLoaded(u);
     } else {
       if(typeof onUserLoaded==='function')onUserLoaded(null);
