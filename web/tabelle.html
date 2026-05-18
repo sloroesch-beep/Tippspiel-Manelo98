@@ -146,12 +146,11 @@ function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);retu
 function initials(n){return n.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
 
 function renderTabelle(){
-  if(!state.user){
-    return`<div class="locked-overlay">
-      <div class="lock-icon">🔒</div>
-      <h3>Nur für Mitspieler sichtbar</h3>
-      <p>Die Rangliste und Punkteübersicht ist nur für angemeldete Mitspieler sichtbar.<br>Melde dich an um deinen Platz in der Tabelle zu sehen!</p>
-      <button onclick="setPage('login')">Jetzt anmelden</button>
+  if(!state.rankings||!state.rankings.length){
+    return`<div style="text-align:center;padding:60px 20px;color:#888">
+      <div style="font-size:48px;margin-bottom:12px">🏆</div>
+      <h3 style="color:#ddd;margin-bottom:8px">Noch keine Punkte</h3>
+      <p>Die Rangliste wird nach dem ersten gewerteten Spiel angezeigt.</p>
     </div>`;
   }
   const max=state.rankings[0]?.points||1;
@@ -221,9 +220,12 @@ function renderTabelle(){
   }
   return html;
 }
+let _initDone=false;
 function onUserLoaded(u){
+  // Always update user from shared header (authoritative source)
   tState.user=u;
-  renderTab(); // re-render now that we know user state
+  if(_initDone) renderTab(); // re-render if init already ran
+  // if init hasn't run yet, it will render when done
 }
 function renderTab(){
   document.getElementById('tabContent').innerHTML=renderTabelle();
@@ -242,15 +244,17 @@ function setPage(p){if(p==='profil')location.href='/profil.html';if(p==='login')
 // onUserLoaded() is called by shared header after /api/me check
 // But load rankings in parallel anyway, then re-render when user is known
 async function init(){
-  // Fetch user + data in parallel
+  // Fetch data (don't override user - let onUserLoaded handle that)
   const[uD,rD,mD]=await Promise.all([
-    fetch('/api/me',{credentials:'include'}).then(r=>r.ok?r.json():null).catch(()=>null),
+    fetch('/api/me',{credentials:'include',cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
     fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
     fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
   ]);
-  tState.user=uD;
+  // Only set user from our own fetch if not already set by onUserLoaded
+  if(!tState.user && uD) tState.user=uD;
   tState.rankings=rD||[];
   tState.matches=mD||[];
+  _initDone=true;
   renderTab();
 }
 init();
