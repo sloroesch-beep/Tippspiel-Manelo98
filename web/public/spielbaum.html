@@ -120,13 +120,19 @@ nav a.on{color:var(--gold);border-color:var(--gold)}
 @media(max-width:899px){
   .panels{display:none}
   .mob{display:flex}
-  nav a:not(.on):not([href="/"]){display:none}
+  nav{display:none}
+  .mob{padding-bottom:65px}
 }
 @media(max-width:600px){
   .hdr{padding:0 8px}
-  nav{gap:0}
-  nav a{padding:4px 6px;font-size:10px}
 }
+/* MOBILE BOTTOM NAV */
+.sb-mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;border-top:2px solid var(--gold);z-index:300;padding:6px 0 env(safe-area-inset-bottom,0)}
+.sb-mob-nav-inner{display:flex;justify-content:space-around}
+.sb-mob-nav a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;color:var(--muted);text-decoration:none;font-size:10px;flex:1;min-height:48px;justify-content:center;-webkit-tap-highlight-color:transparent;border:none;background:none}
+.sb-mob-nav a.on{color:var(--gold)}
+.sb-mob-nav a span:first-child{font-size:22px;line-height:1}
+@media(max-width:899px){.sb-mob-nav{display:block}}
 
 /* ── ACCESSIBILITY ── */
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -351,5 +357,15 @@ load();
 setInterval(async()=>{const[mD,tD]=await Promise.all([api('/api/matches'),api('/api/tips')]);if(mD)M=mD;if(tD)T=tD;render()},30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
 </script>
+<div class="sb-mob-nav" role="navigation" aria-label="Mobile Navigation">
+  <div class="sb-mob-nav-inner">
+    <a href="/"><span>🏠</span><span>Start</span></a>
+    <a href="/spielplan.html"><span>⚽</span><span>Spielplan</span></a>
+    <a href="/spielbaum.html" class="on"><span>🌳</span><span>Spielbaum</span></a>
+    <a href="/tabelle.html"><span>🏆</span><span>Tabelle</span></a>
+    <a href="/auswertung.html"><span>📊</span><span>Auswertung</span></a>
+    <a href="/profil.html"><span>👤</span><span>Profil</span></a>
+  </div>
+</div>
 </body>
 </html>
