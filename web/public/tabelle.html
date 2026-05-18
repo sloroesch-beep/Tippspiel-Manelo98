@@ -127,8 +127,17 @@ function av(r,w=32,h=32){
     :`<div class="t-av-ph" style="background:${col};width:${w}px;height:${h}px">${ini}</div>`;
 }
 
-function renderTable(rankings, matches){
+function renderTable(rankings, matches, user){
   const el=document.getElementById('tContent');
+  if(!user){
+    el.innerHTML=`<div class="t-empty">
+      <div class="t-empty-icon">🔒</div>
+      <h3 style="color:#ddd;margin-bottom:8px">Nur für Mitspieler</h3>
+      <p style="margin-bottom:16px">Melde dich an um die Rangliste zu sehen.</p>
+      <a href="/login.html" style="background:#ffd700;color:#000;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none;display:inline-block">Anmelden</a>
+    </div>`;
+    return;
+  }
   if(!rankings||!rankings.length){
     el.innerHTML=`<div class="t-empty"><div class="t-empty-icon">🏆</div><h3 style="color:#ddd;margin-bottom:8px">Noch keine Punkte</h3><p>Die Rangliste erscheint nach dem ersten gewerteten Spiel.</p></div>`;
     return;
@@ -190,15 +199,19 @@ function renderTable(rankings, matches){
   el.innerHTML=html;
 }
 
+let tUser=null;
+
 async function loadAll(){
-  const[rD,mD]=await Promise.all([
+  const[uD,rD,mD]=await Promise.all([
+    fetch('/api/me',{credentials:'include'}).then(r=>r.ok?r.json():null).catch(()=>null),
     fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
     fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
   ]);
-  renderTable(rD,mD);
+  tUser=uD;
+  renderTable(rD,mD,tUser);
 }
 
-function onUserLoaded(u){}  // not needed - rankings is public
+function onUserLoaded(u){tUser=u;} // extra update from shared header
 loadAll();
 setInterval(loadAll,60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadAll()});
