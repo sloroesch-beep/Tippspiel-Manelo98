@@ -72,193 +72,136 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 <div class="g-content">
 
 <style>
-.status-pill{margin-left:auto;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;}
-.rank-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;}
-.rank-head{background:var(--dark);border-bottom:3px solid var(--gold);padding:11px 18px;display:flex;align-items:center;gap:8px;}
-.rank-head h2{color:#fff;font-size:13px;font-weight:700;}
-.rank-head span{color:rgba(255,255,255,.4);font-size:12px;margin-left:auto;}
-.rank-row{display:flex;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);gap:12px;transition:background .1s;}
-.rank-row:last-child{border-bottom:none;}
-.rank-row:hover{background:#fafafa;}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
-.stat-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
-.stat-v{font-size:22px;font-weight:700;color:var(--black);}
-.stat-l{font-size:11px;color:var(--muted);margin-top:2px;}
-.locked-overlay{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;margin-bottom:12px;}
-.locked-overlay .lock-icon{font-size:36px;margin-bottom:12px;}
-.locked-overlay h3{font-size:16px;font-weight:700;margin-bottom:6px;}
-.locked-overlay p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
-.locked-overlay button{background:var(--gold);border:none;color:var(--black);padding:10px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;}
-.podium-wrap{margin-bottom:16px;}
-.podium-row{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:16px;}
-.podium-card{border-radius:var(--radius);overflow:hidden;text-align:center;position:relative;transition:transform .2s;}
-.podium-card:hover{transform:translateY(-3px);}
-.podium-1{background:linear-gradient(145deg,#f6d860,#e6b800,#f9e47a);border:2px solid #d4a017;width:200px;padding:20px 16px 16px;}
-.podium-2{background:linear-gradient(145deg,#e8e8e8,#b8b8b8,#d8d8d8);border:2px solid #999;width:175px;padding:16px 14px 14px;}
-.podium-3{background:linear-gradient(145deg,#e8c4a0,#b87333,#d4956a);border:2px solid #a0522d;width:155px;padding:14px 12px 12px;}
-.podium-trophy{font-size:36px;margin-bottom:4px;display:block;}
-.podium-1 .podium-trophy{font-size:44px;}
-.podium-2 .podium-trophy{font-size:36px;}
-.podium-3 .podium-trophy{font-size:30px;}
-.podium-place{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
-.podium-1 .podium-place{color:#8b6914;}
-.podium-2 .podium-place{color:#555;}
-.podium-3 .podium-place{color:#6b3a1f;}
-.podium-av{margin:0 auto 8px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.8);}
-.podium-1 .podium-av{width:60px;height:60px;}
-.podium-2 .podium-av{width:52px;height:52px;}
-.podium-3 .podium-av{width:46px;height:46px;}
-.podium-av-ph{margin:0 auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.8);}
-.podium-1 .podium-av-ph{width:60px;height:60px;font-size:20px;}
-.podium-2 .podium-av-ph{width:52px;height:52px;font-size:17px;}
-.podium-3 .podium-av-ph{width:46px;height:46px;font-size:15px;}
-.podium-name{font-weight:700;margin-bottom:4px;}
-.podium-1 .podium-name{font-size:15px;color:#5c4400;}
-.podium-2 .podium-name{font-size:13px;color:#333;}
-.podium-3 .podium-name{font-size:12px;color:#4a2000;}
-.podium-pts{font-weight:700;border-radius:20px;padding:3px 10px;display:inline-block;}
-.podium-1 .podium-pts{background:rgba(255,255,255,.5);color:#8b6914;font-size:15px;}
-.podium-2 .podium-pts{background:rgba(255,255,255,.5);color:#555;font-size:13px;}
-.podium-3 .podium-pts{background:rgba(255,255,255,.4);color:#6b3a1f;font-size:12px;}
-.podium-tips{font-size:10px;margin-top:3px;opacity:.7;}
-.podium-1 .podium-tips{color:#8b6914;}
-.podium-2 .podium-tips{color:#555;}
-.podium-3 .podium-tips{color:#6b3a1f;}
-.podium-base{height:8px;border-radius:0 0 6px 6px;margin:8px -16px -16px;}
-.podium-1 .podium-base{background:rgba(0,0,0,.15);margin:-16px;}
-.podium-2 .podium-base{background:rgba(0,0,0,.12);margin:-14px;}
-.podium-3 .podium-base{background:rgba(0,0,0,.12);margin:-12px;}
-.tab-inner{max-width:700px;margin:0 auto;padding:12px}
-.tab-head{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;text-align:center}
-.tab-eye{font-size:8px;letter-spacing:4px;color:var(--red);font-weight:700;text-transform:uppercase;margin-bottom:2px}
-.tab-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
-.tab-h span{color:var(--gold)}
+.t-head{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;text-align:center}
+.t-eye{font-size:8px;letter-spacing:4px;color:#cc0000;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.t-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
+.t-h span{color:#ffd700}
+.t-inner{max-width:700px;margin:0 auto;padding:12px}
+.t-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.t-stat{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px;text-align:center}
+.t-stat-v{font-size:22px;font-weight:900;color:#ffd700}
+.t-stat-l{font-size:10px;color:#888;margin-top:2px}
+.t-podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:16px;padding:16px}
+.t-pod{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;max-width:160px}
+.t-pod-av{border-radius:50%;object-fit:cover;border:3px solid #2a2a2a}
+.t-pod-av-ph{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;border:3px solid #2a2a2a;flex-shrink:0}
+.t-pod-name{font-size:12px;font-weight:700;color:#ddd;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-pod-pts{font-size:18px;font-weight:900;color:#ffd700}
+.t-pod-bar{width:100%;border-radius:6px 6px 0 0}
+.t-pod-pos{font-size:20px}
+.t-list{background:#111;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden}
+.t-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #1a1a1a;transition:background .15s}
+.t-row:last-child{border-bottom:none}
+.t-row:hover{background:#1a1a1a}
+.t-pos{font-size:14px;font-weight:700;color:#888;width:24px;text-align:center;flex-shrink:0}
+.t-av{width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.t-av-ph{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.t-name{flex:1;font-size:14px;font-weight:600;color:#ddd;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-sub{font-size:10px;color:#666}
+.t-pts{font-size:16px;font-weight:900;color:#ffd700;text-align:right;flex-shrink:0}
+.t-bar-w{width:80px;background:#1a1a1a;border-radius:4px;overflow:hidden;flex-shrink:0}
+.t-bar{height:6px;border-radius:4px;transition:width .3s}
+.t-empty{text-align:center;padding:60px 20px;color:#888}
+.t-empty-icon{font-size:48px;margin-bottom:12px}
+@media(max-width:600px){.t-stats{grid-template-columns:repeat(2,1fr)}.t-bar-w{display:none}.t-pod-pts{font-size:14px}}
 </style>
-<div class="tab-head"><div class="tab-eye">Fanclub Manelo98</div><div class="tab-h">RANGLISTE <span>/ TABELLE</span></div></div>
-<div class="tab-inner" id="tabContent"><div style="text-align:center;padding:40px;color:#888">⏳ Wird geladen…</div></div>
+
+<div class="t-head">
+  <div class="t-eye">Fanclub Manelo98</div>
+  <div class="t-h">RANGLISTE <span>/ TABELLE</span></div>
+</div>
+<div class="t-inner" id="tContent">
+  <div style="text-align:center;padding:40px;color:#888">⏳ Wird geladen…</div>
+</div>
+
 <script>
-let tState={user:null,rankings:[],matches:[],tips:{}};
-const state={get user(){return tState.user},get rankings(){return tState.rankings},get matches(){return tState.matches},get tips(){return tState.tips}};
-const COLORS=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6','#1abc9c','#f39c12'];
+const COLORS2=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6','#1abc9c','#f39c12'];
+function avatarColor2(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS2[Math.abs(h)%COLORS2.length];}
+function initials2(n){return(n||'?').split(/[\s_]/).map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';}
 
-function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
+function av(r,w=32,h=32){
+  const col=avatarColor2(r.username);
+  const ini=initials2(r.username);
+  return r.avatar
+    ?`<img class="t-av" src="${r.avatar}" alt="${r.username}" width="${w}" height="${h}" style="width:${w}px;height:${h}px">`
+    :`<div class="t-av-ph" style="background:${col};width:${w}px;height:${h}px">${ini}</div>`;
+}
 
-function initials(n){return n.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
-
-function renderTabelle(){
-  if(!state.user){
-    return`<div class="locked-overlay">
-      <div class="lock-icon">🔒</div>
-      <h3>Nur für Mitspieler sichtbar</h3>
-      <p>Die Rangliste und Punkteübersicht ist nur für angemeldete Mitspieler sichtbar.<br>Melde dich an um deinen Platz in der Tabelle zu sehen!</p>
-      <button onclick="setPage('login')">Jetzt anmelden</button>
-    </div>`;
+function renderTable(rankings, matches){
+  const el=document.getElementById('tContent');
+  if(!rankings||!rankings.length){
+    el.innerHTML=`<div class="t-empty"><div class="t-empty-icon">🏆</div><h3 style="color:#ddd;margin-bottom:8px">Noch keine Punkte</h3><p>Die Rangliste erscheint nach dem ersten gewerteten Spiel.</p></div>`;
+    return;
   }
-  const max=state.rankings[0]?.points||1;
-  const total=state.matches.length;
-  const done=state.matches.filter(m=>m.status==='done').length;
-  const players=state.rankings.length;
 
-  let html=`<div class="stat-grid">
-    <div class="stat-c"><div class="stat-v">${done}</div><div class="stat-l">Gespielt</div></div>
-    <div class="stat-c"><div class="stat-v">${total-done}</div><div class="stat-l">Noch offen</div></div>
-    <div class="stat-c"><div class="stat-v">${total}</div><div class="stat-l">Spiele gesamt</div></div>
-    <div class="stat-c"><div class="stat-v">${players}</div><div class="stat-l">Mitspieler</div></div>
+  const total=matches?matches.length:104;
+  const done=matches?matches.filter(m=>m.status==='done').length:0;
+  const max=Math.max(...rankings.map(r=>r.points),1);
+
+  let html=`<div class="t-stats">
+    <div class="t-stat"><div class="t-stat-v">${done}</div><div class="t-stat-l">Gespielt</div></div>
+    <div class="t-stat"><div class="t-stat-v">${total-done}</div><div class="t-stat-l">Noch offen</div></div>
+    <div class="t-stat"><div class="t-stat-v">${total}</div><div class="t-stat-l">Spiele gesamt</div></div>
+    <div class="t-stat"><div class="t-stat-v">${rankings.length}</div><div class="t-stat-l">Mitspieler</div></div>
   </div>`;
 
-  if(state.rankings.length){
-    // Podium for top 3
-    const podiumConfig=[
-      {place:1,cls:'podium-1',avSize:52,label:'1. Platz'},
-      {place:2,cls:'podium-2',avSize:44,label:'2. Platz'},
-      {place:3,cls:'podium-3',avSize:38,label:'3. Platz'},
-    ];
-
-    html+=`<div class="podium-wrap">`;
-    for(const {place,cls,avSize,label} of podiumConfig){
-      const r=state.rankings[place-1];
-      if(!r)continue;
-      const col=avatarColor(r.username);
-      const avEl=r.avatar
-        ?`<img class="podium-av" src="${r.avatar}" alt="${r.username}" style="width:${avSize}px;height:${avSize}px;">`
-        :`<div class="podium-av-ph" style="width:${avSize}px;height:${avSize}px;font-size:${Math.round(avSize*0.35)}px;background:${col};">${initials(r.username)}</div>`;
-      html+=`<div class="podium-card ${cls}">
-        <div class="podium-trophy-wrap">${wmTrophy(place)}</div>
-        <div class="podium-info">
-          <div class="podium-place-label">${label}</div>
-          <div class="podium-name-row">
-            ${avEl}
-            <span class="podium-name">${r.username}</span>
-          </div>
-          <div class="podium-pts-row">
-            <span class="podium-pts">${r.points} Punkte</span>
-            <span class="podium-tips-label">${r.evaluated} Tipps</span>
-          </div>
-        </div>
+  // Podium top 3
+  if(rankings.length>=1){
+    const ORDER=rankings.length>=3?[1,0,2]:rankings.length===2?[0,1]:[0];
+    const HEIGHTS=[120,150,100];
+    const BORDERS=['#aaa','#ffd700','#cd7f32'];
+    const SIZES=[48,60,44];
+    const POSES=['🥈','🥇','🥉'];
+    html+=`<div class="t-podium">`;
+    ORDER.forEach(i=>{
+      if(!rankings[i])return;
+      const r=rankings[i];
+      const h=HEIGHTS[i]||100,border=BORDERS[i]||'#aaa',sz=SIZES[i]||40,pos=POSES[i]||`${i+1}.`;
+      const col=avatarColor2(r.username);
+      html+=`<div class="t-pod" style="margin-bottom:${i===0?0:i===1?0:0}px">
+        <div class="t-pod-pos">${pos}</div>
+        ${r.avatar?`<img class="t-pod-av" src="${r.avatar}" alt="${r.username}" style="width:${sz}px;height:${sz}px;border-color:${border}">`
+          :`<div class="t-pod-av-ph" style="background:${col};width:${sz}px;height:${sz}px;font-size:${sz/3}px;border-color:${border}">${initials2(r.username)}</div>`}
+        <div class="t-pod-name" style="max-width:${sz+40}px" title="${r.username}">${r.username}</div>
+        <div class="t-pod-pts">${r.points} Pkt</div>
+        <div class="t-pod-bar" style="height:${h}px;background:${col}22;border:1px solid ${col}44;border-bottom:none"></div>
       </div>`;
-    }
+    });
     html+=`</div>`;
-
-    // Rest of rankings (4th place onwards)
-    if(state.rankings.length>3){
-      html+=`<div class="rank-card"><div class="rank-head"><h2>Weitere Plätze</h2></div>`;
-      state.rankings.slice(3).forEach((r,i)=>{
-        const col=avatarColor(r.username);
-        const av=r.avatar?`<img class="rav" src="${r.avatar}" alt="${r.username}">`:
-          `<div class="rav-ph" style="background:${col};">${initials(r.username)}</div>`;
-        html+=`<div class="rank-row">
-          <div class="rpos">${i+4}.</div>
-          <div class="rname">${av} ${r.username}</div>
-          <div class="rbar-w"><div class="rbar" style="width:${Math.round(r.points/max*100)}%;background:${col};"></div></div>
-          <div class="rtips">${r.evaluated} Tipps</div>
-          <div class="rpts">${r.points} Pkt</div>
-        </div>`;
-      });
-      html+=`</div>`;
-    }
-  }else{
-    html+=`<div class="rank-card"><div class="empty-state"><p>Noch keine Mitspieler</p></div></div>`;
   }
-  return html;
-}
-let _initDone=false;
-function onUserLoaded(u){
-  // Always update user from shared header (authoritative source)
-  tState.user=u;
-  if(_initDone) renderTab(); // re-render if init already ran
-  // if init hasn't run yet, it will render when done
-}
-function renderTab(){
-  document.getElementById('tabContent').innerHTML=renderTabelle();
-}
-async function loadData(){
-  const[rD,mD]=await Promise.all([
-    fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]),
-    fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]),
-  ]);
-  tState.rankings=rD||[];tState.matches=mD||[];
-  renderTab();
-}
-function setPage(p){if(p==='profil')location.href='/profil.html';if(p==='login')location.href='/login.html';}
 
-// Don't call loadData() immediately - wait for user session from shared header
-// onUserLoaded() is called by shared header after /api/me check
-// But load rankings in parallel anyway, then re-render when user is known
-async function init(){
-  // Fetch data (don't override user - let onUserLoaded handle that)
-  const[uD,rD,mD]=await Promise.all([
-    fetch('/api/me',{credentials:'include',cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null),
+  // Full list
+  html+=`<div class="t-list">`;
+  rankings.forEach((r,i)=>{
+    const col=avatarColor2(r.username);
+    const pct=Math.round(r.points/max*100);
+    html+=`<div class="t-row">
+      <div class="t-pos" style="color:${i===0?'#ffd700':i===1?'#aaa':i===2?'#cd7f32':'#555'}">${i+1}.</div>
+      ${av(r)}
+      <div style="flex:1;min-width:0">
+        <div class="t-name">${r.username}</div>
+        <div class="t-sub">${r.evaluated||0} Tipps gewertet${r.wm_tip?` · WM-Tipp: ${r.wm_tip}`:''}</div>
+      </div>
+      <div class="t-bar-w"><div class="t-bar" style="width:${pct}%;background:${col}"></div></div>
+      <div class="t-pts">${r.points} Pkt</div>
+    </div>`;
+  });
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+async function loadAll(){
+  const[rD,mD]=await Promise.all([
     fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
     fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():[]).catch(()=>[]),
   ]);
-  // Only set user from our own fetch if not already set by onUserLoaded
-  if(!tState.user && uD) tState.user=uD;
-  tState.rankings=rD||[];
-  tState.matches=mD||[];
-  _initDone=true;
-  renderTab();
+  renderTable(rD,mD);
 }
-init();
+
+function onUserLoaded(u){}  // not needed - rankings is public
+loadAll();
+setInterval(loadAll,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadAll()});
 </script>
 </div>
 

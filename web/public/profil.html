@@ -234,8 +234,9 @@ async function loadData(){
   _initDone=true;
   document.getElementById('profContent').innerHTML=renderProfil();
 }
-// Show something immediately
-document.getElementById('profContent').innerHTML='<div style="text-align:center;padding:40px;color:#888">Profil wird geladen…</div>';
+// Show loading state immediately, then load data
+document.getElementById('profContent').innerHTML='<div style="text-align:center;padding:40px;color:#888">⏳ Profil wird geladen…</div>';
+loadData();
 </script>
 </div>
 
