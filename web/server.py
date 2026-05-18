@@ -705,16 +705,18 @@ class ProfileBody(BaseModel):
 async def update_profile(body: ProfileBody, request: Request, response: Response):
     user = await get_user(request.cookies.get("session"))
     if not user: raise HTTPException(401, "Nicht angemeldet")
-    if len(body.username) < 2: raise HTTPException(400, "Benutzername zu kurz")
+    if body.username and len(body.username) < 2: raise HTTPException(400, "Benutzername zu kurz")
     async with pool.acquire() as db:
         try:
-            if body.avatar_url:
-                await db.execute("UPDATE users SET username=$1, avatar=$2 WHERE id=$3",
-                    body.username, body.avatar_url, user['id'])
-            else:
-                await db.execute("UPDATE users SET username=$1 WHERE id=$2", body.username, user['id'])
-        except Exception: raise HTTPException(400, "Benutzername bereits vergeben")
-    return {"ok": True, "username": body.username}
+            new_name = body.username or user['username']
+            new_avatar = body.avatar or body.avatar_url or user['avatar']
+            await db.execute("UPDATE users SET username=$1, avatar=$2 WHERE id=$3",
+                new_name, new_avatar, user['id'])
+            row = await db.fetchrow("SELECT * FROM users WHERE id=$1", user['id'])
+            return {"id": row['id'], "username": row['username'], "avatar": row['avatar']}
+        except Exception as e:
+            raise HTTPException(400, str(e))
+
 
 @app.post("/api/upload-avatar")
 async def upload_avatar(request: Request, file: UploadFile = File(...)):
