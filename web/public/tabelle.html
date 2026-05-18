@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0a0a">
+<title>Tabelle — WM Tippspiel 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--gold:#ffd700;--red:#cc0000;--green:#16a34a;--orange:#ea580c;--bg:#0a0a0a;--card:#111;--border:#2a2a2a;--text:#ddd;--muted:#888}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+/* SCROLLBARS */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#1a1a1a}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+*{scrollbar-width:thin;scrollbar-color:var(--gold) #1a1a1a}
+/* HEADER */
+.g-hdr{background:#0d0d0d;border-bottom:3px solid var(--gold);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;position:sticky;top:0;z-index:200;flex-shrink:0}
+.g-brand{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.g-flag{width:26px;height:17px;display:flex;flex-direction:column;border-radius:2px;overflow:hidden;border:1px solid rgba(255,255,255,.15)}
+.g-flag s{flex:1;display:block}
+.g-brand-text h1{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
+.g-brand-text p{font-size:9px;color:var(--gold)}
+/* NAV */
+.g-nav{display:flex;align-items:center;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.g-nav::-webkit-scrollbar{display:none}
+.g-nav a{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:11px;padding:6px 9px;border-radius:5px;text-decoration:none;border:1px solid transparent;white-space:nowrap;flex-shrink:0;transition:color .15s,border-color .15s,background .15s;-webkit-user-select:none;user-select:none}
+.g-nav a:hover{color:#fff;border-color:var(--border);background:#1a1a1a}
+.g-nav a.active{color:var(--gold);border-color:var(--gold);background:#1a1200}
+.g-nav-div{width:1px;height:14px;background:var(--border);flex-shrink:0;margin:0 1px}
+/* USER AREA */
+.g-user{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px}
+.g-login-btn{background:var(--gold);color:#000;border:none;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.g-user-name{font-size:11px;color:#ddd;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+.g-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.g-avatar-ph{width:26px;height:26px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000;flex-shrink:0}
+/* MOBILE NAV (bottom bar) */
+.g-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;border-top:2px solid var(--gold);z-index:300;padding:4px 0 env(safe-area-inset-bottom,0)}
+.g-mobile-nav-inner{display:flex;justify-content:space-around}
+.g-mobile-nav a{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 4px;color:var(--muted);text-decoration:none;font-size:9px;min-width:52px;transition:color .15s}
+.g-mobile-nav a.active{color:var(--gold)}
+.g-mobile-nav a span:first-child{font-size:18px;line-height:1}
+/* MOBILE BODY PADDING */
+.g-content{flex:1}
+@media(max-width:700px){
+  .g-nav{display:none}
+  .g-mobile-nav{display:block}
+  .g-content{padding-bottom:calc(60px + env(safe-area-inset-bottom,0))}
+  .g-brand-text p{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="g-hdr" role="banner">
+  <a class="g-brand" href="/">
+    <div class="g-flag"><s style="background:#000"></s><s style="background:var(--red)"></s><s style="background:var(--gold)"></s></div>
+    <div class="g-brand-text"><h1>Fanclub Manelo98</h1><p>WM Tippspiel 2026</p></div>
+  </a>
+  <nav class="g-nav" aria-label="Hauptnavigation" id="gNav"></nav>
+  <div class="g-user" id="gUser">
+    <button class="g-login-btn" onclick="location.href='/login.html'">Anmelden</button>
+  </div>
+</header>
+
+<nav class="g-mobile-nav" aria-label="Mobile Navigation">
+  <div class="g-mobile-nav-inner" id="gMobNav"></div>
+</nav>
+
+<div class="g-content">
+
+<style>
+.status-pill{margin-left:auto;font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;}
+.rank-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;}
+.rank-head{background:var(--dark);border-bottom:3px solid var(--gold);padding:11px 18px;display:flex;align-items:center;gap:8px;}
+.rank-head h2{color:#fff;font-size:13px;font-weight:700;}
+.rank-head span{color:rgba(255,255,255,.4);font-size:12px;margin-left:auto;}
+.rank-row{display:flex;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);gap:12px;transition:background .1s;}
+.rank-row:last-child{border-bottom:none;}
+.rank-row:hover{background:#fafafa;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.stat-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;}
+.stat-v{font-size:22px;font-weight:700;color:var(--black);}
+.stat-l{font-size:11px;color:var(--muted);margin-top:2px;}
+.locked-overlay{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:32px;text-align:center;margin-bottom:12px;}
+.locked-overlay .lock-icon{font-size:36px;margin-bottom:12px;}
+.locked-overlay h3{font-size:16px;font-weight:700;margin-bottom:6px;}
+.locked-overlay p{font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5;}
+.locked-overlay button{background:var(--gold);border:none;color:var(--black);padding:10px 24px;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;}
+.podium-wrap{margin-bottom:16px;}
+.podium-row{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin-bottom:16px;}
+.podium-card{border-radius:var(--radius);overflow:hidden;text-align:center;position:relative;transition:transform .2s;}
+.podium-card:hover{transform:translateY(-3px);}
+.podium-1{background:linear-gradient(145deg,#f6d860,#e6b800,#f9e47a);border:2px solid #d4a017;width:200px;padding:20px 16px 16px;}
+.podium-2{background:linear-gradient(145deg,#e8e8e8,#b8b8b8,#d8d8d8);border:2px solid #999;width:175px;padding:16px 14px 14px;}
+.podium-3{background:linear-gradient(145deg,#e8c4a0,#b87333,#d4956a);border:2px solid #a0522d;width:155px;padding:14px 12px 12px;}
+.podium-trophy{font-size:36px;margin-bottom:4px;display:block;}
+.podium-1 .podium-trophy{font-size:44px;}
+.podium-2 .podium-trophy{font-size:36px;}
+.podium-3 .podium-trophy{font-size:30px;}
+.podium-place{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.podium-1 .podium-place{color:#8b6914;}
+.podium-2 .podium-place{color:#555;}
+.podium-3 .podium-place{color:#6b3a1f;}
+.podium-av{margin:0 auto 8px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.8);}
+.podium-1 .podium-av{width:60px;height:60px;}
+.podium-2 .podium-av{width:52px;height:52px;}
+.podium-3 .podium-av{width:46px;height:46px;}
+.podium-av-ph{margin:0 auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,.8);}
+.podium-1 .podium-av-ph{width:60px;height:60px;font-size:20px;}
+.podium-2 .podium-av-ph{width:52px;height:52px;font-size:17px;}
+.podium-3 .podium-av-ph{width:46px;height:46px;font-size:15px;}
+.podium-name{font-weight:700;margin-bottom:4px;}
+.podium-1 .podium-name{font-size:15px;color:#5c4400;}
+.podium-2 .podium-name{font-size:13px;color:#333;}
+.podium-3 .podium-name{font-size:12px;color:#4a2000;}
+.podium-pts{font-weight:700;border-radius:20px;padding:3px 10px;display:inline-block;}
+.podium-1 .podium-pts{background:rgba(255,255,255,.5);color:#8b6914;font-size:15px;}
+.podium-2 .podium-pts{background:rgba(255,255,255,.5);color:#555;font-size:13px;}
+.podium-3 .podium-pts{background:rgba(255,255,255,.4);color:#6b3a1f;font-size:12px;}
+.podium-tips{font-size:10px;margin-top:3px;opacity:.7;}
+.podium-1 .podium-tips{color:#8b6914;}
+.podium-2 .podium-tips{color:#555;}
+.podium-3 .podium-tips{color:#6b3a1f;}
+.podium-base{height:8px;border-radius:0 0 6px 6px;margin:8px -16px -16px;}
+.podium-1 .podium-base{background:rgba(0,0,0,.15);margin:-16px;}
+.podium-2 .podium-base{background:rgba(0,0,0,.12);margin:-14px;}
+.podium-3 .podium-base{background:rgba(0,0,0,.12);margin:-12px;}
+.tab-inner{max-width:700px;margin:0 auto;padding:12px}
+</style>
+<div class="tab-inner" id="tabContent"><div style="text-align:center;padding:40px;color:#888">Wird geladen…</div></div>
+<script>
+let tState={user:null,rankings:[],matches:[],tips:{}};
+const state={get user(){return tState.user},get rankings(){return tState.rankings},get matches(){return tState.matches},get tips(){return tState.tips}};
+
+function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
+
+function initials(n){return n.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+function renderTabelle(){
+  if(!state.user){
+    return`<div class="locked-overlay">
+      <div class="lock-icon">🔒</div>
+      <h3>Nur für Mitspieler sichtbar</h3>
+      <p>Die Rangliste und Punkteübersicht ist nur für angemeldete Mitspieler sichtbar.<br>Melde dich an um deinen Platz in der Tabelle zu sehen!</p>
+      <button onclick="setPage('login')">Jetzt anmelden</button>
+    </div>`;
+  }
+  const max=state.rankings[0]?.points||1;
+  const total=state.matches.length;
+  const done=state.matches.filter(m=>m.status==='done').length;
+  const players=state.rankings.length;
+
+  let html=`<div class="stat-grid">
+    <div class="stat-c"><div class="stat-v">${done}</div><div class="stat-l">Gespielt</div></div>
+    <div class="stat-c"><div class="stat-v">${total-done}</div><div class="stat-l">Noch offen</div></div>
+    <div class="stat-c"><div class="stat-v">${total}</div><div class="stat-l">Spiele gesamt</div></div>
+    <div class="stat-c"><div class="stat-v">${players}</div><div class="stat-l">Mitspieler</div></div>
+  </div>`;
+
+  if(state.rankings.length){
+    // Podium for top 3
+    const podiumConfig=[
+      {place:1,cls:'podium-1',avSize:52,label:'1. Platz'},
+      {place:2,cls:'podium-2',avSize:44,label:'2. Platz'},
+      {place:3,cls:'podium-3',avSize:38,label:'3. Platz'},
+    ];
+
+    html+=`<div class="podium-wrap">`;
+    for(const {place,cls,avSize,label} of podiumConfig){
+      const r=state.rankings[place-1];
+      if(!r)continue;
+      const col=avatarColor(r.username);
+      const avEl=r.avatar
+        ?`<img class="podium-av" src="${r.avatar}" alt="${r.username}" style="width:${avSize}px;height:${avSize}px;">`
+        :`<div class="podium-av-ph" style="width:${avSize}px;height:${avSize}px;font-size:${Math.round(avSize*0.35)}px;background:${col};">${initials(r.username)}</div>`;
+      html+=`<div class="podium-card ${cls}">
+        <div class="podium-trophy-wrap">${wmTrophy(place)}</div>
+        <div class="podium-info">
+          <div class="podium-place-label">${label}</div>
+          <div class="podium-name-row">
+            ${avEl}
+            <span class="podium-name">${r.username}</span>
+          </div>
+          <div class="podium-pts-row">
+            <span class="podium-pts">${r.points} Punkte</span>
+            <span class="podium-tips-label">${r.evaluated} Tipps</span>
+          </div>
+        </div>
+      </div>`;
+    }
+    html+=`</div>`;
+
+    // Rest of rankings (4th place onwards)
+    if(state.rankings.length>3){
+      html+=`<div class="rank-card"><div class="rank-head"><h2>Weitere Plätze</h2></div>`;
+      state.rankings.slice(3).forEach((r,i)=>{
+        const col=avatarColor(r.username);
+        const av=r.avatar?`<img class="rav" src="${r.avatar}" alt="${r.username}">`:
+          `<div class="rav-ph" style="background:${col};">${initials(r.username)}</div>`;
+        html+=`<div class="rank-row">
+          <div class="rpos">${i+4}.</div>
+          <div class="rname">${av} ${r.username}</div>
+          <div class="rbar-w"><div class="rbar" style="width:${Math.round(r.points/max*100)}%;background:${col};"></div></div>
+          <div class="rtips">${r.evaluated} Tipps</div>
+          <div class="rpts">${r.points} Pkt</div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+  }else{
+    html+=`<div class="rank-card"><div class="empty-state"><p>Noch keine Mitspieler</p></div></div>`;
+  }
+  return html;
+}
+function onUserLoaded(u){tState.user=u;if(u)loadData();else document.getElementById('tabContent').innerHTML=renderTabelle()}
+async function loadData(){
+  const[rD,mD]=await Promise.all([fetch('/api/rankings',{credentials:'include'}).then(r=>r.ok?r.json():null),fetch('/api/matches',{credentials:'include'}).then(r=>r.ok?r.json():null)]);
+  if(rD)tState.rankings=rD;if(mD)tState.matches=mD;
+  document.getElementById('tabContent').innerHTML=renderTabelle();
+}
+function setPage(p){if(p==='profil')location.href='/profil.html'}
+</script>
+</div>
+
+<script>
+const G_PAGES=[
+  {id:'index',label:'Start',icon:'🏠',url:'/'},
+  {id:'spielplan',label:'Spielplan',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
+  {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
+  {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
+  {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
+];
+const G_CURRENT='tabelle';
+
+// Build desktop nav
+const nav=document.getElementById('gNav');
+G_PAGES.forEach((p,i)=>{
+  if(i>0){const d=document.createElement('div');d.className='g-nav-div';nav.appendChild(d);}
+  const a=document.createElement('a');
+  a.href=p.url;a.textContent=p.icon+' '+p.label;
+  if(p.id===G_CURRENT)a.className='active';
+  nav.appendChild(a);
+});
+
+// Build mobile nav
+const mob=document.getElementById('gMobNav');
+G_PAGES.forEach(p=>{
+  const a=document.createElement('a');
+  a.href=p.url;
+  a.innerHTML=`<span>${p.icon}</span><span>${p.label}</span>`;
+  if(p.id===G_CURRENT)a.className='active';
+  mob.appendChild(a);
+});
+
+// Load user session
+(async()=>{
+  try{
+    const r=await fetch('/api/me',{credentials:'include'});
+    if(r.ok){
+      const u=await r.json();
+      const el=document.getElementById('gUser');
+      const initials=u.username.slice(0,2).toUpperCase();
+      const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
+      el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      if(typeof onUserLoaded==='function')onUserLoaded(u);
+    } else {
+      if(typeof onUserLoaded==='function')onUserLoaded(null);
+    }
+  }catch{if(typeof onUserLoaded==='function')onUserLoaded(null);}
+})();
+</script>

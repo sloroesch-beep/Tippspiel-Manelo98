@@ -731,7 +731,7 @@ function renderMobileGroupBar(){
 function renderHeader(){
   const navItems=[
     ['welcome','🏠 Start'],
-    ['spielplan','⚽ Spielplan'],
+    ['spielplan','⚽ Spielplan/Tipps'],
     ['spielbaum','🌳 Spielbaum'],
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
@@ -753,9 +753,11 @@ function renderHeader(){
       <div class="logo-text"><span class="logo-main">Fanclub Manelo98</span><span class="logo-sub">WM Tippspiel 2026</span></div>
     </a>
     <nav class="topnav">
-      ${navItems.filter(Boolean).map(([id,label])=>id==='spielbaum'
-    ?`<a href="/spielbaum.html" style="text-decoration:none;">${label}</a>`
-    :`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`).join('')}
+      ${navItems.filter(Boolean).map(([id,label])=>{
+    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html'};
+    if(urls[id])return`<a href="${urls[id]}" style="text-decoration:none;${id===state.page?'color:var(--gold);border:1px solid var(--gold);padding:4px 8px;border-radius:5px;':''}">${label}</a>`;
+    return`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`;
+  }).join('')}
     </nav>
     <div class="user-area">${uArea}</div>
   </header>
@@ -1259,6 +1261,7 @@ function renderAdmin(){
       <div style="padding:16px 18px;">
         <button class="save-btn" style="padding:9px 20px;font-size:13px;" onclick="adminFetchScores()">🌐 Scores jetzt abrufen</button>
         <button class="save-btn" style="padding:9px 20px;font-size:13px;margin-left:8px;background:#1a3a1a;" onclick="adminUpdateBrackets()">🔄 KO-Brackets aktualisieren</button>
+        <button class="save-btn" style="padding:9px 20px;font-size:13px;margin-left:8px;background:#1a0a2a;" onclick="adminEvalChampion()">🏆 Weltmeister auswerten</button>
         <span id="fetch-scores-msg" style="margin-left:12px;font-size:13px;color:var(--muted);"></span>
       </div>
     </div>
@@ -1375,6 +1378,17 @@ async function adminSetResult(){
   }catch(e){alert('Fehler: '+e.message);}
 }
 
+async function adminEvalChampion(){
+  const winner=prompt('Weltmeister eingeben (exakter Teamname):');
+  if(!winner)return;
+  const msg=document.getElementById('fetch-scores-msg');
+  if(msg)msg.textContent='Auswerte...';
+  try{
+    const r=await api('/api/admin/evaluate-champion',{method:'POST',body:JSON.stringify({winner})});
+    if(msg)msg.textContent=`✅ ${r.evaluated} Tipps ausgewertet`;
+    setTimeout(()=>{if(msg)msg.textContent=''},4000);
+  }catch(e){if(msg)msg.textContent='❌ '+e.message}
+}
 async function adminUpdateBrackets(){
   const msg=document.getElementById("fetch-scores-msg");
   if(msg)msg.textContent="Aktualisiere KO-Brackets...";
@@ -1523,6 +1537,8 @@ async function doLogout(){
 }
 
 function setPage(p){
+  const redirects={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html',login:'/login.html'};
+  if(redirects[p]){location.href=redirects[p];return;}
   state.page=p;
   if(p==='spielplan')state.group='A';
   render();

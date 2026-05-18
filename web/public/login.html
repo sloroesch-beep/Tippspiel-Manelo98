@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0a0a">
+<title>Anmelden — WM Tippspiel 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--gold:#ffd700;--red:#cc0000;--green:#16a34a;--orange:#ea580c;--bg:#0a0a0a;--card:#111;--border:#2a2a2a;--text:#ddd;--muted:#888}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+/* SCROLLBARS */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#1a1a1a}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+*{scrollbar-width:thin;scrollbar-color:var(--gold) #1a1a1a}
+/* HEADER */
+.g-hdr{background:#0d0d0d;border-bottom:3px solid var(--gold);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;position:sticky;top:0;z-index:200;flex-shrink:0}
+.g-brand{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.g-flag{width:26px;height:17px;display:flex;flex-direction:column;border-radius:2px;overflow:hidden;border:1px solid rgba(255,255,255,.15)}
+.g-flag s{flex:1;display:block}
+.g-brand-text h1{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
+.g-brand-text p{font-size:9px;color:var(--gold)}
+/* NAV */
+.g-nav{display:flex;align-items:center;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.g-nav::-webkit-scrollbar{display:none}
+.g-nav a{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:11px;padding:6px 9px;border-radius:5px;text-decoration:none;border:1px solid transparent;white-space:nowrap;flex-shrink:0;transition:color .15s,border-color .15s,background .15s;-webkit-user-select:none;user-select:none}
+.g-nav a:hover{color:#fff;border-color:var(--border);background:#1a1a1a}
+.g-nav a.active{color:var(--gold);border-color:var(--gold);background:#1a1200}
+.g-nav-div{width:1px;height:14px;background:var(--border);flex-shrink:0;margin:0 1px}
+/* USER AREA */
+.g-user{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px}
+.g-login-btn{background:var(--gold);color:#000;border:none;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.g-user-name{font-size:11px;color:#ddd;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+.g-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.g-avatar-ph{width:26px;height:26px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000;flex-shrink:0}
+/* MOBILE NAV (bottom bar) */
+.g-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;border-top:2px solid var(--gold);z-index:300;padding:4px 0 env(safe-area-inset-bottom,0)}
+.g-mobile-nav-inner{display:flex;justify-content:space-around}
+.g-mobile-nav a{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 4px;color:var(--muted);text-decoration:none;font-size:9px;min-width:52px;transition:color .15s}
+.g-mobile-nav a.active{color:var(--gold)}
+.g-mobile-nav a span:first-child{font-size:18px;line-height:1}
+/* MOBILE BODY PADDING */
+.g-content{flex:1}
+@media(max-width:700px){
+  .g-nav{display:none}
+  .g-mobile-nav{display:block}
+  .g-content{padding-bottom:calc(60px + env(safe-area-inset-bottom,0))}
+  .g-brand-text p{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="g-hdr" role="banner">
+  <a class="g-brand" href="/">
+    <div class="g-flag"><s style="background:#000"></s><s style="background:var(--red)"></s><s style="background:var(--gold)"></s></div>
+    <div class="g-brand-text"><h1>Fanclub Manelo98</h1><p>WM Tippspiel 2026</p></div>
+  </a>
+  <nav class="g-nav" aria-label="Hauptnavigation" id="gNav"></nav>
+  <div class="g-user" id="gUser">
+    <button class="g-login-btn" onclick="location.href='/login.html'">Anmelden</button>
+  </div>
+</header>
+
+<nav class="g-mobile-nav" aria-label="Mobile Navigation">
+  <div class="g-mobile-nav-inner" id="gMobNav"></div>
+</nav>
+
+<div class="g-content">
+
+<style>.login-btn{background:var(--gold);border:none;color:var(--black);padding:6px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
+.login-btn:hover{background:var(--gold-light);}
+.login-teaser{background:var(--dark);border-radius:var(--radius);padding:20px 24px;display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.login-teaser-text h3{color:#fff;font-size:15px;font-weight:600;margin-bottom:4px;}
+.login-teaser-text p{color:rgba(255,255,255,.55);font-size:13px;}
+.login-teaser-btn{background:var(--gold);border:none;color:var(--black);padding:9px 20px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.login-teaser-btn:hover{background:var(--gold-light);}
+.auth-scene{min-height:calc(100vh - 59px);display:flex;align-items:center;justify-content:center;background:var(--bg);padding:24px 16px;}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:390px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);}
+.auth-top{background:var(--dark);padding:0;}
+.auth-top-stripe{height:5px;background:linear-gradient(to right,#1a1a1a 33.3%,#cc0000 33.3% 66.6%,#ffcc00 66.6%);}
+.auth-top-body{padding:24px;text-align:center;}
+.auth-top-flag{display:flex;flex-direction:column;width:42px;height:28px;border-radius:4px;overflow:hidden;margin:0 auto 12px;border:1px solid rgba(255,255,255,.2);}
+.auth-top-flag span{flex:1;display:block;}
+.auth-top h1{color:#fff;font-size:18px;font-weight:700;margin-bottom:3px;}
+.auth-top h1 span{color:var(--gold);}
+.auth-top p{color:rgba(255,255,255,.5);font-size:12px;}
+.auth-tabs{display:flex;border-bottom:1px solid var(--border);}
+.auth-tab{flex:1;padding:11px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;color:var(--muted);border:none;border-bottom:3px solid transparent;background:none;transition:all .15s;}
+.auth-tab.active{color:var(--black);border-bottom-color:var(--gold);}
+.auth-body{padding:22px 24px;}
+.auth-hint{font-size:11px;color:var(--hint);text-align:center;margin-top:14px;line-height:1.5;}
+.auth-hint a{color:var(--discord);cursor:pointer;text-decoration:none;}
+.login-inner{max-width:480px;margin:40px auto;padding:0 12px}</style>
+<div class="login-inner" id="loginContent"></div>
+<script>
+let lState={user:null,authTab:'login',authStep:'form',authError:'',authSuccess:''};
+const state={get user(){return lState.user},get authTab(){return lState.authTab},get authStep(){return lState.authStep},get authError(){return lState.authError},get authSuccess(){return lState.authSuccess}};
+
+function initials(n){return n.split(/[\s_]/).map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+
+function avatarColor(n){let h=0;for(let c of n)h=((h<<5)-h)+c.charCodeAt(0);return COLORS[Math.abs(h)%COLORS.length];}
+
+function renderLogin(){
+  if(state.authStep==='discord'){
+    return`<div class="auth-scene"><div class="auth-card">
+      <div class="auth-top"><div class="auth-top-stripe"></div>
+        <div class="auth-top-body">
+          <div class="auth-top-flag"><span class="de-f1"></span><span class="de-f2"></span><span class="de-f3"></span></div>
+          <h1>Fanclub <span>Manelo98</span></h1><p>WM Tippspiel 2026</p>
+        </div>
+      </div>
+      <div class="dc-modal">
+        <div style="font-size:40px;margin-bottom:10px;">💬</div>
+        <h2>Mit Discord verbinden</h2>
+        <p>Du wirst kurz zu Discord weitergeleitet.<br>Dein <strong>Discord-Anzeigename</strong> und <strong>Profilbild</strong> werden automatisch übernommen.</p>
+        <div class="perm-list">
+          <div class="perm-row"><span class="perm-ok">✓</span> Discord-Anzeigename übernehmen</div>
+          <div class="perm-row"><span class="perm-ok">✓</span> Discord-Profilbild automatisch übernehmen</div>
+          <div class="perm-row"><span class="perm-ok">✓</span> Serverzugehörigkeit prüfen</div>
+          <div class="perm-row"><span class="perm-no">✗</span> Keine Nachrichten lesen oder senden</div>
+        </div>
+        <button class="dc-auth-btn" onclick="window.location='/auth/discord'">💬 Weiter zu Discord</button>
+        <a class="back-link" onclick="state.authStep='form';render()">← Zurück</a>
+      </div>
+    </div></div>`;
+  }
+
+  const isLogin=state.authTab==='login';
+  return`<div class="auth-scene"><div class="auth-card">
+    <div class="auth-top">
+      <div class="auth-top-stripe"></div>
+      <div class="auth-top-body">
+        <div class="auth-top-flag"><span class="de-f1"></span><span class="de-f2"></span><span class="de-f3"></span></div>
+        <h1>Fanclub <span>Manelo98</span></h1><p>WM Tippspiel 2026</p>
+      </div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab${isLogin?' active':''}" onclick="state.authTab='login';render()">Anmelden</button>
+      <button class="auth-tab${!isLogin?' active':''}" onclick="state.authTab='register';render()">Registrieren</button>
+    </div>
+    <div class="auth-body">
+      <div class="err-msg" id="err-msg"></div>
+      <button class="disc-btn" onclick="state.authStep='discord';render()">
+        💬 Mit Discord ${isLogin?'anmelden':'registrieren'}
+      </button>
+      <div class="info-box info-discord" style="margin-top:8px;">
+        💬 Bei Discord-Login wird dein Discord-Name als Anzeigename verwendet — automatisch und privat.
+      </div>
+      <div class="divider"><div class="div-line"></div><span class="div-text">oder mit E-Mail</span><div class="div-line"></div></div>
+      ${!isLogin?`
+      <div class="field">
+        <label>Anzeigename <span class="hint-tag">(sichtbar für andere Mitspieler)</span></label>
+        <input type="text" id="f-name" placeholder="z. B. Lars_K">
+      </div>
+      <div class="info-box info-privacy">
+        🔒 Deine E-Mail-Adresse bleibt privat und ist für andere Mitspieler niemals sichtbar.
+      </div>`:''}
+      <div class="field">
+        <label>E-Mail-Adresse <span class="hint-tag">(bleibt privat)</span></label>
+        <input type="email" id="f-email" placeholder="name@beispiel.de">
+      </div>
+      <div class="field">
+        <label>Passwort</label>
+        <div class="pw-wrap">
+          <input type="password" id="f-pw" placeholder="${isLogin?'Dein Passwort':'Mindestens 8 Zeichen'}" ${!isLogin?'oninput="checkStr(this.value)"':''}>
+          <button class="eye-btn" onclick="togglePw()" type="button">👁</button>
+        </div>
+        ${!isLogin?`<div class="str-bar"><div class="str-fill" id="str-fill" style="width:0%;background:#dc2626;"></div></div>`:''}
+      </div>
+      ${isLogin?`<div style="text-align:right;margin-bottom:14px;margin-top:-6px;"><a style="font-size:11px;color:var(--discord);cursor:pointer;">Passwort vergessen?</a></div>`:''}
+      <button class="submit-btn" onclick="${isLogin?'doLogin()':'doRegister()'}">
+        ${isLogin?'Anmelden':'Konto erstellen'}
+      </button>
+      <p class="auth-hint">${isLogin
+        ?`Noch kein Konto? <a onclick="state.authTab='register';render()">Registrieren</a>`
+        :`Bereits ein Konto? <a onclick="state.authTab='login';render()">Anmelden</a>`}
+      </p>
+    </div>
+  </div></div>`;
+}
+
+function togglePw(){const i=document.getElementById('f-pw');if(i)i.type=i.type==='password'?'text':'password';}
+
+function checkStr(v){
+  const f=document.getElementById('str-fill');if(!f)return;
+  let s=0;if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^A-Za-z0-9]/.test(v))s++;
+  f.style.width=(s*25)+'%';f.style.background=s<=1?'#dc2626':s===2?'#ea580c':s===3?'#ca8a04':'#16a34a';
+}
+
+function showErr(m){const e=document.getElementById('err-msg');if(e){e.textContent=m;e.style.display='block';}}
+function render(){document.getElementById('loginContent').innerHTML=renderLogin();}
+function setPage(p){if(p==='welcome')location.href='/';}
+async function doDiscordLogin(){location.href='/auth/discord';}
+async function doLogin(e){
+  e&&e.preventDefault();
+  const username=document.getElementById('login-username')?.value||'';
+  const password=document.getElementById('login-pw')?.value||'';
+  const r=await fetch('/api/login',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+  if(r.ok){location.href='/';}else{lState.authError='Ungültige Anmeldedaten';render();}
+}
+async function doRegister(e){
+  e&&e.preventDefault();
+  const username=document.getElementById('reg-username')?.value||'';
+  const password=document.getElementById('reg-pw')?.value||'';
+  const r=await fetch('/api/register',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+  if(r.ok){lState.authStep='success';lState.authSuccess='Registrierung erfolgreich! Du kannst dich jetzt anmelden.';lState.authTab='login';render();}else{const d=await r.json();lState.authError=d.detail||'Fehler';render();}
+}
+function onUserLoaded(u){if(u)location.href='/';else render();}
+function switchTab(t){lState.authTab=t;lState.authError='';render();}
+</script>
+</div>
+
+<script>
+const G_PAGES=[
+  {id:'index',label:'Start',icon:'🏠',url:'/'},
+  {id:'spielplan',label:'Spielplan',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
+  {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
+  {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
+  {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
+];
+const G_CURRENT='login';
+
+// Build desktop nav
+const nav=document.getElementById('gNav');
+G_PAGES.forEach((p,i)=>{
+  if(i>0){const d=document.createElement('div');d.className='g-nav-div';nav.appendChild(d);}
+  const a=document.createElement('a');
+  a.href=p.url;a.textContent=p.icon+' '+p.label;
+  if(p.id===G_CURRENT)a.className='active';
+  nav.appendChild(a);
+});
+
+// Build mobile nav
+const mob=document.getElementById('gMobNav');
+G_PAGES.forEach(p=>{
+  const a=document.createElement('a');
+  a.href=p.url;
+  a.innerHTML=`<span>${p.icon}</span><span>${p.label}</span>`;
+  if(p.id===G_CURRENT)a.className='active';
+  mob.appendChild(a);
+});
+
+// Load user session
+(async()=>{
+  try{
+    const r=await fetch('/api/me',{credentials:'include'});
+    if(r.ok){
+      const u=await r.json();
+      const el=document.getElementById('gUser');
+      const initials=u.username.slice(0,2).toUpperCase();
+      const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
+      el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      if(typeof onUserLoaded==='function')onUserLoaded(u);
+    } else {
+      if(typeof onUserLoaded==='function')onUserLoaded(null);
+    }
+  }catch{if(typeof onUserLoaded==='function')onUserLoaded(null);}
+})();
+</script>
