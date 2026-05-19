@@ -533,11 +533,8 @@ async def discord_send(channel_id: str, message: str):
         print(f"[Bot] Discord send error: {e}")
         return False
 
-async def send_email(to_email: str, subject: str, html_body: str) -> bool:
-    """Sendet eine E-Mail via Gmail SMTP."""
-    if not GMAIL_USER or not GMAIL_APP_PASSWORD:
-        print("[Email] Keine Gmail-Konfiguration")
-        return False
+def _send_email_sync(to_email: str, subject: str, html_body: str) -> bool:
+    """Synchroner E-Mail-Versand via Gmail SMTP."""
     import smtplib
     from email.mime.multipart import MIMEMultipart
     from email.mime.text import MIMEText
@@ -546,14 +543,42 @@ async def send_email(to_email: str, subject: str, html_body: str) -> bool:
         msg["Subject"] = subject
         msg["From"] = "WM Tippspiel 2026 <" + GMAIL_USER + ">"
         msg["To"] = to_email
+        msg["Reply-To"] = GMAIL_USER
         msg.attach(MIMEText(html_body, "html", "utf-8"))
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-            smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-            smtp.sendmail(GMAIL_USER, to_email, msg.as_string())
+        # Versuche Port 587 (STARTTLS) — Railway blockiert oft Port 465
+        try:
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as smtp:
+                smtp.ehlo()
+                smtp.starttls()
+                smtp.ehlo()
+                smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+                smtp.sendmail(GMAIL_USER, to_email, msg.as_string())
+        except Exception:
+            # Fallback: Port 465 SSL
+            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+                smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+                smtp.sendmail(GMAIL_USER, to_email, msg.as_string())
         print("[Email] Gesendet an: " + to_email)
         return True
     except Exception as e:
         print("[Email] Fehler: " + str(e))
+        return False
+
+async def send_email(to_email: str, subject: str, html_body: str) -> bool:
+    """Sendet E-Mail async (blockiert Event-Loop nicht)."""
+    if not GMAIL_USER or not GMAIL_APP_PASSWORD:
+        print("[Email] Keine Gmail-Konfiguration — GMAIL_USER/GMAIL_APP_PASSWORD fehlt")
+        return False
+    import concurrent.futures
+    loop = asyncio.get_event_loop()
+    try:
+        with concurrent.futures.ThreadPoolExecutor() as pool:
+            result = await loop.run_in_executor(
+                pool, _send_email_sync, to_email, subject, html_body
+            )
+        return result
+    except Exception as e:
+        print("[Email] Async Fehler: " + str(e))
         return False
 
 def make_email_html(title: str, content: str, footer: str = "") -> str:
@@ -760,7 +785,7 @@ async def bot_send_reminders():
                 FROM matches m
                 WHERE m.status = 'open'
                 AND (
-                    m.match_date + COALESCE(m.match_time, '00:00:00'::time)
+                    (m.match_date::timestamp + COALESCE(m.match_time, '00:00:00'::time)::interval)
                     BETWEEN (NOW() AT TIME ZONE 'UTC') + INTERVAL '50 minutes'
                     AND (NOW() AT TIME ZONE 'UTC') + INTERVAL '70 minutes'
                 )
