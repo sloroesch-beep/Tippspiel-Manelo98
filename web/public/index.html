@@ -1366,6 +1366,15 @@ function renderAdmin(){
 
     <!-- TAB 1: MITSPIELER -->
     <div class="adm-tab-content" id="admTab1">
+      <div class="adm-section" id="adm-pw-resets" style="border-color:#ffd70033">
+        <div class="adm-section-head" style="background:#1a1200">
+          <h2>🔑 Passwort-Reset Anfragen</h2>
+          <span id="adm-pw-reset-count" style="color:#ffd700">Wird geladen…</span>
+        </div>
+        <div id="adm-pw-resets-body" style="padding:8px 14px">
+          <div style="color:#555;font-size:11px">Keine offenen Anfragen</div>
+        </div>
+      </div>
       <div class="adm-section" id="admin-users-card">
         <div class="adm-section-head">
           <h2>👥 Alle Mitspieler</h2>
@@ -1871,6 +1880,35 @@ async function admClearKaderCache(){
 }
 
 async function loadAdminUsers(){
+  // Passwort-Reset Anfragen laden
+  try{
+    const resets = await api('/api/admin/password-resets');
+    const count = document.getElementById('adm-pw-reset-count');
+    const body = document.getElementById('adm-pw-resets-body');
+    if(count) count.textContent = resets.length ? resets.length + ' offen' : 'Keine';
+    if(body){
+      if(!resets.length){
+        body.innerHTML = '<div style="color:#555;font-size:11px;padding:4px 0">Keine offenen Anfragen</div>';
+      } else {
+        body.innerHTML = resets.map(r => {
+          const date = r.requested_at ? new Date(r.requested_at).toLocaleString('de-DE') : '—';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #111;font-size:11px;flex-wrap:wrap">
+            <div style="flex:1">
+              <strong style="color:#ffd700">${r.username||'?'}</strong>
+              <span style="color:#555"> · ${r.email}</span>
+              <div style="color:#333;font-size:10px">${date}</div>
+            </div>
+            <button class="adm-btn blue" style="padding:3px 8px;font-size:10px"
+              onclick="adminResetPassword(0,'${r.username}',true,'${r.email}')">🔑 Passwort setzen</button>
+            <button class="adm-btn" style="padding:3px 8px;font-size:10px"
+              onclick="admMarkResetDone(${r.id})">✓ Erledigt</button>
+          </div>`;
+        }).join('');
+      }
+    }
+  }catch(e){console.error('resets:',e);}
+
+  // Dann normale User laden
   try{
     const users=await api('/api/admin/users-detail').catch(()=>api('/api/admin/users'));
     const count=document.getElementById('admin-user-count');
@@ -1920,6 +1958,13 @@ async function loadAdminUsers(){
     html+='</tbody></table></div>';
     body.innerHTML=html;
   }catch(e){console.error('loadAdminUsers:',e);}
+}
+
+async function admMarkResetDone(id){
+  try{
+    await api('/api/admin/password-resets/'+id+'/done',{method:'POST'});
+    await loadAdminUsers();
+  }catch(e){alert('Fehler: '+e.message);}
 }
 
 async function adminShowUserTips(id,name){
@@ -2133,7 +2178,7 @@ function renderLogin(){
         </div>
         ${!isLogin?`<div class="str-bar"><div class="str-fill" id="str-fill" style="width:0%;background:#dc2626;"></div></div>`:''}
       </div>
-      ${isLogin?`<div style="text-align:right;margin-bottom:14px;margin-top:-6px;"><a style="font-size:11px;color:var(--discord);cursor:pointer;">Passwort vergessen?</a></div>`:''}
+      ${isLogin?`<div style="text-align:right;margin-bottom:14px;margin-top:-6px;"><a style="font-size:11px;color:var(--discord);cursor:pointer;" onclick="showForgotPassword()">Passwort vergessen?</a></div>`:''}
       <button class="submit-btn" onclick="${isLogin?'doLogin()':'doRegister()'}">
         ${isLogin?'Anmelden':'Konto erstellen'}
       </button>
@@ -2152,6 +2197,58 @@ function checkStr(v){
   f.style.width=(s*25)+'%';f.style.background=s<=1?'#dc2626':s===2?'#ea580c':s===3?'#ca8a04':'#16a34a';
 }
 function showErr(m){const e=document.getElementById('err-msg');if(e){e.textContent=m;e.style.display='block';}}
+
+function showForgotPassword(){
+  // Zeigt ein Modal mit E-Mail-Eingabe
+  const existing = document.getElementById('forgot-modal');
+  if(existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'forgot-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:#000a;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:24px;max-width:400px;width:100%;position:relative">
+      <button onclick="document.getElementById('forgot-modal').remove()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#555;font-size:18px;cursor:pointer">✕</button>
+      <div style="font-size:24px;margin-bottom:8px">🔑</div>
+      <h3 style="color:#fff;font-size:16px;margin-bottom:6px">Passwort vergessen?</h3>
+      <p style="color:#888;font-size:12px;margin-bottom:16px;line-height:1.5">
+        Gib deine E-Mail-Adresse ein. Der Admin wird benachrichtigt und setzt dein Passwort manuell zurück — du erhältst dann eine Nachricht.
+      </p>
+      <input id="forgot-email" type="email" placeholder="Deine E-Mail-Adresse"
+        style="width:100%;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;margin-bottom:10px">
+      <button onclick="submitForgotPassword()"
+        style="width:100%;background:#ffd700;color:#000;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+        Anfrage senden
+      </button>
+      <div id="forgot-msg" style="margin-top:10px;font-size:12px;text-align:center;min-height:18px"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(()=>document.getElementById('forgot-email')?.focus(), 100);
+}
+
+async function submitForgotPassword(){
+  const email = document.getElementById('forgot-email')?.value?.trim();
+  const msg = document.getElementById('forgot-msg');
+  if(!email){if(msg)msg.textContent='⚠️ Bitte E-Mail eingeben';return;}
+  if(msg){msg.textContent='⏳ Wird gesendet…';msg.style.color='#888';}
+  try{
+    const r = await fetch('/api/forgot-password', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    const d = await r.json();
+    if(r.ok){
+      if(msg){msg.textContent='✅ Anfrage gesendet! Der Admin wird dein Passwort zurücksetzen.';msg.style.color='#4ade80';}
+      setTimeout(()=>document.getElementById('forgot-modal')?.remove(), 4000);
+    } else {
+      if(msg){msg.textContent='❌ '+(d.detail||'Fehler');msg.style.color='#dc2626';}
+    }
+  }catch(e){
+    if(msg){msg.textContent='❌ Verbindungsfehler';msg.style.color='#dc2626';}
+  }
+}
 
 async function doLogin(){
   const email=document.getElementById('f-email')?.value?.trim();
@@ -2174,7 +2271,37 @@ async function doRegister(){
   if(!name||!email||!pw){showErr('Bitte alle Felder ausfüllen.');return;}
   if(pw.length<8){showErr('Passwort muss mindestens 8 Zeichen haben.');return;}
   try{
-    await api('/api/register',{method:'POST',body:JSON.stringify({username:name,email,password:pw})});
+    const btn=document.querySelector('.submit-btn');
+    if(btn){btn.disabled=true;btn.textContent='⏳ Wird gesendet…';}
+    const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:name,email,password:pw})});
+    const d=await r.json();
+    if(!r.ok){showErr(d.detail||'Fehler');if(btn){btn.disabled=false;btn.textContent='Konto erstellen';}return;}
+    if(d.pending){
+      // Bestätigungs-E-Mail wurde gesendet — Hinweis anzeigen
+      const authCard=document.querySelector('.auth-card');
+      if(authCard){
+        authCard.innerHTML=`
+          <div class="auth-top"><div class="auth-top-stripe"></div></div>
+          <div style="padding:32px 28px;text-align:center">
+            <div style="font-size:48px;margin-bottom:16px">📧</div>
+            <h2 style="color:#fff;font-size:18px;font-weight:700;margin-bottom:10px">E-Mail bestätigen!</h2>
+            <p style="color:#888;font-size:13px;line-height:1.6;margin-bottom:20px">
+              Wir haben eine Bestätigungs-E-Mail an<br>
+              <strong style="color:#ffd700">${email}</strong><br>
+              gesendet. Bitte klicke auf den Link in der E-Mail um dein Konto zu aktivieren.
+            </p>
+            <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:12px;font-size:11px;color:#555;margin-bottom:20px">
+              ⏱️ Der Link ist 24 Stunden gültig.<br>
+              Auch im Spam-Ordner nachschauen!
+            </div>
+            <button onclick="state.authTab='login';render()" style="background:#ffd700;color:#000;border:none;padding:11px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+              Zur Anmeldung
+            </button>
+          </div>`;
+      }
+      return;
+    }
+    // Direkt eingeloggt (Fallback ohne E-Mail)
     state.user=await api('/api/me');
     state.tips=await api('/api/tips');
     state.rankings=await api('/api/rankings');
