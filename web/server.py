@@ -184,6 +184,29 @@ async def init_db():
         # Sanfte Migrationen
         try: await db.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS welcomed INTEGER DEFAULT 0")
         except: pass
+        try:
+            await db.execute("""CREATE TABLE IF NOT EXISTS password_resets (
+                id SERIAL PRIMARY KEY,
+                email TEXT NOT NULL,
+                username TEXT,
+                requested_at TIMESTAMP DEFAULT NOW(),
+                done INTEGER DEFAULT 0
+            )""")
+        except: pass
+        try:
+            await db.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS verified INTEGER DEFAULT 1")
+        except: pass
+        try:
+            await db.execute("""CREATE TABLE IF NOT EXISTS email_verifications (
+                id SERIAL PRIMARY KEY,
+                token TEXT UNIQUE NOT NULL,
+                email TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT NOW()
+            )""")
+        except: pass
+        except: pass
         try: await db.execute("ALTER TABLE tips ADD COLUMN IF NOT EXISTS evaluated_at TIMESTAMP DEFAULT NULL")
         except: pass
         # wm_champion table
@@ -511,6 +534,66 @@ async def discord_send(channel_id: str, message: str):
         print(f"[Bot] Discord send error: {e}")
         return False
 
+async def send_email(to_email: str, subject: str, html_body: str) -> bool:
+    """Sendet eine E-Mail via Gmail SMTP."""
+    if not GMAIL_USER or not GMAIL_APP_PASSWORD:
+        print("[Email] Keine Gmail-Konfiguration")
+        return False
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = "WM Tippspiel 2026 <" + GMAIL_USER + ">"
+        msg["To"] = to_email
+        msg.attach(MIMEText(html_body, "html", "utf-8"))
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
+            smtp.sendmail(GMAIL_USER, to_email, msg.as_string())
+        print("[Email] Gesendet an: " + to_email)
+        return True
+    except Exception as e:
+        print("[Email] Fehler: " + str(e))
+        return False
+
+def make_email_html(title: str, content: str, footer: str = "") -> str:
+    """Erstellt ein schönes HTML-E-Mail-Template im Stil der Website."""
+    return """<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:30px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%">
+        <!-- Header -->
+        <tr><td style="background:#0d0d0d;border-bottom:3px solid #ffd700;padding:20px 28px;border-radius:10px 10px 0 0">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">🏆</span>
+            <div>
+              <div style="color:#fff;font-size:16px;font-weight:700">Fanclub Manelo98</div>
+              <div style="color:#ffd700;font-size:11px">WM Tippspiel 2026</div>
+            </div>
+          </div>
+        </td></tr>
+        <!-- Content -->
+        <tr><td style="background:#111;padding:28px;border:1px solid #2a2a2a;border-top:none">
+          <h2 style="color:#fff;font-size:20px;margin:0 0 16px 0">""" + title + """</h2>
+          """ + content + """
+        </td></tr>
+        <!-- Footer -->
+        <tr><td style="background:#0d0d0d;padding:16px 28px;border:1px solid #2a2a2a;border-top:none;border-radius:0 0 10px 10px;text-align:center">
+          <div style="color:#555;font-size:11px">""" + (footer or "Fanclub Manelo98 &mdash; WM Tippspiel 2026") + """</div>
+          <div style="margin-top:6px">
+            <a href="https://www.manelo98-league.de" style="color:#ffd700;font-size:11px;text-decoration:none">www.manelo98-league.de</a>
+          </div>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
 async def bot_send_welcome(username: str, discord_id: str):
     """Begruest einen neuen Mitspieler im Teilnehmer-Channel mit Discord Embed."""
     if not TEILNEHMER_CHANNEL_ID or not DISCORD_TOKEN:
@@ -832,16 +915,122 @@ class TipBody(BaseModel):
 async def register(body: RegisterBody, response: Response):
     if len(body.username) < 2: raise HTTPException(400, "Benutzername zu kurz")
     if len(body.password) < 8: raise HTTPException(400, "Passwort zu kurz")
-    token = secrets.token_urlsafe(32)
+    if not body.email or "@" not in body.email:
+        raise HTTPException(400, "Ungültige E-Mail-Adresse")
+
+    # Prüfen ob E-Mail oder Username bereits existiert
     async with pool.acquire() as db:
-        try:
-            await db.execute(
-                "INSERT INTO users (username,email,password_hash,session_token) VALUES ($1,$2,$3,$4)",
-                body.username, body.email, hash_pw(body.password), token)
-        except Exception: raise HTTPException(400, "E-Mail bereits registriert")
-    response.set_cookie("session", token, httponly=True, samesite="lax", max_age=2592000)
-    asyncio.create_task(bot_send_welcome(body.username, ""))
-    return {"ok": True, "username": body.username}
+        existing = await db.fetchrow(
+            "SELECT id FROM users WHERE LOWER(email)=$1 OR LOWER(username)=$2",
+            body.email.lower(), body.username.lower()
+        )
+        if existing:
+            raise HTTPException(400, "E-Mail oder Benutzername bereits registriert")
+        # Prüfen ob bereits eine ausstehende Verifizierung existiert
+        pending = await db.fetchval(
+            "SELECT id FROM email_verifications WHERE LOWER(email)=$1 AND created_at > NOW() - INTERVAL '24 hours'",
+            body.email.lower()
+        )
+        if pending:
+            raise HTTPException(400, "Es wurde bereits eine Bestätigungs-E-Mail gesendet. Bitte prüfe dein Postfach.")
+
+    # Bestätigungs-Token generieren
+    verify_token = secrets.token_urlsafe(32)
+    async with pool.acquire() as db:
+        # Alte abgelaufene Einträge löschen
+        await db.execute(
+            "DELETE FROM email_verifications WHERE email=$1",
+            body.email.lower()
+        )
+        # Neuen Eintrag speichern (Konto noch NICHT anlegen)
+        await db.execute(
+            "INSERT INTO email_verifications (token, email, username, password_hash) VALUES ($1,$2,$3,$4)",
+            verify_token, body.email.lower(), body.username, hash_pw(body.password)
+        )
+
+    # Bestätigungs-E-Mail senden
+    verify_url = WEB_URL + "/auth/verify-email?token=" + verify_token
+    email_content = """
+        <p style="color:#ddd;font-size:14px;margin:0 0 16px 0">
+            Hallo <strong style="color:#ffd700">""" + body.username + """</strong>,<br><br>
+            willkommen beim WM Tippspiel 2026 des Fanclub Manelo98!<br>
+            Bitte bestätige deine E-Mail-Adresse um dein Konto zu aktivieren.
+        </p>
+        <div style="text-align:center;margin:24px 0">
+            <a href="""" + verify_url + """"
+               style="background:#ffd700;color:#000;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
+                ✅ E-Mail bestätigen
+            </a>
+        </div>
+        <p style="color:#555;font-size:11px;margin-top:16px;text-align:center">
+            Dieser Link ist 24 Stunden gültig.<br>
+            Falls du kein Konto erstellt hast, ignoriere diese E-Mail.
+        </p>
+    """
+    html = make_email_html("E-Mail bestätigen 📧", email_content)
+    sent = await send_email(body.email, "WM Tippspiel — Bitte bestätige deine E-Mail", html)
+
+    if not sent:
+        # Fallback: direkt registrieren ohne E-Mail (falls Gmail nicht konfiguriert)
+        async with pool.acquire() as db:
+            session_token = secrets.token_urlsafe(32)
+            try:
+                await db.execute(
+                    "INSERT INTO users (username,email,password_hash,session_token,verified) VALUES ($1,$2,$3,$4,1)",
+                    body.username, body.email.lower(), hash_pw(body.password), session_token
+                )
+            except Exception:
+                raise HTTPException(400, "Registrierung fehlgeschlagen")
+        response.set_cookie("session", session_token, httponly=True, samesite="lax", max_age=2592000)
+        asyncio.create_task(bot_send_welcome(body.username, ""))
+        return {"ok": True, "username": body.username, "verified": True}
+
+    return {"ok": True, "pending": True, "email": body.email}
+
+@app.get("/auth/verify-email")
+async def verify_email(token: str, response: Response):
+    """Bestätigt die E-Mail und legt das Konto an."""
+    async with pool.acquire() as db:
+        entry = await db.fetchrow(
+            "SELECT * FROM email_verifications WHERE token=$1 AND created_at > NOW() - INTERVAL '24 hours'",
+            token
+        )
+        if not entry:
+            return RedirectResponse(url="/login.html?error=token_invalid")
+
+        # Prüfen ob E-Mail/Username bereits vergeben (Doppelklick verhindern)
+        existing = await db.fetchrow(
+            "SELECT id FROM users WHERE LOWER(email)=$1 OR LOWER(username)=$2",
+            entry["email"], entry["username"]
+        )
+        if existing:
+            # Bereits verifiziert — einfach einloggen
+            user = await db.fetchrow("SELECT * FROM users WHERE LOWER(email)=$1", entry["email"])
+            if user:
+                session_token = secrets.token_urlsafe(32)
+                await db.execute("UPDATE users SET session_token=$1 WHERE id=$2", session_token, user["id"])
+                await db.execute("DELETE FROM email_verifications WHERE token=$1", token)
+                r = RedirectResponse(url="/")
+                r.set_cookie("session", session_token, httponly=True, samesite="lax", max_age=2592000)
+                return r
+            return RedirectResponse(url="/login.html?error=already_registered")
+
+        # Konto anlegen
+        session_token = secrets.token_urlsafe(32)
+        await db.execute(
+            "INSERT INTO users (username,email,password_hash,session_token,verified) VALUES ($1,$2,$3,$4,1)",
+            entry["username"], entry["email"], entry["password_hash"], session_token
+        )
+        # Verifizierungs-Eintrag löschen
+        await db.execute("DELETE FROM email_verifications WHERE token=$1", token)
+        username = entry["username"]
+
+    # Begrüßung im Discord
+    asyncio.create_task(bot_send_welcome(username, ""))
+    # Direkt einloggen
+    r = RedirectResponse(url="/")
+    r.set_cookie("session", session_token, httponly=True, samesite="lax", max_age=2592000)
+    return r
 
 @app.post("/api/login")
 async def login(body: LoginBody, response: Response):
@@ -850,6 +1039,9 @@ async def login(body: LoginBody, response: Response):
             "SELECT * FROM users WHERE email=$1 AND password_hash=$2",
             body.email, hash_pw(body.password))
     if not user: raise HTTPException(401, "E-Mail oder Passwort falsch")
+    # Verifizierung prüfen
+    if user.get("verified", 1) == 0:
+        raise HTTPException(401, "Bitte bestätige zuerst deine E-Mail-Adresse")
     token = secrets.token_urlsafe(32)
     async with pool.acquire() as db:
         await db.execute("UPDATE users SET session_token=$1 WHERE id=$2", token, user['id'])
@@ -1031,6 +1223,28 @@ async def update_profile(body: ProfileBody, request: Request, response: Response
             raise HTTPException(400, str(e))
 
 
+@app.post("/api/change-password")
+async def change_password(request: Request):
+    """User ändert sein Passwort im Profil."""
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401, "Nicht angemeldet")
+    body = await request.json()
+    old_pw = body.get("old_password", "")
+    new_pw = body.get("new_password", "")
+    if len(new_pw) < 8:
+        raise HTTPException(400, "Neues Passwort muss mindestens 8 Zeichen haben")
+    async with pool.acquire() as db:
+        # Altes Passwort prüfen (nur wenn User ein Passwort hat)
+        db_user = await db.fetchrow("SELECT password_hash FROM users WHERE id=$1", user["id"])
+        if db_user["password_hash"]:
+            if db_user["password_hash"] != hash_pw(old_pw):
+                raise HTTPException(400, "Altes Passwort ist falsch")
+        await db.execute(
+            "UPDATE users SET password_hash=$1 WHERE id=$2",
+            hash_pw(new_pw), user["id"]
+        )
+    return {"ok": True}
+
 @app.post("/api/upload-avatar")
 async def upload_avatar(request: Request, file: UploadFile = File(...)):
     user = await get_user(request.cookies.get("session"))
@@ -1180,6 +1394,10 @@ DISCORD_TOKEN     = os.environ.get("DISCORD_TOKEN", "")
 STAND_CHANNEL_ID       = os.environ.get("STAND_CHANNEL_ID", "")
 ERINNERUNGEN_CHANNEL_ID = os.environ.get("ERINNERUNGEN_CHANNEL_ID", "")
 TEILNEHMER_CHANNEL_ID  = os.environ.get("TEILNEHMER_CHANNEL_ID", "")
+
+# Gmail SMTP
+GMAIL_USER         = os.environ.get("GMAIL_USER", "")
+GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
 
 # ── Kader-Cache ───────────────────────────────────────────────────
 _kader_cache: dict = {}
@@ -1543,5 +1761,74 @@ async def bot_test_reminder(request: Request):
     if r.status_code not in (200, 201):
         raise HTTPException(500, "Discord Fehler: " + str(r.status_code))
     return {"ok": True, "message": "Test-Erinnerung gesendet für: " + home + " vs " + away}
+
+@app.post("/api/forgot-password")
+async def forgot_password(request: Request):
+    """Generiert zufälliges Passwort und schickt es per E-Mail."""
+    import random, string
+    body = await request.json()
+    email = (body.get("email") or "").strip().lower()
+    if not email or "@" not in email:
+        raise HTTPException(400, "Ungültige E-Mail")
+    async with pool.acquire() as db:
+        user = await db.fetchrow("SELECT id, username FROM users WHERE LOWER(email)=$1", email)
+        if not user:
+            return {"ok": True}  # Kein Fehler aus Sicherheitsgründen
+        # Zufälliges Passwort generieren (12 Zeichen, sicher)
+        chars = string.ascii_letters + string.digits + "!@#$%"
+        new_pw = "".join(random.choices(chars, k=12))
+        # In DB speichern
+        await db.execute(
+            "UPDATE users SET password_hash=$1 WHERE id=$2",
+            hash_pw(new_pw), user["id"]
+        )
+    # E-Mail senden
+    username = user["username"]
+    content = """
+        <p style="color:#ddd;font-size:14px;margin:0 0 20px 0">
+            Hallo <strong style="color:#ffd700">""" + username + """</strong>,<br><br>
+            du hast ein neues Passwort für dein WM Tippspiel Konto angefordert.
+        </p>
+        <div style="background:#0d0d0d;border:1px solid #ffd700;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0">
+            <div style="color:#888;font-size:11px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Dein neues Passwort</div>
+            <div style="color:#ffd700;font-size:24px;font-weight:900;letter-spacing:3px;font-family:monospace">""" + new_pw + """</div>
+        </div>
+        <p style="color:#888;font-size:12px;margin:0 0 16px 0">
+            Melde dich damit an und ändere dein Passwort anschließend im <strong style="color:#ddd">Profil</strong>.
+        </p>
+        <div style="text-align:center;margin-top:24px">
+            <a href="https://www.manelo98-league.de/login.html"
+               style="background:#ffd700;color:#000;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;display:inline-block">
+                Jetzt anmelden
+            </a>
+        </div>
+        <p style="color:#555;font-size:11px;margin-top:20px">
+            Falls du kein neues Passwort angefordert hast, ignoriere diese E-Mail.
+        </p>
+    """
+    html = make_email_html("Dein neues Passwort 🔑", content)
+    asyncio.create_task(send_email(email, "WM Tippspiel — Neues Passwort", html))
+    return {"ok": True}
+
+@app.get("/api/admin/password-resets")
+async def admin_password_resets(request: Request):
+    """Alle offenen Passwort-Reset-Anfragen für den Admin."""
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows = await db.fetch("""
+            SELECT id, email, username, requested_at
+            FROM password_resets
+            WHERE done=0
+            ORDER BY requested_at DESC
+        """)
+    return [dict(r) for r in rows]
+
+@app.post("/api/admin/password-resets/{reset_id}/done")
+async def admin_mark_reset_done(reset_id: int, request: Request):
+    """Markiert eine Passwort-Reset-Anfrage als erledigt."""
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        await db.execute("UPDATE password_resets SET done=1 WHERE id=$1", reset_id)
+    return {"ok": True}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
