@@ -1319,7 +1319,13 @@ async def admin_get_users(request: Request):
 async def admin_delete_user(user_id: int, request: Request):
     if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
     async with pool.acquire() as db:
+        # Erst Email des Users holen für Verifications-Cleanup
+        user = await db.fetchrow("SELECT email FROM users WHERE id=$1", user_id)
         await db.execute("DELETE FROM tips WHERE user_id=$1", user_id)
+        await db.execute("DELETE FROM wm_champions WHERE user_id=$1", user_id)
+        if user and user["email"]:
+            await db.execute("DELETE FROM email_verifications WHERE email=$1", user["email"])
+            await db.execute("DELETE FROM password_resets WHERE email=$1", user["email"])
         await db.execute("DELETE FROM users WHERE id=$1", user_id)
     return {"ok": True}
 
@@ -1328,6 +1334,9 @@ async def admin_reset_users(request: Request):
     if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
     async with pool.acquire() as db:
         await db.execute("DELETE FROM tips")
+        await db.execute("DELETE FROM wm_champions")
+        await db.execute("DELETE FROM email_verifications")
+        await db.execute("DELETE FROM password_resets")
         await db.execute("DELETE FROM users")
     return {"ok": True, "message": "Alle Nutzer gelöscht"}
 
@@ -1828,6 +1837,14 @@ async def admin_mark_reset_done(reset_id: int, request: Request):
     if not await is_admin(request): raise HTTPException(403)
     async with pool.acquire() as db:
         await db.execute("UPDATE password_resets SET done=1 WHERE id=$1", reset_id)
+    return {"ok": True}
+
+@app.delete("/api/admin/email-verification/{email}")
+async def admin_delete_verification(email: str, request: Request):
+    """Löscht eine ausstehende E-Mail-Verifizierung — damit kann der User sich neu registrieren."""
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        await db.execute("DELETE FROM email_verifications WHERE LOWER(email)=$1", email.lower())
     return {"ok": True}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
