@@ -1760,15 +1760,14 @@ function admUpdatePreview(){
   if(!ta||!preview)return;
   const text=ta.value||'';
   if(!text.trim()){preview.innerHTML='<span style="color:#555;font-style:italic">Nachricht erscheint hier…</span>';return;}
-  // Einfaches Discord Markdown
   let html=text
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/[*][*](.+?)[*][*]/g,'<strong>$1</strong>')
+    .replace(/[*](.+?)[*]/g,'<em>$1</em>')
     .replace(/`(.+?)`/g,'<code style="background:#2f3136;padding:1px 4px;border-radius:3px">$1</code>')
-    .replace(/^> (.+)$/gm,'<blockquote style="border-left:3px solid #4f545c;padding-left:8px;color:#a3a6aa">$1</blockquote>')
-    .replace(/
-/g,'<br>');
+    .replace(/\n/g,'<br>');
   preview.innerHTML=html;
 }
 
