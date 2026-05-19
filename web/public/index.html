@@ -739,6 +739,7 @@ function renderHeader(){
     ['spielbaum','🌳 Spielbaum'],
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
+    ['kader','👕 Kader'],
     ['profil','👤 Profil'],
     state.isAdmin?['admin','🔧 Admin']:null,
   ];
@@ -758,7 +759,7 @@ function renderHeader(){
     </a>
     <nav class="topnav">
       ${navItems.filter(Boolean).map(([id,label])=>{
-    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html'};
+    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html',kader:'/kader.html'};
     if(urls[id])return`<a href="${urls[id]}" style="text-decoration:none;${id===state.page?'color:var(--gold);border:1px solid var(--gold);padding:4px 8px;border-radius:5px;':''}">${label}</a>`;
     return`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`;
   }).join('')}

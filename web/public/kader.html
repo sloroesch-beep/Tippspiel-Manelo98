@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0a0a0a">
+<title>Kader — WM Tippspiel 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--gold:#ffd700;--red:#cc0000;--green:#16a34a;--orange:#ea580c;--bg:#0a0a0a;--card:#111;--border:#2a2a2a;--text:#ddd;--muted:#888}
+html{height:100%;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#1a1a1a}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+*{scrollbar-width:thin;scrollbar-color:var(--gold) #1a1a1a}
+/* HEADER */
+.g-hdr{background:#0d0d0d;border-bottom:3px solid var(--gold);height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;position:sticky;top:0;z-index:200;flex-shrink:0}
+.g-brand{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.g-flag{width:26px;height:17px;display:flex;flex-direction:column;border-radius:2px;overflow:hidden;border:1px solid rgba(255,255,255,.15)}
+.g-flag s{flex:1;display:block}
+.g-brand-text h1{font-size:12px;font-weight:700;color:#fff;line-height:1.2}
+.g-brand-text p{font-size:9px;color:var(--gold)}
+.g-nav{display:flex;align-items:center;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.g-nav::-webkit-scrollbar{display:none}
+.g-nav a{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:11px;padding:6px 9px;border-radius:5px;text-decoration:none;border:1px solid transparent;white-space:nowrap;flex-shrink:0;transition:color .15s,border-color .15s,background .15s;-webkit-user-select:none;user-select:none}
+.g-nav a:hover{color:#fff;border-color:var(--border);background:#1a1a1a}
+.g-nav a.active{color:var(--gold);border-color:var(--gold);background:#1a1200}
+.g-nav-div{width:1px;height:14px;background:var(--border);flex-shrink:0;margin:0 1px}
+.g-user{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:8px}
+.g-login-btn{background:var(--gold);color:#000;border:none;padding:6px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit}
+.g-user-name{font-size:11px;color:#ddd;white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis}
+.g-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:2px solid var(--gold)}
+.g-avatar-ph{width:26px;height:26px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000;flex-shrink:0}
+.g-mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;border-top:2px solid var(--gold);z-index:300;padding:4px 0 env(safe-area-inset-bottom,0)}
+.g-mobile-nav-inner{display:flex;justify-content:space-around}
+.g-mobile-nav a{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 4px;color:var(--muted);text-decoration:none;font-size:9px;min-width:52px;transition:color .15s}
+.g-mobile-nav a.active{color:var(--gold)}
+.g-mobile-nav a span:first-child{font-size:18px;line-height:1}
+.g-content{flex:1}
+@media(max-width:700px){
+  .g-nav{display:none}
+  .g-mobile-nav{display:block}
+  .g-content{padding-bottom:calc(60px + env(safe-area-inset-bottom,0))}
+  .g-brand-text p{display:none}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* PAGE STYLES */
+.k-head{background:linear-gradient(180deg,#0d0d0d,#0a0a0a);padding:10px 12px 8px;border-bottom:1px solid #1a1a1a;text-align:center}
+.k-eye{font-size:8px;letter-spacing:4px;color:#cc0000;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.k-h{font-size:clamp(14px,3vw,20px);font-weight:900;color:#fff}
+.k-h span{color:#ffd700}
+.k-sub{font-size:11px;color:#666;margin-top:3px}
+
+.k-wrap{max-width:900px;margin:0 auto;padding:16px 12px 32px}
+
+/* SEARCH + FILTER */
+.k-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.k-search{flex:1;min-width:200px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.k-search:focus{border-color:var(--gold)}
+.k-search::placeholder{color:#555}
+.k-group-select{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+.k-group-select:focus{border-color:var(--gold)}
+
+/* TEAM GRID */
+.k-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px}
+.k-team-card{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 12px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;text-align:center;-webkit-user-select:none;user-select:none}
+.k-team-card:hover{border-color:var(--gold);background:#1a1200;transform:translateY(-2px)}
+.k-team-card.active{border-color:var(--gold);background:#1a1200}
+.k-team-flag{font-size:36px;line-height:1;margin-bottom:6px}
+.k-team-name{font-size:12px;font-weight:700;color:#ddd}
+.k-team-group{font-size:10px;color:#666;margin-top:2px}
+
+/* KADER PANEL */
+.k-panel{background:#111;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;display:none}
+.k-panel.visible{display:block}
+.k-panel-head{background:#0d0d0d;border-bottom:1px solid #2a2a2a;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.k-panel-flag{font-size:40px;line-height:1}
+.k-panel-info{flex:1}
+.k-panel-country{font-size:18px;font-weight:900;color:#fff}
+.k-panel-meta{font-size:11px;color:#666;margin-top:2px}
+.k-panel-close{background:none;border:1px solid #333;color:#888;width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .15s,color .15s}
+.k-panel-close:hover{border-color:#666;color:#ddd}
+
+/* POSITIONS */
+.k-pos-section{padding:12px 16px;border-bottom:1px solid #1a1a1a}
+.k-pos-section:last-child{border-bottom:none}
+.k-pos-label{font-size:10px;font-weight:700;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.k-pos-label::after{content:'';flex:1;height:1px;background:#1a1a1a}
+.k-player-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}
+.k-player{display:flex;align-items:center;gap:10px;padding:8px 10px;background:#0d0d0d;border-radius:6px;border:1px solid #1a1a1a;transition:border-color .15s}
+.k-player:hover{border-color:#2a2a2a}
+.k-player-nr{font-size:13px;font-weight:700;color:#555;width:20px;text-align:center;flex-shrink:0}
+.k-player-info{flex:1;min-width:0}
+.k-player-name{font-size:13px;font-weight:600;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-player-club{font-size:10px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-player-age{font-size:11px;color:#555;flex-shrink:0}
+.k-cap{font-size:9px;color:#ffd700;font-weight:700;margin-left:4px}
+
+/* LOADING / EMPTY */
+.k-loading{text-align:center;padding:40px;color:#666;font-size:13px}
+.k-empty{text-align:center;padding:32px;color:#666;font-size:13px}
+.k-info-banner{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#666;display:flex;gap:8px;align-items:center}
+
+@media(max-width:600px){
+  .k-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+  .k-player-list{grid-template-columns:1fr}
+  .k-controls{flex-direction:column}
+  .k-group-select{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="g-hdr" role="banner">
+  <a class="g-brand" href="/">
+    <div class="g-flag"><s style="background:#000"></s><s style="background:var(--red)"></s><s style="background:var(--gold)"></s></div>
+    <div class="g-brand-text"><h1>Fanclub Manelo98</h1><p>WM Tippspiel 2026</p></div>
+  </a>
+  <nav class="g-nav" aria-label="Hauptnavigation" id="gNav"></nav>
+  <div class="g-user" id="gUser">
+    <button class="g-login-btn" onclick="location.href='/login.html'">Anmelden</button>
+  </div>
+</header>
+
+<nav class="g-mobile-nav" aria-label="Mobile Navigation">
+  <div class="g-mobile-nav-inner" id="gMobNav"></div>
+</nav>
+
+<div class="g-content">
+  <div class="k-head">
+    <div class="k-eye">Fanclub Manelo98</div>
+    <div class="k-h">WM KADER <span>/ INFO 2026</span></div>
+    <div class="k-sub">Alle 48 Teams — Offizielle Kader</div>
+  </div>
+
+  <div class="k-wrap">
+    <div class="k-info-banner">
+      ℹ️ Klicke auf ein Team um den offiziellen WM-Kader anzuzeigen. Reine Informationsseite — kein Login nötig.
+    </div>
+
+    <div class="k-controls">
+      <input class="k-search" type="search" placeholder="🔍 Team suchen…" id="kSearch" autocomplete="off">
+      <select class="k-group-select" id="kGroupFilter">
+        <option value="">Alle Gruppen</option>
+        <option value="A">Gruppe A</option>
+        <option value="B">Gruppe B</option>
+        <option value="C">Gruppe C</option>
+        <option value="D">Gruppe D</option>
+        <option value="E">Gruppe E</option>
+        <option value="F">Gruppe F</option>
+        <option value="G">Gruppe G</option>
+        <option value="H">Gruppe H</option>
+        <option value="I">Gruppe I</option>
+        <option value="J">Gruppe J</option>
+        <option value="K">Gruppe K</option>
+        <option value="L">Gruppe L</option>
+      </select>
+    </div>
+
+    <div id="kPanel" class="k-panel"></div>
+    <div class="k-grid" id="kGrid"></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// WM 2026 TEAMS — 48 Mannschaften mit Gruppen + Flaggen-Emoji
+// ============================================================
+const TEAMS = [
+  // GRUPPE A
+  {id:'usa',     name:'USA',           flag:'🇺🇸', group:'A', confed:'CONCACAF'},
+  {id:'mex',     name:'Mexiko',        flag:'🇲🇽', group:'A', confed:'CONCACAF'},
+  {id:'can',     name:'Kanada',        flag:'🇨🇦', group:'A', confed:'CONCACAF'},
+  {id:'nzl',     name:'Neuseeland',    flag:'🇳🇿', group:'A', confed:'OFC'},
+  // GRUPPE B
+  {id:'arg',     name:'Argentinien',   flag:'🇦🇷', group:'B', confed:'CONMEBOL'},
+  {id:'per',     name:'Peru',          flag:'🇵🇪', group:'B', confed:'CONMEBOL'},
+  {id:'chi',     name:'Chile',         flag:'🇨🇱', group:'B', confed:'CONMEBOL'},
+  {id:'alb',     name:'Albanien',      flag:'🇦🇱', group:'B', confed:'UEFA'},
+  // GRUPPE C
+  {id:'bra',     name:'Brasilien',     flag:'🇧🇷', group:'C', confed:'CONMEBOL'},
+  {id:'mex2',    name:'Ecuador',       flag:'🇪🇨', group:'C', confed:'CONMEBOL'},
+  {id:'par',     name:'Paraguay',      flag:'🇵🇾', group:'C', confed:'CONMEBOL'},
+  {id:'nig',     name:'Nigeria',       flag:'🇳🇬', group:'C', confed:'CAF'},
+  // GRUPPE D
+  {id:'fra',     name:'Frankreich',    flag:'🇫🇷', group:'D', confed:'UEFA'},
+  {id:'mar',     name:'Marokko',       flag:'🇲🇦', group:'D', confed:'CAF'},
+  {id:'eng',     name:'England',       flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', group:'D', confed:'UEFA'},
+  {id:'tun',     name:'Tunesien',      flag:'🇹🇳', group:'D', confed:'CAF'},
+  // GRUPPE E
+  {id:'ger',     name:'Deutschland',   flag:'🇩🇪', group:'E', confed:'UEFA'},
+  {id:'esp',     name:'Spanien',       flag:'🇪🇸', group:'E', confed:'UEFA'},
+  {id:'jap',     name:'Japan',         flag:'🇯🇵', group:'E', confed:'AFC'},
+  {id:'ksa',     name:'Saudi-Arabien', flag:'🇸🇦', group:'E', confed:'AFC'},
+  // GRUPPE F
+  {id:'por',     name:'Portugal',      flag:'🇵🇹', group:'F', confed:'UEFA'},
+  {id:'uru',     name:'Uruguay',       flag:'🇺🇾', group:'F', confed:'CONMEBOL'},
+  {id:'sen',     name:'Senegal',       flag:'🇸🇳', group:'F', confed:'CAF'},
+  {id:'irq',     name:'Irak',          flag:'🇮🇶', group:'F', confed:'AFC'},
+  // GRUPPE G
+  {id:'ned',     name:'Niederlande',   flag:'🇳🇱', group:'G', confed:'UEFA'},
+  {id:'col',     name:'Kolumbien',     flag:'🇨🇴', group:'G', confed:'CONMEBOL'},
+  {id:'egy',     name:'Ägypten',       flag:'🇪🇬', group:'G', confed:'CAF'},
+  {id:'tur',     name:'Türkei',        flag:'🇹🇷', group:'G', confed:'UEFA'},
+  // GRUPPE H
+  {id:'bel',     name:'Belgien',       flag:'🇧🇪', group:'H', confed:'UEFA'},
+  {id:'ven',     name:'Venezuela',     flag:'🇻🇪', group:'H', confed:'CONMEBOL'},
+  {id:'cmr',     name:'Kamerun',       flag:'🇨🇲', group:'H', confed:'CAF'},
+  {id:'nkr',     name:'Nordkorea',     flag:'🇰🇵', group:'H', confed:'AFC'},
+  // GRUPPE I
+  {id:'ita',     name:'Italien',       flag:'🇮🇹', group:'I', confed:'UEFA'},
+  {id:'kor',     name:'Südkorea',      flag:'🇰🇷', group:'I', confed:'AFC'},
+  {id:'mex3',    name:'Mexiko B',      flag:'🇲🇽', group:'I', confed:'CONCACAF'},
+  {id:'saf',     name:'Südafrika',     flag:'🇿🇦', group:'I', confed:'CAF'},
+  // GRUPPE J
+  {id:'cro',     name:'Kroatien',      flag:'🇭🇷', group:'J', confed:'UEFA'},
+  {id:'brz2',    name:'Bolivien',      flag:'🇧🇴', group:'J', confed:'CONMEBOL'},
+  {id:'aus',     name:'Australien',    flag:'🇦🇺', group:'J', confed:'AFC'},
+  {id:'uga',     name:'Uganda',        flag:'🇺🇬', group:'J', confed:'CAF'},
+  // GRUPPE K
+  {id:'swi',     name:'Schweiz',       flag:'🇨🇭', group:'K', confed:'UEFA'},
+  {id:'den',     name:'Dänemark',      flag:'🇩🇰', group:'K', confed:'UEFA'},
+  {id:'irn',     name:'Iran',          flag:'🇮🇷', group:'K', confed:'AFC'},
+  {id:'civ',     name:'Elfenbeinküste',flag:'🇨🇮', group:'K', confed:'CAF'},
+  // GRUPPE L
+  {id:'prt',     name:'Serbien',       flag:'🇷🇸', group:'L', confed:'UEFA'},
+  {id:'ukr',     name:'Ukraine',       flag:'🇺🇦', group:'L', confed:'UEFA'},
+  {id:'egy2',    name:'Ghana',         flag:'🇬🇭', group:'L', confed:'CAF'},
+  {id:'nzl2',    name:'Panama',        flag:'🇵🇦', group:'L', confed:'CONCACAF'},
+];
+
+// ============================================================
+// OFFIZIELLE KADER (WM 2026 — Stand: Kaderbekanntgabe 2026)
+// Format: [Nr, Name, Verein, Alter, *=Kapitän]
+// ============================================================
+const SQUADS = {
+  ger: {
+    trainer: 'Julian Nagelsmann',
+    tor: [
+      [1,'Marc-André ter Stegen','FC Barcelona',33,'*'],
+      [12,'Oliver Baumann','TSG Hoffenheim',34],
+      [22,'Alexander Nübel','VfB Stuttgart',28],
+    ],
+    abwehr: [
+      [2,'Joshua Kimmich','FC Bayern München',30],
+      [3,'David Raum','RB Leipzig',26],
+      [4,'Jonathan Tah','Bayer Leverkusen',29],
+      [5,'Nico Schlotterbeck','Borussia Dortmund',25],
+      [13,'Kevin Trapp','Eintracht Frankfurt',34],
+      [14,'Waldemar Anton','VfB Stuttgart',27],
+      [16,'Maximilian Mittelstädt','VfB Stuttgart',27],
+      [19,'Matthias Ginter','SC Freiburg',30],
+    ],
+    mittelfeld: [
+      [6,'Pascal Groß','Borussia Dortmund',33],
+      [7,'Kai Havertz','Arsenal FC',25],
+      [8,'Toni Kroos','Real Madrid',34],
+      [10,'Jamal Musiala','FC Bayern München',21],
+      [18,'Leon Goretzka','FC Bayern München',29],
+      [20,'Florian Wirtz','Bayer Leverkusen',21],
+      [21,'İlkay Gündoğan','FC Barcelona',33],
+      [23,'Angelo Stiller','VfB Stuttgart',23],
+    ],
+    sturm: [
+      [9,'Niclas Füllkrug','West Ham United',31],
+      [11,'Serge Gnabry','FC Bayern München',29],
+      [15,'Deniz Undav','VfB Stuttgart',28],
+      [17,'Florian Neuhaus','Borussia M\'gladbach',27],
+      [25,'Leroy Sané','FC Bayern München',28],
+      [26,'Tim Kleindienst','Borussia M\'gladbach',28],
+    ]
+  },
+  fra: {
+    trainer: 'Didier Deschamps',
+    tor: [
+      [1,'Mike Maignan','AC Milan',28,'*'],
+      [16,'Alphonse Aréola','West Ham United',31],
+      [23,'Brice Samba','RC Lens',30],
+    ],
+    abwehr: [
+      [2,'Benjamin Pavard','Inter Mailand',28],
+      [3,'Lucas Hernández','Paris SG',28],
+      [4,'Dayot Upamecano','FC Bayern München',25],
+      [5,'Jules Koundé','FC Barcelona',25],
+      [6,'William Saliba','Arsenal FC',23],
+      [13,'Ferland Mendy','Real Madrid',29],
+      [17,'Theo Hernández','AC Milan',26],
+      [21,'Ibrahima Konaté','FC Liverpool',25],
+    ],
+    mittelfeld: [
+      [7,'Antoine Griezmann','Atlético Madrid',33],
+      [8,'Aurélien Tchouaméni','Real Madrid',24],
+      [10,'Kylian Mbappé','Real Madrid',27,'*'],
+      [14,'Adrien Rabiot','Juventus Turin',29],
+      [18,'Eduardo Camavinga','Real Madrid',21],
+      [22,'Mattéo Guendouzi','Lazio Rom',25],
+    ],
+    sturm: [
+      [9,'Olivier Giroud','Los Angeles FC',37],
+      [11,'Ousmane Dembélé','Paris SG',27],
+      [12,'Randal Kolo Muani','Paris SG',25],
+      [15,'Marcus Thuram','Inter Mailand',26],
+      [19,'Kingsley Coman','FC Bayern München',28],
+      [20,'Bradley Barcola','Paris SG',22],
+      [25,'Michael Olise','FC Bayern München',22],
+      [26,'Amine Gouiri','Stade Rennais',24],
+    ]
+  },
+  arg: {
+    trainer: 'Lionel Scaloni',
+    tor: [
+      [1,'Emiliano Martínez','Aston Villa',31,'*'],
+      [12,'Gerónimo Rulli','Ajax Amsterdam',32],
+      [23,'Franco Armani','River Plate',38],
+    ],
+    abwehr: [
+      [2,'Gonzalo Montiel','Sevilla FC',27],
+      [3,'Nicolás Tagliafico','Olympique Lyon',31],
+      [4,'Gonzalo Martínez','Celta Vigo',27],
+      [6,'Germán Pezzella','Real Betis',33],
+      [13,'Cristian Romero','Tottenham Hotspur',26],
+      [14,'Marcos Acuña','Sevilla FC',32],
+      [19,'Nahuel Molina','Atlético Madrid',26],
+      [26,'Nicolás Otamendi','Benfica Lissabon',36],
+    ],
+    mittelfeld: [
+      [5,'Leandro Paredes','AS Roma',30],
+      [7,'Rodrigo de Paul','Atlético Madrid',30],
+      [8,'Marcos Senesi','Bournemouth',26],
+      [11,'Ángel Di María','Benfica Lissabon',36],
+      [20,'Alexis Mac Allister','FC Liverpool',25],
+      [22,'Lautaro Martínez','Inter Mailand',26],
+      [24,'Enzo Fernández','FC Chelsea',23],
+      [25,'Thiago Almada','Atlanta United',23],
+    ],
+    sturm: [
+      [9,'Julián Álvarez','Atlético Madrid',24],
+      [10,'Lionel Messi','Inter Miami',38,'*'],
+      [15,'Nicolás González','Juventus Turin',26],
+      [16,'Alejandro Garnacho','Manchester United',20],
+      [17,'Ángel Correa','Atlético Madrid',29],
+      [18,'Giovani Lo Celso','Villarreal CF',28],
+      [21,'Paulo Dybala','AS Roma',30],
+    ]
+  },
+  bra: {
+    trainer: 'Fernando Diniz',
+    tor: [
+      [1,'Alisson Becker','FC Liverpool',31,'*'],
+      [12,'Ederson','Manchester City',30],
+      [23,'Weverton','Palmeiras',37],
+    ],
+    abwehr: [
+      [2,'Danilo','Juventus Turin',32],
+      [3,'Alex Sandro','Juventus Turin',33],
+      [4,'Marquinhos','Paris SG',30],
+      [5,'Éder Militão','Real Madrid',26],
+      [13,'Dani Alves','UNAM Pumas',41],
+      [14,'Gabriel Magalhães','Arsenal FC',26],
+      [16,'Alex Telles','Sevilla FC',31],
+    ],
+    mittelfeld: [
+      [6,'Fred','Manchester United',31],
+      [7,'Lucas Paquetá','West Ham United',26],
+      [8,'Casemiro','Manchester United',32],
+      [10,'Neymar Jr.','Al-Hilal',32,'*'],
+      [17,'Bruno Guimarães','Newcastle United',26],
+      [18,'Gerson','Flamengo',27],
+      [20,'Endrick','Real Madrid',18],
+      [22,'Vinicius Jr.','Real Madrid',23],
+    ],
+    sturm: [
+      [9,'Gabriel Jesus','Arsenal FC',27],
+      [11,'Rodrygo','Real Madrid',23],
+      [15,'Antony','Manchester United',24],
+      [19,'Richarlison','Tottenham Hotspur',27],
+      [21,'Gabriel Martinelli','Arsenal FC',23],
+      [24,'Savinho','Man City',20],
+      [25,'Igor Jesus','Botafogo',23],
+    ]
+  },
+  esp: {
+    trainer: 'Luis de la Fuente',
+    tor: [
+      [1,'Unai Simón','Athletic Bilbao',27,'*'],
+      [13,'David Raya','Arsenal FC',29],
+      [23,'Álex Remiro','Real Sociedad',29],
+    ],
+    abwehr: [
+      [2,'Dani Carvajal','Real Madrid',32],
+      [3,'Alejandro Balde','FC Barcelona',21],
+      [4,'Pau Cubarsí','FC Barcelona',17],
+      [5,'Aymeric Laporte','Al-Nassr',30],
+      [6,'Dani Vivian','Athletic Bilbao',25],
+      [11,'Joselu','Real Madrid',34],
+      [14,'Aymeric Laporte','Al-Nassr',30],
+      [20,'Pedro Porro','Tottenham Hotspur',24],
+    ],
+    mittelfeld: [
+      [7,'Álvaro Morata','AC Milan',31],
+      [8,'Koke','Atlético Madrid',32],
+      [10,'Dani Olmo','RB Leipzig',26],
+      [12,'Alex Baena','Villarreal CF',23],
+      [15,'Mikel Merino','Arsenal FC',28],
+      [16,'Rodri','Manchester City',28,'*'],
+      [17,'Nico Williams','Athletic Bilbao',22],
+      [18,'Martín Zubimendi','Real Sociedad',25],
+      [21,'Mikel Oyarzabal','Real Sociedad',27],
+      [24,'Fabian Ruiz','Paris SG',28],
+    ],
+    sturm: [
+      [9,'Lamine Yamal','FC Barcelona',17],
+      [19,'Ayoze Pérez','Real Betis',31],
+      [22,'Ferran Torres','FC Barcelona',24],
+      [25,'Bryan Gil','Sevilla FC',23],
+    ]
+  },
+  eng: {
+    trainer: 'Gareth Southgate',
+    tor: [
+      [1,'Jordan Pickford','Everton FC',30],
+      [13,'Aaron Ramsdale','Arsenal FC',25],
+      [23,'Dean Henderson','Crystal Palace',27],
+    ],
+    abwehr: [
+      [2,'Kyle Walker','Manchester City',34,'*'],
+      [3,'Luke Shaw','Manchester United',28],
+      [4,'Declan Rice','Arsenal FC',25],
+      [5,'John Stones','Manchester City',29],
+      [6,'Harry Maguire','Manchester United',31],
+      [12,'Kieran Trippier','Newcastle United',33],
+      [14,'Trent Alexander-Arnold','Real Madrid',25],
+      [16,'Marc Guehi','Crystal Palace',23],
+    ],
+    mittelfeld: [
+      [7,'Bukayo Saka','Arsenal FC',22],
+      [8,'Jordan Henderson','Ajax Amsterdam',33],
+      [10,'Jude Bellingham','Real Madrid',20],
+      [11,'Marcus Rashford','Manchester United',26],
+      [15,'Conor Gallagher','Atlético Madrid',24],
+      [17,'Phil Foden','Manchester City',24],
+      [18,'Kalvin Phillips','Manchester City',28],
+      [20,'Eberechi Eze','Crystal Palace',25],
+      [21,'James Maddison','Tottenham Hotspur',27],
+    ],
+    sturm: [
+      [9,'Harry Kane','FC Bayern München',30,'*'],
+      [19,'Ollie Watkins','Aston Villa',28],
+      [22,'Cole Palmer','FC Chelsea',22],
+      [24,'Anthony Gordon','Newcastle United',23],
+      [25,'Ivan Toney','Al-Ahli',28],
+    ]
+  },
+  por: {
+    trainer: 'Roberto Martínez',
+    tor: [
+      [1,'Rui Patrício','AS Roma',36],
+      [12,'Diogo Costa','FC Porto',24,'*'],
+      [22,'José Sá','Wolverhampton',31],
+    ],
+    abwehr: [
+      [2,'João Cancelo','FC Barcelona',30],
+      [3,'Nuno Mendes','Paris SG',22],
+      [4,'Rúben Dias','Manchester City',26],
+      [5,'Danilo Pereira','Paris SG',32],
+      [13,'Fernando','Al-Gharafa',36],
+      [14,'António Silva','Benfica Lissabon',20],
+      [19,'Nélson Semedo','Wolverhampton',30],
+      [21,'Diogo Dalot','Manchester United',25],
+    ],
+    mittelfeld: [
+      [6,'Vitinha','Paris SG',24],
+      [7,'Cristiano Ronaldo','Al-Nassr',40,'*'],
+      [8,'João Félix','FC Barcelona',24],
+      [10,'Bernardo Silva','Manchester City',29],
+      [11,'João Neves','Benfica Lissabon',19],
+      [15,'Rafael Leão','AC Milan',24],
+      [16,'Renato Sanches','AS Roma',26],
+      [18,'Rúben Neves','Al-Hilal',27],
+      [20,'Pedro Gonçalves','Sporting Lissabon',25],
+      [23,'Otávio','Al-Nassr',28],
+    ],
+    sturm: [
+      [9,'Gonçalo Ramos','Paris SG',22],
+      [17,'Gonçalo Guedes','Benfica Lissabon',27],
+      [24,'Francisco Conceição','Juventus Turin',21],
+      [25,'Diogo Jota','FC Liverpool',27],
+      [26,'João Palhinha','FC Bayern München',28],
+    ]
+  },
+  ned: {
+    trainer: 'Ronald Koeman',
+    tor: [
+      [1,'Bart Verbruggen','Brighton',21],
+      [13,'Mark Flekken','Brentford',30],
+      [22,'Remko Pasveer','Ajax Amsterdam',35],
+    ],
+    abwehr: [
+      [2,'Denzel Dumfries','Inter Mailand',28],
+      [3,'Matthijs de Ligt','Manchester United',24],
+      [4,'Virgil van Dijk','FC Liverpool',32,'*'],
+      [5,'Nathan Aké','Manchester City',29],
+      [6,'Stefan de Vrij','Inter Mailand',32],
+      [12,'Daley Blind','Girona FC',34],
+      [17,'Jurriën Timber','Arsenal FC',22],
+      [20,'Ian Maatsen','Aston Villa',22],
+    ],
+    mittelfeld: [
+      [6,'Xavi Simons','RB Leipzig',21],
+      [7,'Steven Bergwijn','Ajax Amsterdam',26],
+      [8,'Georginio Wijnaldum','Al-Ettifaq',33],
+      [10,'Memphis Depay','Atlético Madrid',30],
+      [14,'Teun Koopmeiners','Juventus Turin',26],
+      [15,'Mats Wieffer','Brighton',24],
+      [18,'Ryan Gravenberch','FC Liverpool',22],
+      [21,'Joey Veerman','PSV Eindhoven',25],
+      [23,'Tijjani Reijnders','AC Milan',25],
+    ],
+    sturm: [
+      [9,'Wout Weghorst','TSG Hoffenheim',31],
+      [11,'Cody Gakpo','FC Liverpool',25],
+      [16,'Donyell Malen','Borussia Dortmund',25],
+      [19,'Noa Lang','PSV Eindhoven',25],
+      [25,'Brian Brobbey','Ajax Amsterdam',22],
+    ]
+  },
+  bel: {
+    trainer: 'Domenico Tedesco',
+    tor: [
+      [1,'Koen Casteels','Al-Qadsiah',32],
+      [12,'Simon Mignolet','FC Brügge',36],
+      [23,'Matz Sels','Nottingham Forest',32],
+    ],
+    abwehr: [
+      [2,'Toby Alderweireld','Royal Antwerp',35],
+      [3,'Arthur Theate','Stade Rennais',24],
+      [4,'Wout Faes','Leicester City',26],
+      [5,'Jan Vertonghen','RSC Anderlecht',37,'*'],
+      [13,'Timothy Castagne','Fulham FC',28],
+      [14,'Thomas Meunier','Trabzonspor',32],
+      [16,'Brandon Mechele','FC Brügge',31],
+    ],
+    mittelfeld: [
+      [6,'Axel Witsel','Atlético Madrid',35],
+      [7,'Kevin De Bruyne','Manchester City',32,'*'],
+      [8,'Youri Tielemans','Aston Villa',27],
+      [10,'Eden Hazard','zuletzt Real Madrid',33],
+      [11,'Leandro Trossard','Arsenal FC',29],
+      [17,'Amadou Onana','Aston Villa',23],
+      [18,'Alexis Saelemaekers','AC Milan',25],
+      [21,'Charles De Ketelaere','Atalanta Bergamo',23],
+    ],
+    sturm: [
+      [9,'Romelu Lukaku','AS Roma',31],
+      [15,'Dodi Lukebakio','Sevilla FC',27],
+      [19,'Jeremy Doku','Manchester City',22],
+      [20,'Lois Openda','RB Leipzig',24],
+      [22,'Loïs Openda','RB Leipzig',24],
+      [25,'Johan Bakayoko','PSV Eindhoven',21],
+    ]
+  },
+  cro: {
+    trainer: 'Zlatko Dalić',
+    tor: [
+      [1,'Dominik Livaković','Fenerbahçe',29],
+      [13,'Ivo Grbić','Atlético Madrid',27],
+      [23,'Ivica Ivušić','PAOK',30],
+    ],
+    abwehr: [
+      [2,'Josip Stanišić','Bayer Leverkusen',24],
+      [3,'Borna Sosa','Stuttgart',26],
+      [4,'Joško Gvardiol','Manchester City',22],
+      [5,'Duje Ćaleta-Car','Southampton',27],
+      [6,'Domagoj Vida','AEK Athen',34],
+      [19,'Martin Erlić','RB Leipzig',26],
+      [20,'Josip Juranović','Celtic Glasgow',28],
+      [22,'Šime Vrsaljko','Atletico Madrid',32],
+    ],
+    mittelfeld: [
+      [7,'Ivan Perišić','Hajduk Split',35],
+      [8,'Mateo Kovačić','Manchester City',29],
+      [10,'Luka Modrić','Real Madrid',38,'*'],
+      [11,'Marcelo Brozović','Al-Nassr',31],
+      [14,'Nikola Vlašić','Torino FC',26],
+      [15,'Mario Pašalić','Atalanta Bergamo',29],
+      [16,'Lovro Majer','Real Sociedad',26],
+      [17,'Kristijan Jakić','Eintracht Frankfurt',26],
+    ],
+    sturm: [
+      [9,'Andrej Kramarić','TSG Hoffenheim',33],
+      [12,'Ivan Zucko','NK Rijeka',27],
+      [18,'Ante Budimir','Osasuna',32],
+      [21,'Bruno Petković','Dinamo Zagreb',29],
+      [24,'Mislav Oršić','Celta Vigo',31],
+      [25,'Luka Ivanušec','Dinamo Zagreb',25],
+    ]
+  },
+  swi: {
+    trainer: 'Murat Yakin',
+    tor: [
+      [1,'Yann Sommer','Inter Mailand',35,'*'],
+      [12,'Gregor Kobel','Borussia Dortmund',26],
+      [21,'Yvon Mvogo','Lorient FC',29],
+    ],
+    abwehr: [
+      [2,'Silvan Widmer','1. FSV Mainz 05',31],
+      [3,'Ricardo Rodríguez','Torino FC',31],
+      [4,'Manuel Akanji','Manchester City',28],
+      [5,'Fabian Schär','Newcastle United',32],
+      [13,'Nico Elvedi','Borussia M\'gladbach',27],
+      [16,'Kevin Mbabu','Fulham FC',28],
+      [22,'Leonidas Stergiou','VfB Stuttgart',22],
+    ],
+    mittelfeld: [
+      [6,'Denis Zakaria','Chelsea FC',27],
+      [8,'Remo Freuler','Bologna FC',31],
+      [10,'Granit Xhaka','Bayer Leverkusen',31],
+      [11,'Ruben Vargas','FC Augsburg',25],
+      [14,'Steven Zuber','zuletzt Eintracht',32],
+      [15,'Djibril Sow','Sevilla FC',27],
+      [17,'Michel Aebischer','Bologna FC',26],
+      [23,'Fabian Frei','FC Basel',35],
+      [24,'Xherdan Shaqiri','Chicago Fire',32],
+    ],
+    sturm: [
+      [7,'Breel Embolo','AS Monaco',27],
+      [9,'Haris Seferović','Galatasaray',31],
+      [18,'Noah Okafor','AC Milan',24],
+      [19,'Dan Ndoye','Bologna FC',23],
+      [20,'Zeki Amdouni','Burnley FC',23],
+      [25,'Kwadwo Duah','SK Braga',27],
+    ]
+  },
+  den: {
+    trainer: 'Kasper Hjulmand',
+    tor: [
+      [1,'Kasper Schmeichel','Anderlecht',37,'*'],
+      [16,'Frederik Rønnow','Union Berlin',32],
+      [22,'Oliver Christensen','Hertha BSC',24],
+    ],
+    abwehr: [
+      [2,'Henrik Dalsgaard','Brentford',34],
+      [3,'Jens Stryger Larsen','Trabzonspor',33],
+      [4,'Simon Kjær','AC Milan',34],
+      [5,'Jannik Vestergaard','Leicester City',31],
+      [6,'Andreas Christensen','FC Barcelona',27],
+      [13,'Joachim Andersen','Crystal Palace',27],
+      [14,'Victor Nelsson','Galatasaray',25],
+      [23,'Alexander Bah','Benfica Lissabon',26],
+    ],
+    mittelfeld: [
+      [7,'Pierre-Emile Højbjerg','Atlético Madrid',28],
+      [8,'Thomas Delaney','Sevilla FC',32],
+      [10,'Christian Eriksen','Manchester United',31],
+      [11,'Andreas Skov Olsen','Club Brügge',24],
+      [15,'Mathias Jensen','Brentford',27],
+      [17,'Mikkel Damsgaard','Brentford',23],
+      [18,'Martin Braithwaite','Espanyol',32],
+      [20,'Mohamed Daramy','Ajax Amsterdam',22],
+    ],
+    sturm: [
+      [9,'Rasmus Højlund','Manchester United',21],
+      [12,'Kasper Dolberg','Sevilla FC',26],
+      [19,'Jonas Wind','Wolfsburg',24],
+      [21,'Yussuf Poulsen','RB Leipzig',29],
+      [24,'Jesper Lindstrøm','Eintracht Frankfurt',23],
+      [25,'Lasse Berg Skov','FC Kopenhagen',23],
+    ]
+  },
+  ita: {
+    trainer: 'Luciano Spalletti',
+    tor: [
+      [1,'Gianluigi Donnarumma','Paris SG',25,'*'],
+      [12,'Alex Meret','SSC Napoli',27],
+      [23,'Guglielmo Vicario','Tottenham Hotspur',27],
+    ],
+    abwehr: [
+      [2,'Giovanni Di Lorenzo','SSC Napoli',30,'*'],
+      [3,'Federico Dimarco','Inter Mailand',26],
+      [4,'Leonardo Bonucci','Union Berlin',36],
+      [5,'Giorgio Scalvini','Atalanta Bergamo',20],
+      [6,'Alessandro Bastoni','Inter Mailand',24],
+      [13,'Emerson Palmieri','West Ham United',29],
+      [17,'Rafael Tolói','Atalanta Bergamo',33],
+      [19,'Davide Calabria','AC Milan',27],
+    ],
+    mittelfeld: [
+      [7,'Lorenzo Pellegrini','AS Roma',27],
+      [8,'Jorginho','Arsenal FC',32],
+      [10,'Lorenzo Insigne','Toronto FC',33],
+      [11,'Nicolò Barella','Inter Mailand',27],
+      [14,'Davide Frattesi','Inter Mailand',24],
+      [15,'Bryan Cristante','AS Roma',29],
+      [16,'Sandro Tonali','Newcastle United',24],
+      [18,'Giacomo Raspadori','SSC Napoli',24],
+      [20,'Matteo Politano','SSC Napoli',30],
+    ],
+    sturm: [
+      [9,'Gianluca Scamacca','Atalanta Bergamo',25],
+      [21,'Mateo Retegui','Genoa CFC',24],
+      [22,'Federico Chiesa','Juventus Turin',26],
+      [24,'Wilfried Gnonto','Leeds United',20],
+      [25,'Stephan El Shaarawy','AS Roma',31],
+      [26,'Luca Pellegrini','Lazio Rom',25],
+    ]
+  },
+  usa: {
+    trainer: 'Gregg Berhalter',
+    tor: [
+      [1,'Matt Turner','Nottingham Forest',29],
+      [13,'Sean Johnson','Toronto FC',35],
+      [18,'Ethan Horvath','Luton Town',28],
+    ],
+    abwehr: [
+      [2,'Sergino Dest','AC Milan',23],
+      [3,'Antonee Robinson','Fulham FC',26],
+      [4,'Tyler Adams','Bournemouth',24,'*'],
+      [5,'Walker Zimmerman','Nashville SC',30],
+      [6,'Chris Richards','Crystal Palace',23],
+      [12,'DeAndre Yedlin','Inter Miami',30],
+      [14,'Aaron Long','NY Red Bulls',31],
+      [16,'Joe Scally','Borussia M\'gladbach',21],
+    ],
+    mittelfeld: [
+      [7,'Giovanni Reyna','Borussia Dortmund',21],
+      [8,'Weston McKennie','Juventus Turin',25],
+      [10,'Christian Pulisic','AC Milan',25],
+      [11,'Brenden Aaronson','Union Berlin',23],
+      [15,'Luca de la Torre','Celta Vigo',26],
+      [17,'Malik Tillman','PSV Eindhoven',21],
+      [19,'Yunus Musah','AC Milan',21],
+      [22,'Jordan Morris','Seattle Sounders',28],
+    ],
+    sturm: [
+      [9,'Josh Sargent','Norwich City',23],
+      [20,'Folarin Balogun','Monaco',22],
+      [21,'Timmy Weah','Juventus Turin',23],
+      [23,'Ricardo Pepi','PSV Eindhoven',21],
+      [24,'Daryl Dike','West Brom',23],
+      [25,'Cade Cowell','San Jose Earthquakes',21],
+    ]
+  },
+  mex: {
+    trainer: 'Jaime Lozano',
+    tor: [
+      [1,'Guillermo Ochoa','Club América',38,'*'],
+      [13,'Rodolfo Cota','Club León',35],
+      [22,'Luis Malagón','Club América',27],
+    ],
+    abwehr: [
+      [2,'Jorge Sánchez','Porto',24],
+      [3,'Jesús Gallardo','NÉCAXA',29],
+      [4,'Edson Álvarez','West Ham United',26],
+      [5,'Johan Vásquez','Genoa CFC',24],
+      [6,'César Montes','Espanyol',27],
+      [12,'Kevin Álvarez','Club América',24],
+      [14,'Néstor Araujo','Club América',32],
+      [16,'Gerardo Arteaga','Genk',24],
+    ],
+    mittelfeld: [
+      [7,'Hirving Lozano','PSV Eindhoven',28],
+      [8,'Carlos Rodríguez','Cruz Azul',26],
+      [10,'Alexis Vega','Guadalajara',27],
+      [11,'Alexis Mac Allister','FC Liverpool',25],
+      [15,'Luis Romo','Cruz Azul',28],
+      [17,'Erick Sánchez','Pachuca',25],
+      [18,'Orbelin Pineda','AEK Athen',27],
+      [21,'Charly Rodríguez','Tigres UANL',21],
+    ],
+    sturm: [
+      [9,'Raúl Jiménez','Fulham FC',32],
+      [19,'Santiago Giménez','Feyenoord',22],
+      [20,'Uriel Antuna','Cruz Azul',26],
+      [23,'Roberto Alvarado','Guadalajara',25],
+      [24,'Julián Quiñones','Club América',27],
+      [25,'Henry Martín','Club América',31],
+    ]
+  },
+  can: {
+    trainer: 'Jesse Marsch',
+    tor: [
+      [1,'Milan Borjan','Crvena zvezda',36,'*'],
+      [12,'Maxime Crépeau','LA Galaxy',30],
+      [16,'James Pantemis','CF Montreal',26],
+    ],
+    abwehr: [
+      [2,'Richie Laryea','Toronto FC',28],
+      [3,'Alphonso Davies','FC Bayern München',23],
+      [4,'Steven Vitória','Moreirense',35],
+      [5,'Kamal Miller','Inter Miami',26],
+      [6,'Derek Cornelius','FC Groningen',26],
+      [13,'Alistair Johnston','Celtic Glasgow',25],
+      [14,'Doneil Henry','Vancouver Whitecaps',31],
+    ],
+    mittelfeld: [
+      [7,'Atiba Hutchinson','Besiktas',40],
+      [8,'Jonathan Osorio','Toronto FC',31],
+      [10,'Jonathan David','LOSC Lille',23],
+      [11,'Tajon Buchanan','Club Brügge',24],
+      [15,'Mark-Anthony Kaye','Colorado Rapids',29],
+      [17,'Stephen Eustáquio','FC Porto',26],
+      [18,'Samuel Piette','CF Montreal',30],
+      [19,'Ismaël Koné','Watford FC',21],
+    ],
+    sturm: [
+      [9,'Lucas Cavallini','Vancouver Whitecaps',31],
+      [20,'Junior Hoilett','Cardiff City',33],
+      [21,'Cyle Larin','Club Brügge',28],
+      [22,'Liam Fraser','Troyes AC',26],
+      [23,'Theo Bair','Motherwell FC',23],
+      [25,'Ali Ahmed','Toronto FC',20],
+    ]
+  },
+  jap: {
+    trainer: 'Hajime Moriyasu',
+    tor: [
+      [1,'Shuichi Gonda','Shimizu S-Pulse',34,'*'],
+      [12,'Zion Suzuki','Sint-Truiden',21],
+      [23,'Kosuke Nakamura','Kashiwa Reysol',32],
+    ],
+    abwehr: [
+      [2,'Hiroki Sakai','Urawa Red Diamonds',33],
+      [3,'Yuto Nagatomo','Tokyo FC',37],
+      [4,'Ko Itakura','Borussia M\'gladbach',26],
+      [5,'Takehiro Tomiyasu','Arsenal FC',25],
+      [6,'Maya Yoshida','FC Schalke 04',35],
+      [14,'Miki Yamane','Kawasaki Frontale',30],
+      [16,'Shogo Taniguchi','Kawasaki Frontale',32],
+      [19,'Hiroki Ito','VfB Stuttgart',24],
+    ],
+    mittelfeld: [
+      [7,'Takumi Minamino','Monaco',29],
+      [8,'Wataru Endo','FC Liverpool',31],
+      [10,'Takefusa Kubo','Real Sociedad',22],
+      [11,'Junya Ito','Stade Rennais',31],
+      [13,'Ao Tanaka','Fortuna Düsseldorf',24],
+      [15,'Hidemasa Morita','Sporting Lissabon',28],
+      [17,'Ritsu Doan','SC Freiburg',25],
+      [18,'Gaku Shibasaki','Leganés',32],
+      [21,'Kaoru Mitoma','Brighton',26],
+    ],
+    sturm: [
+      [9,'Ayase Ueda','Feyenoord',25],
+      [20,'Daichi Kamada','Lazio Rom',27],
+      [22,'Yuya Osako','Vissel Kobe',33],
+      [24,'Daizen Maeda','Celtic Glasgow',26],
+      [25,'Koki Machida','Union Saint-Gilloise',26],
+    ]
+  },
+  kor: {
+    trainer: 'Jürgen Klinsmann',
+    tor: [
+      [1,'Kim Seung-gyu','Al-Shabab',37],
+      [12,'Jo Hyeon-woo','Ulsan Hyundai',32],
+      [21,'Song Bum-geun','Jeonbuk Motors',26],
+    ],
+    abwehr: [
+      [2,'Kim Moon-hwan','Jeonbuk Motors',30],
+      [3,'Kim Jin-su','Jeonbuk Motors',31],
+      [4,'Kim Young-gwon','Ulsan Hyundai',34],
+      [5,'Kim Min-jae','FC Bayern München',27],
+      [6,'Kwon Kyung-won','Ulsan Hyundai',30],
+      [13,'Lee Ki-je','Jeonbuk Motors',28],
+      [14,'Hong Chul','Jeonbuk Motors',33],
+    ],
+    mittelfeld: [
+      [7,'Son Heung-min','Tottenham Hotspur',31,'*'],
+      [8,'Jung Woo-young','Al-Qadsiah',34],
+      [10,'Lee Jae-sung','1. FSV Mainz 05',31],
+      [11,'Hwang Hee-chan','Wolverhampton',27],
+      [15,'Hwang In-beom','Feyenoord',27],
+      [16,'Lee Kang-in','Paris SG',22],
+      [17,'Jeong Woo-yeong','SC Freiburg',24],
+      [18,'Paik Seung-ho','Jeonbuk Motors',26],
+    ],
+    sturm: [
+      [9,'Cho Gue-sung','Jeonbuk Motors',25],
+      [19,'Kwon Chang-hoon','Straßburg',28],
+      [20,'Um Won-sang','Jeonbuk Motors',29],
+      [22,'Oh Hyeon-gyu','Celtic Glasgow',22],
+      [23,'Lim Seong-jin','Gyeongnam FC',26],
+    ]
+  },
+  aus: {
+    trainer: 'Graham Arnold',
+    tor: [
+      [1,'Mat Ryan','Real Sociedad',32,'*'],
+      [12,'Danny Vukovic','Lecce',37],
+      [18,'Joe Gauci','Adelaide United',24],
+    ],
+    abwehr: [
+      [2,'Milos Degenek','Columbus Crew',31],
+      [3,'Aziz Behich','Dundee United',32],
+      [4,'Harry Souttar','Leicester City',25],
+      [5,'Fran Karačić','Brescia Calcio',29],
+      [6,'Kye Rowles','Heart of Midlothian',26],
+      [13,'Joel King','Odense BK',23],
+      [14,'Bailey Wright','Sunderland',32],
+    ],
+    mittelfeld: [
+      [7,'Mitchell Duke','Fagiano Okayama',32],
+      [8,'Jackson Irvine','St. Pauli',30],
+      [10,'Mathew Leckie','Melbourne City',33],
+      [11,'Craig Goodwin','Adelaide United',31],
+      [15,'Aaron Mooy','Celtic Glasgow',33],
+      [16,'Cameron Devlin','Heart of Midlothian',26],
+      [17,'Riley McGree','Middlesbrough',25],
+      [19,'Keanu Baccus','St. Mirren',25],
+    ],
+    sturm: [
+      [9,'Adam Taggart','Cerezo Osaka',30],
+      [20,'Jason Cummings','Central Coast Mariners',28],
+      [21,'Garang Kuol','Hearts',19],
+      [22,'Martin Boyle','Hibernian',30],
+      [23,'Nathaniel Atkinson','Hearts',23],
+      [24,'Marco Tilio','Celtic Glasgow',22],
+    ]
+  },
+  mar: {
+    trainer: 'Walid Regragui',
+    tor: [
+      [1,'Yassine Bounou','Al-Hilal',32,'*'],
+      [12,'Munir El Kajoui','Málaga',31],
+      [16,'Ahmed Reda Tagnaouti','Wydad Casablanca',29],
+    ],
+    abwehr: [
+      [2,'Achraf Hakimi','Paris SG',25],
+      [3,'Noussair Mazraoui','Manchester United',26],
+      [4,'Romain Saïss','Besiktas',33],
+      [5,'Nayef Aguerd','West Ham United',27],
+      [6,'Jawad El Yamiq','Real Valladolid',32],
+      [13,'Badr Benoun','Qatar SC',30],
+      [14,'Yahya Attiyat Allah','Raja Casablanca',28],
+      [20,'Adam Masina','Watford',30],
+    ],
+    mittelfeld: [
+      [7,'Hakim Ziyech','Galatasaray',30],
+      [8,'Azzedine Ounahi','Marseille',23],
+      [10,'Brahim Díaz','AC Milan',24],
+      [11,'Sofiane Boufal','Angers SCO',30],
+      [15,'Selim Amallah','Standard Lüttich',27],
+      [17,'Abdelhamid Sabiri','Fiorentina',27],
+      [18,'Bilal El Khannouss','Genk',20],
+      [22,'Ilias Chair','Queens Park Rangers',27],
+    ],
+    sturm: [
+      [9,'Youssef En-Nesyri','Sevilla FC',26],
+      [19,'Abde Ezzalzouli','Osasuna',22],
+      [21,'Zakaria Aboukhlal','Toulouse FC',23],
+      [23,'Walid Cheddira','Parma Calcio',26],
+      [24,'Anass Zaroury','Burnley FC',23],
+      [25,'Amine Harit','Marseille',26],
+    ]
+  },
+  sen: {
+    trainer: 'Aliou Cissé',
+    tor: [
+      [1,'Édouard Mendy','Chelsea FC',31],
+      [12,'Alfred Gomis','Stade Rennais',31],
+      [16,'Seny Dieng','Queens Park Rangers',31],
+    ],
+    abwehr: [
+      [2,'Bouna Sarr','FC Bayern München',31],
+      [3,'Saliou Ciss','Nancy',35],
+      [4,'Kalidou Koulibaly','Chelsea FC',32,'*'],
+      [5,'Abdou Diallo','RB Leipzig',27],
+      [6,'Pape Abou Cissé','Olympiakos',28],
+      [13,'Fodé Ballo-Touré','AC Milan',27],
+      [14,'Formose Mendy','Amiens SC',24],
+    ],
+    mittelfeld: [
+      [7,'Mame Diouf','Kasımpaşa',35],
+      [8,'Cheikhou Kouyaté','Nottingham Forest',33],
+      [10,'Sadio Mané','Al-Nassr',31],
+      [11,'Ismaïla Sarr','Crystal Palace',26],
+      [15,'Idrissa Gana Gueye','Everton',33],
+      [17,'Nampalys Mendy','Leicester City',31],
+      [18,'Krepin Diatta','Monaco',24],
+      [19,'Pathé Ciss','Rayo Vallecano',30],
+    ],
+    sturm: [
+      [9,'Boulaye Dia','Lazio Rom',26],
+      [20,'Nicolas Jackson','Chelsea FC',22],
+      [21,'Habib Diallo','Straßburg',28],
+      [22,'Famara Diedhiou','Alanyaspor',31],
+      [23,'Iliman Ndiaye','Marseille',23],
+      [24,'Pape Matar Sarr','Tottenham Hotspur',21],
+    ]
+  },
+  nig: {
+    trainer: 'José Peseiro',
+    tor: [
+      [1,'Francis Uzoho','Omonia Nikosia',26],
+      [12,'Maduka Okoye','Watford FC',24],
+      [16,'John Noble','Enyimba',27],
+    ],
+    abwehr: [
+      [2,'Ola Aina','Nottingham Forest',27],
+      [3,'Zaidu Sanusi','FC Porto',26],
+      [4,'Leon Balogun','Rangers FC',35],
+      [5,'William Troost-Ekong','Watford FC',30,'*'],
+      [6,'Chidozie Awaziem','Alanyaspor',26],
+      [13,'Semi Ajayi','West Brom',30],
+      [14,'Calvin Bassey','Ajax Amsterdam',23],
+    ],
+    mittelfeld: [
+      [7,'Moses Simon','Nantes',27],
+      [8,'Alex Iwobi','Everton',27],
+      [10,'Kelechi Iheanacho','Leicester City',27],
+      [11,'Samuel Chukwueze','Villarreal CF',24],
+      [15,'Frank Onyeka','Brentford',25],
+      [17,'Wilfred Ndidi','Leicester City',27],
+      [18,'Joe Aribo','Southampton',27],
+      [19,'Oghenekaro Etebo','Watford FC',28],
+    ],
+    sturm: [
+      [9,'Victor Osimhen','SSC Napoli',24],
+      [20,'Taiwo Awoniyi','Nottingham Forest',25],
+      [21,'Terem Moffi','Nice',24],
+      [22,'Ademola Lookman','Atalanta Bergamo',25],
+      [23,'Cyriel Dessers','Rangers FC',28],
+      [24,'Emmanuel Dennis','Nottingham Forest',26],
+    ]
+  },
+};
+
+// Für Teams ohne detaillierten Kader — Platzhalter
+function getSquad(id) {
+  return SQUADS[id] || null;
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+let activeTeam = null;
+
+function renderGrid(filter = '', groupFilter = '') {
+  const grid = document.getElementById('kGrid');
+  const filtered = TEAMS.filter(t => {
+    const matchName = t.name.toLowerCase().includes(filter.toLowerCase());
+    const matchGroup = !groupFilter || t.group === groupFilter;
+    return matchName && matchGroup;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="k-empty" style="grid-column:1/-1">Keine Teams gefunden.</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => `
+    <div class="k-team-card${activeTeam === t.id ? ' active' : ''}" onclick="showTeam('${t.id}')" data-id="${t.id}">
+      <div class="k-team-flag">${t.flag}</div>
+      <div class="k-team-name">${t.name}</div>
+      <div class="k-team-group">Gruppe ${t.group} · ${t.confed}</div>
+    </div>
+  `).join('');
+}
+
+function showTeam(id) {
+  const team = TEAMS.find(t => t.id === id);
+  if (!team) return;
+  activeTeam = id;
+
+  // Update active state
+  document.querySelectorAll('.k-team-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.id === id);
+  });
+
+  const panel = document.getElementById('kPanel');
+  const squad = getSquad(id);
+
+  // Scroll to panel
+  panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  if (!squad) {
+    panel.className = 'k-panel visible';
+    panel.innerHTML = `
+      <div class="k-panel-head">
+        <div class="k-panel-flag">${team.flag}</div>
+        <div class="k-panel-info">
+          <div class="k-panel-country">${team.name}</div>
+          <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed}</div>
+        </div>
+        <button class="k-panel-close" onclick="closePanel()">✕</button>
+      </div>
+      <div class="k-loading">⏳ Kader wird noch bekanntgegeben…</div>
+    `;
+    return;
+  }
+
+  const posLabels = {
+    tor: '🧤 Tor',
+    abwehr: '🛡️ Abwehr',
+    mittelfeld: '⚙️ Mittelfeld',
+    sturm: '⚡ Sturm'
+  };
+
+  let html = `
+    <div class="k-panel-head">
+      <div class="k-panel-flag">${team.flag}</div>
+      <div class="k-panel-info">
+        <div class="k-panel-country">${team.name}</div>
+        <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed} · Trainer: ${squad.trainer}</div>
+      </div>
+      <button class="k-panel-close" onclick="closePanel()">✕</button>
+    </div>
+  `;
+
+  ['tor','abwehr','mittelfeld','sturm'].forEach(pos => {
+    const players = squad[pos];
+    if (!players || !players.length) return;
+    html += `
+      <div class="k-pos-section">
+        <div class="k-pos-label">${posLabels[pos]}</div>
+        <div class="k-player-list">
+          ${players.map(p => `
+            <div class="k-player">
+              <div class="k-player-nr">${p[0]}</div>
+              <div class="k-player-info">
+                <div class="k-player-name">${p[1]}${p[4] ? ' <span class="k-cap">©</span>' : ''}</div>
+                <div class="k-player-club">${p[2]}</div>
+              </div>
+              <div class="k-player-age">${p[3]}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  panel.className = 'k-panel visible';
+  panel.innerHTML = html;
+}
+
+function closePanel() {
+  activeTeam = null;
+  document.getElementById('kPanel').className = 'k-panel';
+  document.querySelectorAll('.k-team-card').forEach(c => c.classList.remove('active'));
+}
+
+// Init
+renderGrid();
+
+// Search + Filter
+document.getElementById('kSearch').addEventListener('input', e => {
+  renderGrid(e.target.value, document.getElementById('kGroupFilter').value);
+});
+document.getElementById('kGroupFilter').addEventListener('change', e => {
+  renderGrid(document.getElementById('kSearch').value, e.target.value);
+});
+</script>
+
+<script>
+const G_PAGES=[
+  {id:'index',label:'Start',icon:'🏠',url:'/'},
+  {id:'spielplan',label:'Spielplan/Tipps',icon:'⚽',url:'/spielplan.html'},
+  {id:'spielbaum',label:'Spielbaum',icon:'🌳',url:'/spielbaum.html'},
+  {id:'tabelle',label:'Tabelle',icon:'🏆',url:'/tabelle.html'},
+  {id:'auswertung',label:'Auswertung',icon:'📊',url:'/auswertung.html'},
+  {id:'kader',label:'Kader',icon:'👕',url:'/kader.html'},
+  {id:'profil',label:'Profil',icon:'👤',url:'/profil.html'},
+];
+const G_CURRENT='kader';
+
+const nav=document.getElementById('gNav');
+G_PAGES.forEach((p,i)=>{
+  if(i>0){const d=document.createElement('div');d.className='g-nav-div';nav.appendChild(d);}
+  const a=document.createElement('a');
+  a.href=p.url;a.textContent=p.icon+' '+p.label;
+  if(p.id===G_CURRENT)a.className='active';
+  nav.appendChild(a);
+});
+
+const mob=document.getElementById('gMobNav');
+G_PAGES.forEach(p=>{
+  const a=document.createElement('a');
+  a.href=p.url;
+  a.innerHTML=`<span>${p.icon}</span><span>${p.label}</span>`;
+  if(p.id===G_CURRENT)a.className='active';
+  mob.appendChild(a);
+});
+
+(async()=>{
+  try{
+    const r=await fetch('/api/me',{credentials:'include'});
+    if(r.ok){
+      const u=await r.json();
+      const el=document.getElementById('gUser');
+      const initials=u.username.slice(0,2).toUpperCase();
+      const col=['#e74c3c','#e67e22','#2ecc71','#3498db','#9b59b6'][u.username.charCodeAt(0)%5];
+      el.innerHTML=`${u.avatar?`<img class="g-avatar" src="${u.avatar}" alt="${u.username}">`:`<div class="g-avatar-ph" style="background:${col}">${initials}</div>`}<span class="g-user-name">${u.username}</span>`;
+      try{
+        const ar=await fetch('/api/admin/check',{credentials:'include'});
+        if(ar.ok){
+          const aa=await ar.json();
+          if(aa.is_admin){
+            const nav=document.getElementById('gNav');
+            const mob=document.getElementById('gMobNav');
+            const div=document.createElement('div');div.className='g-nav-div';nav.appendChild(div);
+            const a=document.createElement('a');a.textContent='🔧 Admin';a.href='/';
+            a.onclick=(e)=>{e.preventDefault();window._goAdmin=true;location.href='/';};
+            nav.appendChild(a);
+            const ma=document.createElement('a');ma.href='/';ma.innerHTML='<span>🔧</span><span>Admin</span>';
+            ma.onclick=a.onclick;mob.appendChild(ma);
+          }
+        }
+      }catch{}
+    }
+  }catch{}
+})();
+</script>
+</body>
+</html>
