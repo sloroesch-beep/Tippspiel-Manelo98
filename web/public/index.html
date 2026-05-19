@@ -358,7 +358,66 @@ img{max-width:100%;}
 .podium-2 .podium-base{background:rgba(0,0,0,.12);margin:-14px;}
 .podium-3 .podium-base{background:rgba(0,0,0,.12);margin:-12px;}
 
-.admin-page{max-width:900px;}
+.admin-page{max-width:960px;}
+.admin-section{background:#111;border:1px solid #2a2a2a;border-radius:10px;margin-bottom:14px;overflow:hidden}
+.admin-section-head{background:#0d0d0d;border-bottom:1px solid #1a1a1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.admin-section-head h2{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
+.admin-section-head span{font-size:11px;color:#666}
+.admin-section-body{padding:14px 16px}
+.admin-tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.admin-tool-btn{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:12px;font-weight:600;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;font-family:inherit;display:flex;align-items:center;gap:8px}
+.admin-tool-btn:hover{border-color:#555;background:#1a1a1a}
+.admin-tool-btn.gold{border-color:#ffd70044;color:#ffd700}
+.admin-tool-btn.gold:hover{border-color:#ffd700;background:#1a1200}
+.admin-tool-btn.red{border-color:#cc000044;color:#ff4444}
+.admin-tool-btn.red:hover{border-color:#cc0000;background:#1a0000}
+.admin-tool-btn.green{border-color:#16a34a44;color:#4ade80}
+.admin-tool-btn.green:hover{border-color:#16a34a;background:#001a0d}
+.admin-msg{font-size:12px;color:#888;padding:6px 0;min-height:20px}
+/* User Table */
+.adm-table{width:100%;border-collapse:collapse;font-size:12px}
+.adm-table th{text-align:left;padding:8px 10px;color:#555;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #1a1a1a}
+.adm-table td{padding:8px 10px;border-bottom:1px solid #111;vertical-align:middle}
+.adm-table tr:last-child td{border-bottom:none}
+.adm-table tr:hover td{background:#0d0d0d}
+.adm-act-btn{background:#111;border:1px solid #2a2a2a;color:#888;padding:4px 8px;border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .15s,color .15s}
+.adm-act-btn:hover{border-color:#555;color:#ddd}
+.adm-act-btn.gold:hover{border-color:#ffd700;color:#ffd700}
+.adm-act-btn.red:hover{border-color:#cc0000;color:#ff4444}
+.adm-act-btn.blue:hover{border-color:#3b82f6;color:#60a5fa}
+.adm-act-btn.orange:hover{border-color:#ea580c;color:#fb923c}
+/* Detail panel */
+.adm-detail{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:12px;margin-top:8px;display:none}
+.adm-detail.open{display:block}
+.adm-tip-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;border:1px solid #1a1a1a;margin-bottom:4px;font-size:11px;background:#111}
+.adm-tip-match{flex:1;color:#aaa}
+.adm-tip-score{font-weight:700;color:#ddd;min-width:40px;text-align:center}
+.adm-tip-pts{min-width:28px;text-align:right}
+.adm-tip-pts.p3{color:#16a34a}
+.adm-tip-pts.p1{color:#ca8a04}
+.adm-tip-pts.p0{color:#dc2626}
+.adm-tip-pts.pn{color:#555}
+/* Result form */
+.result-form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.result-form select,.result-form input{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:8px 10px;color:#ddd;font-size:12px;font-family:inherit;outline:none}
+.result-form select:focus,.result-form input:focus{border-color:#ffd700}
+.result-form input[type=number]{width:60px;text-align:center}
+/* Badge */
+.adm-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;display:inline-block}
+.adm-badge.discord{background:#5865f244;color:#818cf8}
+.adm-badge.email{background:#37374744;color:#888}
+.adm-badge.wm{background:#ffd70022;color:#ffd700}
+/* Danger zone */
+.adm-danger{background:#110000;border:1px solid #2a0000;border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.adm-danger h3{color:#ff4444;font-size:13px;margin-bottom:6px}
+.adm-danger p{font-size:11px;color:#666;margin-bottom:10px}
+.adm-danger-btns{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:600px){
+  .adm-table{font-size:11px}
+  .adm-table th:nth-child(3),.adm-table td:nth-child(3){display:none}
+  .adm-table th:nth-child(6),.adm-table td:nth-child(6){display:none}
+  .admin-tools-grid{grid-template-columns:1fr 1fr}
+}
 .admin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
 .admin-head{background:#1a1a1a;border-bottom:3px solid var(--red);padding:11px 18px;display:flex;align-items:center;gap:8px;}
 .admin-head h2{color:#fff;font-size:13px;font-weight:700;}
@@ -739,7 +798,6 @@ function renderHeader(){
     ['spielbaum','🌳 Spielbaum'],
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
-    ['kader','👕 Kader'],
     ['profil','👤 Profil'],
     state.isAdmin?['admin','🔧 Admin']:null,
   ];
@@ -759,7 +817,7 @@ function renderHeader(){
     </a>
     <nav class="topnav">
       ${navItems.filter(Boolean).map(([id,label])=>{
-    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html',kader:'/kader.html'};
+    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html'};
     if(urls[id])return`<a href="${urls[id]}" style="text-decoration:none;${id===state.page?'color:var(--gold);border:1px solid var(--gold);padding:4px 8px;border-radius:5px;':''}">${label}</a>`;
     return`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`;
   }).join('')}
@@ -1249,81 +1307,167 @@ function renderAdmin(){
   if(!state.isAdmin){
     return`<div class="locked-overlay"><div class="lock-icon">🔒</div><h3>Kein Zugriff</h3><p>Nur Administratoren können diese Seite sehen.</p></div>`;
   }
-  return`<div class="admin-page">
-    <div class="admin-notice">⚠️ Admin-Bereich — Änderungen sind sofort wirksam und können nicht rückgängig gemacht werden!</div>
-
-    <div class="admin-danger-zone">
-      <h3>🗑️ Gefahrenzone</h3>
-      <p>Diese Aktionen löschen Daten unwiderruflich. Bitte nur mit Bedacht verwenden!</p>
-      <div class="admin-danger-btns">
-        <button class="danger-btn danger-btn-orange" onclick="adminResetTips()">🔄 Alle Tipps zurücksetzen</button>
-        <button class="danger-btn danger-btn-red" onclick="adminResetUsers()">💥 Alle Nutzer löschen</button>
-      </div>
+  return`<div class="admin-page" style="padding:12px">
+    <div style="background:#1a0a00;border:1px solid #ffd70033;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#ca8a04;display:flex;gap:8px;align-items:center">
+      ⚠️ Admin-Bereich — Änderungen sind sofort wirksam!
     </div>
 
-    <div class="admin-card">
-      <div class="admin-head"><h2>🔄 Live-Scores</h2><span>Ergebnisse von football-data.org abrufen</span></div>
-      <div style="padding:16px 18px;">
-        <button class="save-btn" style="padding:9px 20px;font-size:13px;" onclick="adminFetchScores()">🌐 Scores jetzt abrufen</button>
-        <button class="save-btn" style="padding:9px 20px;font-size:13px;margin-left:8px;background:#1a3a1a;" onclick="adminUpdateBrackets()">🔄 KO-Brackets aktualisieren</button>
-        <button class="save-btn" style="padding:9px 20px;font-size:13px;margin-left:8px;background:#1a0a2a;" onclick="adminEvalChampion()">🏆 Weltmeister auswerten</button>
-        <span id="fetch-scores-msg" style="margin-left:12px;font-size:13px;color:var(--muted);"></span>
-      </div>
-    </div>
-
-    <div class="admin-card">
-      <div class="admin-head"><h2>⚽ Ergebnis eintragen</h2><span>Punkte werden automatisch vergeben</span></div>
-      <div style="padding:16px 18px;">
-        <div class="result-form">
-          <select id="admin-match-sel" style="flex:1;min-width:200px;">
-            <option value="">Spiel auswählen...</option>
-            ${state.matches.filter(m=>m.status!=='done').map(m=>`<option value="${m.id}">${m.home} vs ${m.away} (${m.date})</option>`).join('')}
-          </select>
-          <input type="number" id="admin-home-score" min="0" max="20" placeholder="H" value="0">
-          <span style="font-weight:700;">:</span>
-          <input type="number" id="admin-away-score" min="0" max="20" placeholder="A" value="0">
-          <button class="save-btn" style="padding:7px 16px;font-size:13px;" onclick="adminSetResult()">✅ Eintragen</button>
+    <!-- TOOLS -->
+    <div class="admin-section">
+      <div class="admin-section-head"><h2>🛠️ Live & Brackets</h2><div class="admin-msg" id="fetch-scores-msg"></div></div>
+      <div class="admin-section-body">
+        <div class="admin-tools-grid">
+          <button class="admin-tool-btn green" onclick="adminFetchScores()">🌐 Scores abrufen</button>
+          <button class="admin-tool-btn green" onclick="adminUpdateBrackets()">🔄 KO-Brackets update</button>
+          <button class="admin-tool-btn gold" onclick="adminEvalChampion()">🏆 Weltmeister auswerten</button>
         </div>
       </div>
     </div>
 
-    <div class="admin-card" id="admin-users-card">
-      <div class="admin-head"><h2>👥 Alle Mitspieler</h2><span id="admin-user-count">Wird geladen...</span></div>
-      <div id="admin-users-body" style="padding:8px 0;">Wird geladen...</div>
+    <!-- ERGEBNIS -->
+    <div class="admin-section">
+      <div class="admin-section-head"><h2>⚽ Ergebnis eintragen</h2><span>Punkte werden sofort vergeben</span></div>
+      <div class="admin-section-body">
+        <div class="result-form">
+          <select id="admin-match-sel" style="flex:1;min-width:180px;">
+            <option value="">Spiel auswählen...</option>
+            ${state.matches.filter(m=>m.status!=='done').map(m=>`<option value="${m.id}">${m.home} vs ${m.away} (${m.date})</option>`).join('')}
+          </select>
+          <input type="number" id="admin-home-score" min="0" max="20" value="0" style="width:55px">
+          <span style="font-weight:700;color:#555">:</span>
+          <input type="number" id="admin-away-score" min="0" max="20" value="0" style="width:55px">
+          <button class="admin-tool-btn gold" style="padding:8px 14px" onclick="adminSetResult()">✅ Eintragen</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MITSPIELER -->
+    <div class="admin-section" id="admin-users-card">
+      <div class="admin-section-head">
+        <h2>👥 Mitspieler</h2>
+        <span id="admin-user-count">Wird geladen…</span>
+      </div>
+      <div id="admin-users-body" style="padding:4px 0">
+        <div style="padding:16px;color:#666;font-size:12px">⏳ Wird geladen…</div>
+      </div>
+    </div>
+
+    <!-- GEFAHRENZONE -->
+    <div class="adm-danger">
+      <h3>🗑️ Gefahrenzone</h3>
+      <p>Unwiderrufliche Aktionen — bitte mit Bedacht verwenden!</p>
+      <div class="adm-danger-btns">
+        <button class="admin-tool-btn red" onclick="adminResetTips()">🔄 Alle Tipps reset</button>
+        <button class="admin-tool-btn red" onclick="adminResetUsers()">💥 Alle Nutzer löschen</button>
+      </div>
     </div>
   </div>`;
 }
 
 async function loadAdminUsers(){
   try{
-    const users=await api('/api/admin/users');
+    const users=await api('/api/admin/users-detail');
     const count=document.getElementById('admin-user-count');
     const body=document.getElementById('admin-users-body');
     if(count)count.textContent=users.length+' Mitspieler';
     if(!body)return;
-    if(!users.length){body.innerHTML='<div style="padding:16px;color:var(--muted);font-size:13px;">Noch keine Mitspieler</div>';return;}
-    let html='<table class="admin-table"><thead><tr><th>Avatar</th><th>Anzeigename</th><th>Discord</th><th>Tipps</th><th>Punkte</th><th>Angemeldet</th><th>Aktionen</th></tr></thead><tbody>';
+    if(!users.length){body.innerHTML='<div style="padding:16px;color:#555;font-size:12px">Noch keine Mitspieler</div>';return;}
+    let html=`<div style="overflow-x:auto"><table class="adm-table">
+      <thead><tr>
+        <th></th><th>Name</th><th>Login</th>
+        <th>Tipps</th><th>Punkte</th><th>WM-Tipp</th><th>Datum</th><th style="min-width:280px">Aktionen</th>
+      </tr></thead><tbody>`;
     users.forEach(u=>{
       const col=avatarColor(u.username);
-      const av=u.avatar?`<img src="${u.avatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`:
-        `<div style="width:28px;height:28px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">${initials(u.username)}</div>`;
+      const av=u.avatar
+        ?`<img src="${u.avatar}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid #2a2a2a">`
+        :`<div style="width:28px;height:28px;border-radius:50%;background:${col};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000">${initials(u.username)}</div>`;
       const joined=u.joined_at?u.joined_at.split('T')[0]:'—';
+      const loginBadge=u.discord_id
+        ?`<span class="adm-badge discord">Discord</span>`
+        :`<span class="adm-badge email">E-Mail</span>`;
+      const wmBadge=u.wm_tip
+        ?`<span class="adm-badge wm">🏆 ${u.wm_tip}</span>`
+        :`<span style="color:#333;font-size:10px">—</span>`;
       html+=`<tr>
         <td>${av}</td>
-        <td><strong>${u.username}</strong></td>
-        <td style="color:var(--muted);font-size:12px;">${u.discord_id||'E-Mail'}</td>
-        <td>${u.tips}</td>
-        <td><strong>${u.points}</strong></td>
-        <td style="font-size:12px;color:var(--muted);">${joined}</td>
-        <td style="display:flex;gap:5px;">
-          <button class="admin-btn admin-btn-gold" onclick="adminResetUserTips(${u.id},'${u.username}')">Tipps reset</button>
-          <button class="admin-btn admin-btn-red" onclick="adminDeleteUser(${u.id},'${u.username}')">Löschen</button>
+        <td><strong style="color:#ddd">${u.username}</strong>${u.email?`<div style="font-size:10px;color:#444">${u.email}</div>`:''}</td>
+        <td>${loginBadge}</td>
+        <td style="color:#888">${u.tips}</td>
+        <td><strong style="color:#ffd700">${u.points}</strong>${u.wm_points?`<span style="color:#ffd70066;font-size:10px"> +${u.wm_points}</span>`:''}</td>
+        <td>${wmBadge}</td>
+        <td style="color:#444;font-size:11px">${joined}</td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="adm-act-btn gold" onclick="adminShowUserTips(${u.id},'${u.username}')">📋 Tipps</button>
+            <button class="adm-act-btn orange" onclick="adminResetUserTips(${u.id},'${u.username}')">🔄 Alle Tipps</button>
+            <button class="adm-act-btn orange" onclick="adminResetWmChampion(${u.id},'${u.username}')">🏆 WM-Tipp</button>
+            <button class="adm-act-btn blue" onclick="adminResetPassword(${u.id},'${u.username}')">🔑 Passwort</button>
+            <button class="adm-act-btn red" onclick="adminDeleteUser(${u.id},'${u.username}')">🗑️ Löschen</button>
+          </div>
+          <div class="adm-detail" id="tips-detail-${u.id}"></div>
         </td>
       </tr>`;
     });
-    html+='</tbody></table>';
+    html+='</tbody></table></div>';
     body.innerHTML=html;
   }catch(e){console.error(e);}
+}
+
+async function adminShowUserTips(id,name){
+  const panel=document.getElementById(`tips-detail-${id}`);
+  if(!panel)return;
+  if(panel.classList.contains('open')){panel.classList.remove('open');return;}
+  panel.classList.add('open');
+  panel.innerHTML='<div style="color:#555;font-size:11px;padding:4px">⏳ Lade Tipps…</div>';
+  try{
+    const tips=await api(`/api/admin/user-tips/${id}`);
+    if(!tips.length){panel.innerHTML='<div style="color:#555;font-size:11px;padding:4px">Noch keine Tipps abgegeben</div>';return;}
+    let html=`<div style="font-size:10px;color:#555;margin-bottom:6px;font-weight:700;padding:4px 0">${name} — ${tips.length} Tipps</div>`;
+    tips.forEach(t=>{
+      const pts=t.points;
+      const ptsClass=pts===3?'p3':pts===1?'p1':pts===0?'p0':'pn';
+      const ptsLabel=pts===null||pts===undefined?'—':(pts>0?'+':'')+pts;
+      const result=t.home_score!==null&&t.home_score!==undefined?`${t.home_score}:${t.away_score}`:'offen';
+      html+=`<div class="adm-tip-row">
+        <div class="adm-tip-match">${t.home_team} vs ${t.away_team} <span style="color:#2a2a2a">(Gr.${t.group_name})</span></div>
+        <div class="adm-tip-score">Tipp: ${t.home_tip}:${t.away_tip}</div>
+        <div style="font-size:10px;color:#444;min-width:55px">Erg: ${result}</div>
+        <div class="adm-tip-pts ${ptsClass}">${ptsLabel} Pkt</div>
+        <button class="adm-act-btn red" style="padding:2px 6px;font-size:9px" onclick="adminDeleteTip(${t.id},${id},'${name}')">✕</button>
+      </div>`;
+    });
+    panel.innerHTML=html;
+  }catch(e){panel.innerHTML=`<div style="color:#cc0000;font-size:11px">Fehler: ${e.message}</div>`;}
+}
+
+async function adminDeleteTip(tipId,userId,name){
+  if(!confirm(`Diesen einzelnen Tipp von "${name}" löschen?`))return;
+  try{
+    await api(`/api/admin/tip/${tipId}`,{method:'DELETE'});
+    await adminShowUserTips(userId,name);
+    const panel=document.getElementById(`tips-detail-${userId}`);
+    if(panel){panel.classList.remove('open');setTimeout(()=>{panel.classList.add('open');adminShowUserTips(userId,name);},50);}
+    await loadAdminUsers();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminResetWmChampion(id,name){
+  if(!confirm(`WM-Tipp von "${name}" zurücksetzen? Der User kann danach neu tippen.`))return;
+  try{
+    await api(`/api/admin/reset-wm-champion/${id}`,{method:'POST'});
+    await loadAdminUsers();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function adminResetPassword(id,name){
+  const pw=prompt(`Neues Passwort für "${name}" (mind. 6 Zeichen):`);
+  if(!pw)return;
+  if(pw.length<6){alert('Passwort muss mind. 6 Zeichen haben!');return;}
+  try{
+    await api(`/api/admin/reset-password/${id}`,{method:'POST',body:JSON.stringify({password:pw})});
+    alert(`✅ Passwort für "${name}" wurde geändert!`);
+  }catch(e){alert('Fehler: '+e.message);}
 }
 
 async function adminDeleteUser(id,name){
@@ -1337,7 +1481,7 @@ async function adminDeleteUser(id,name){
 }
 
 async function adminResetUserTips(id,name){
-  if(!confirm(`Alle Tipps von "${name}" zurücksetzen?`))return;
+  if(!confirm(`ALLE Tipps von "${name}" zurücksetzen?`))return;
   try{
     await api(`/api/admin/reset-user-tips/${id}`,{method:'POST'});
     await loadAdminUsers();
@@ -1392,32 +1536,32 @@ async function adminEvalChampion(){
     const r=await api('/api/admin/evaluate-champion',{method:'POST',body:JSON.stringify({winner})});
     if(msg)msg.textContent=`✅ ${r.evaluated} Tipps ausgewertet`;
     setTimeout(()=>{if(msg)msg.textContent=''},4000);
-  }catch(e){if(msg)msg.textContent='❌ '+e.message}
+  }catch(e){if(msg)msg.textContent='❌ '+e.message;}
 }
+
 async function adminUpdateBrackets(){
-  const msg=document.getElementById("fetch-scores-msg");
-  if(msg)msg.textContent="Aktualisiere KO-Brackets...";
+  const msg=document.getElementById('fetch-scores-msg');
+  if(msg)msg.textContent='Aktualisiere KO-Brackets...';
   try{
-    const r=await api("/api/admin/update-brackets",{method:"POST"});
-    if(msg)msg.textContent=`✅ Aktualisiert: ${(r.updated||[]).join(', ')||'Keine Änderungen'}`;
-    setTimeout(()=>{if(msg)msg.textContent="";},4000);
-  }catch(e){if(msg)msg.textContent="❌ Fehler: "+e.message;}
+    const r=await api('/api/admin/update-brackets',{method:'POST'});
+    if(msg)msg.textContent=`✅ ${(r.updated||[]).join(', ')||'Keine Änderungen'}`;
+    setTimeout(()=>{if(msg)msg.textContent='';},4000);
+  }catch(e){if(msg)msg.textContent='❌ '+e.message;}
 }
 
 async function adminFetchScores(){
-  const msg=document.getElementById("fetch-scores-msg");
-  if(msg)msg.textContent="Wird abgerufen...";
+  const msg=document.getElementById('fetch-scores-msg');
+  if(msg)msg.textContent='Wird abgerufen...';
   try{
-    await api("/api/admin/fetch-scores",{method:"POST"});
-    state.matches=await api("/api/matches");
-    if(msg)msg.textContent="✅ Erfolgreich abgerufen!";
-    setTimeout(()=>{if(msg)msg.textContent="";},3000);
+    await api('/api/admin/fetch-scores',{method:'POST'});
+    state.matches=await api('/api/matches');
+    if(msg)msg.textContent='✅ Erfolgreich abgerufen!';
+    setTimeout(()=>{if(msg)msg.textContent='';},3000);
     render();
     setTimeout(loadAdminUsers,500);
-  }catch(e){
-    if(msg)msg.textContent="❌ Fehler: "+e.message;
-  }
+  }catch(e){if(msg)msg.textContent='❌ '+e.message;}
 }
+
 
 function renderLogin(){
   if(state.authStep==='discord'){
@@ -1916,7 +2060,6 @@ init();
     <a href="/spielbaum.html"><span>🌳</span><span>Spielbaum</span></a>
     <a href="/tabelle.html"><span>🏆</span><span>Tabelle</span></a>
     <a href="/auswertung.html"><span>📊</span><span>Auswertung</span></a>
-    <a href="/kader.html"><span>👕</span><span>Kader</span></a>
     <a href="/profil.html"><span>👤</span><span>Profil</span></a>
   </div>
 </div>
