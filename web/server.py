@@ -821,72 +821,6 @@ async def admin_reset_user_tips(user_id: int, request: Request):
         await db.execute("DELETE FROM tips WHERE user_id=$1", user_id)
     return {"ok": True}
 
-@app.get("/api/admin/user-tips/{user_id}")
-async def admin_get_user_tips(user_id: int, request: Request):
-    """Alle Tipps eines Users laden (inkl. Spielinfo)."""
-    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
-    async with pool.acquire() as db:
-        rows = await db.fetch("""
-            SELECT t.id, t.home_tip, t.away_tip, t.points, t.evaluated_at,
-                   m.home_team, m.away_team, m.match_date, m.group_name, m.status,
-                   m.home_score, m.away_score
-            FROM tips t
-            JOIN matches m ON t.match_id = m.id
-            WHERE t.user_id = $1
-            ORDER BY m.match_date, m.id
-        """, user_id)
-    return [dict(r) for r in rows]
-
-@app.delete("/api/admin/tip/{tip_id}")
-async def admin_delete_single_tip(tip_id: int, request: Request):
-    """Einzelnen Tipp löschen."""
-    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
-    async with pool.acquire() as db:
-        await db.execute("DELETE FROM tips WHERE id=$1", tip_id)
-    return {"ok": True}
-
-@app.post("/api/admin/reset-wm-champion/{user_id}")
-async def admin_reset_wm_champion(user_id: int, request: Request):
-    """WM-Tipp eines Users zurücksetzen."""
-    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
-    async with pool.acquire() as db:
-        await db.execute("DELETE FROM wm_champions WHERE user_id=$1", user_id)
-    return {"ok": True}
-
-@app.post("/api/admin/reset-password/{user_id}")
-async def admin_reset_password(user_id: int, request: Request):
-    """Passwort eines Users zurücksetzen."""
-    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
-    body = await request.json()
-    new_password = body.get("password", "")
-    if len(new_password) < 6:
-        raise HTTPException(400, "Passwort muss mindestens 6 Zeichen haben")
-    pw_hash = hash_pw(new_password)
-    async with pool.acquire() as db:
-        result = await db.execute(
-            "UPDATE users SET password_hash=$1 WHERE id=$2", pw_hash, user_id)
-    return {"ok": True}
-
-@app.get("/api/admin/users-detail")
-async def admin_users_detail(request: Request):
-    """Erweiterte Userliste mit WM-Tipp."""
-    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
-    async with pool.acquire() as db:
-        rows = await db.fetch("""
-            SELECT u.id, u.username, u.email, u.discord_id, u.avatar,
-                   u.joined_at,
-                   COUNT(t.id) as tips,
-                   COALESCE(SUM(t.points),0) as points,
-                   wc.champion as wm_tip,
-                   wc.points as wm_points
-            FROM users u
-            LEFT JOIN tips t ON t.user_id = u.id
-            LEFT JOIN wm_champions wc ON wc.user_id = u.id
-            GROUP BY u.id, u.username, u.email, u.discord_id, u.avatar, u.joined_at, wc.champion, wc.points
-            ORDER BY points DESC
-        """)
-    return [dict(r) for r in rows]
-
 @app.post("/api/admin/result")
 async def admin_set_result(request: Request):
     if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
@@ -921,5 +855,312 @@ async def admin_get_matches(request: Request):
 @app.get("/api/admin/check")
 async def admin_check(request: Request):
     return {"is_admin": await is_admin(request)}
+
+# ══════════════════════════════════════════════════════════════════
+# ERWEITERTES ADMIN-SYSTEM
+# Bot (bot/) bleibt vollständig unverändert.
+# Nur neue Web-API-Endpoints für Admin-Panel.
+# ══════════════════════════════════════════════════════════════════
+
+import time as _time
+
+# ── Discord Bot Token + Channel IDs (nur für Broadcast via API) ───
+DISCORD_TOKEN     = os.environ.get("DISCORD_TOKEN", "")
+STAND_CHANNEL_ID       = os.environ.get("STAND_CHANNEL_ID", "")
+ERINNERUNGEN_CHANNEL_ID = os.environ.get("ERINNERUNGEN_CHANNEL_ID", "")
+TEILNEHMER_CHANNEL_ID  = os.environ.get("TEILNEHMER_CHANNEL_ID", "")
+
+# ── Kader-Cache ───────────────────────────────────────────────────
+_kader_cache: dict = {}
+KADER_CACHE_TTL = 3600 * 6  # 6 Stunden
+
+TEAM_ID_MAP = {
+    "ger":759,"fra":773,"esp":760,"eng":770,"por":765,"ned":779,"bel":805,
+    "ita":784,"cro":799,"swi":788,"den":782,"tur":803,"ukr":790,"prt":798,
+    "alb":1036,"arg":762,"bra":764,"uru":803,"col":769,"chi":801,"per":796,
+    "mex":791,"mex2":780,"par":780,"ven":802,"brz2":800,"usa":768,"can":772,
+    "nzl2":814,"sen":907,"mar":1030,"nig":910,"egy":922,"cmr":904,"civ":892,
+    "tun":924,"saf":911,"uga":928,"egy2":897,"jap":827,"kor":832,"aus":835,
+    "ksa":833,"irq":831,"irn":820,"nzl":829,"nkr":824,"mex3":791,
+}
+
+def _calc_age_admin(dob):
+    if not dob: return 0
+    try:
+        from datetime import date
+        b=date.fromisoformat(dob[:10]); t=date.today()
+        return t.year-b.year-((t.month,t.day)<(b.month,b.day))
+    except: return 0
+
+def _pos_group_admin(pos):
+    pos=(pos or "").upper()
+    if pos=="GOALKEEPER": return "tor"
+    if any(x in pos for x in ("BACK","DEFENCE","DEFENDER")): return "abwehr"
+    if any(x in pos for x in ("FORWARD","WINGER","OFFENCE","STRIKER","ATTACKER")): return "sturm"
+    return "mittelfeld"
+
+@app.get("/api/kader/{team_id}")
+async def get_kader(team_id: str):
+    """Kader live von football-data.org mit 6h Cache."""
+    cached=_kader_cache.get(team_id)
+    if cached and (_time.time()-cached["fetched_at"])<KADER_CACHE_TTL:
+        return cached["data"]
+    fd_id=TEAM_ID_MAP.get(team_id)
+    if not fd_id: return {"error":"Team nicht gefunden","source":"not_found"}
+    if not FOOTBALL_API_KEY: return {"error":"Kein API Key","source":"no_key"}
+    try:
+        async with httpx.AsyncClient() as client:
+            r=await client.get(f"{FOOTBALL_API_URL}/teams/{fd_id}",
+                headers={"X-Auth-Token":FOOTBALL_API_KEY},timeout=10)
+        if r.status_code==429: return {"error":"Rate Limit","source":"rate_limit"}
+        if r.status_code!=200: return {"error":f"API Fehler {r.status_code}","source":"api_error"}
+        data=r.json(); squad=data.get("squad",[])
+        if not squad: return {"error":"Kein Kader","source":"empty","team":data.get("name","")}
+        grouped={"tor":[],"abwehr":[],"mittelfeld":[],"sturm":[]}
+        for p in squad:
+            grouped[_pos_group_admin(p.get("position",""))].append({
+                "nr":p.get("shirtNumber") or "","name":p.get("name",""),"club":"",
+                "age":_calc_age_admin(p.get("dateOfBirth","")),"dob":(p.get("dateOfBirth","") or "")[:10],
+                "nationality":p.get("nationality",""),"position":p.get("position",""),
+            })
+        for g in grouped.values():
+            g.sort(key=lambda x:(not x["nr"] and x["nr"]!=0,x["nr"] or 99))
+        result={"source":"api","team_name":data.get("name",""),
+            "trainer":(data.get("coach") or {}).get("name",""),
+            "squad":grouped,"fetched_at":int(_time.time())}
+        _kader_cache[team_id]={"data":result,"fetched_at":_time.time()}
+        return result
+    except httpx.TimeoutException: return {"error":"Timeout","source":"timeout"}
+    except Exception as e: return {"error":str(e),"source":"exception"}
+
+@app.delete("/api/admin/kader-cache")
+async def clear_kader_cache(request: Request):
+    if not await is_admin(request): return Response(status_code=403)
+    _kader_cache.clear()
+    return {"ok":True,"cleared":True}
+
+# ── User-Detail Endpoint ──────────────────────────────────────────
+@app.get("/api/admin/users-detail")
+async def admin_users_detail(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows=await db.fetch("""
+            SELECT u.id,u.username,u.email,u.discord_id,u.avatar,u.joined_at,
+                   COUNT(t.id) as tips,
+                   COALESCE(SUM(CASE WHEN t.points IS NOT NULL THEN t.points ELSE 0 END),0) as points,
+                   COUNT(CASE WHEN t.points=3 THEN 1 END) as exact_tips,
+                   COUNT(CASE WHEN t.points=1 THEN 1 END) as tend_tips,
+                   COUNT(CASE WHEN t.points=0 THEN 1 END) as wrong_tips,
+                   wc.champion as wm_tip,wc.points as wm_points
+            FROM users u
+            LEFT JOIN tips t ON t.user_id=u.id
+            LEFT JOIN wm_champions wc ON wc.user_id=u.id
+            GROUP BY u.id,u.username,u.email,u.discord_id,u.avatar,u.joined_at,wc.champion,wc.points
+            ORDER BY points DESC
+        """)
+    return [dict(r) for r in rows]
+
+# ── Einzelner Tipp eines Users ────────────────────────────────────
+@app.get("/api/admin/user-tips/{user_id}")
+async def admin_get_user_tips(user_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows=await db.fetch("""
+            SELECT t.id,t.home_tip,t.away_tip,t.points,t.evaluated_at,
+                   m.home_team,m.away_team,m.match_date,m.group_name,
+                   m.status,m.home_score,m.away_score
+            FROM tips t JOIN matches m ON t.match_id=m.id
+            WHERE t.user_id=$1 ORDER BY m.match_date,t.id
+        """,user_id)
+    return [dict(r) for r in rows]
+
+@app.delete("/api/admin/tip/{tip_id}")
+async def admin_delete_single_tip(tip_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        await db.execute("DELETE FROM tips WHERE id=$1",tip_id)
+    return {"ok":True}
+
+@app.post("/api/admin/reset-wm-champion/{user_id}")
+async def admin_reset_wm_champion(user_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        await db.execute("DELETE FROM wm_champions WHERE user_id=$1",user_id)
+    return {"ok":True}
+
+@app.post("/api/admin/reset-password/{user_id}")
+async def admin_reset_password(user_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    body=await request.json()
+    pw=body.get("password","")
+    if len(pw)<6: raise HTTPException(400,"Passwort zu kurz")
+    async with pool.acquire() as db:
+        await db.execute("UPDATE users SET password_hash=$1 WHERE id=$2",hash_pw(pw),user_id)
+    return {"ok":True}
+
+# ── Dashboard ─────────────────────────────────────────────────────
+@app.get("/api/admin/dashboard")
+async def admin_dashboard(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        users_count    = await db.fetchval("SELECT COUNT(*) FROM users")
+        tips_total     = await db.fetchval("SELECT COUNT(*) FROM tips")
+        tips_evaluated = await db.fetchval("SELECT COUNT(*) FROM tips WHERE points IS NOT NULL")
+        matches_done   = await db.fetchval("SELECT COUNT(*) FROM matches WHERE status='done'")
+        matches_live   = await db.fetchval("SELECT COUNT(*) FROM matches WHERE status='live'")
+        matches_open   = await db.fetchval("SELECT COUNT(*) FROM matches WHERE status='open'")
+        matches_total  = await db.fetchval("SELECT COUNT(*) FROM matches")
+        wm_tips        = await db.fetchval("SELECT COUNT(*) FROM wm_champions")
+        exact_tips     = await db.fetchval("SELECT COUNT(*) FROM tips WHERE points=3")
+        tend_tips      = await db.fetchval("SELECT COUNT(*) FROM tips WHERE points=1")
+        wrong_tips     = await db.fetchval("SELECT COUNT(*) FROM tips WHERE points=0")
+        top_scorer     = await db.fetchrow("""
+            SELECT u.username,u.avatar,
+                   COALESCE(SUM(t.points),0)+COALESCE(MAX(wc.points),0) as pts
+            FROM users u
+            LEFT JOIN tips t ON t.user_id=u.id
+            LEFT JOIN wm_champions wc ON wc.user_id=u.id
+            GROUP BY u.id,u.username,u.avatar ORDER BY pts DESC LIMIT 1
+        """)
+    return {
+        "users":users_count,"tips_total":tips_total,"tips_evaluated":tips_evaluated,
+        "matches_done":matches_done,"matches_live":matches_live,
+        "matches_open":matches_open,"matches_total":matches_total,
+        "wm_tips":wm_tips,"exact_tips":exact_tips,"tend_tips":tend_tips,"wrong_tips":wrong_tips,
+        "top_scorer":dict(top_scorer) if top_scorer else None,
+        "api_key_set":bool(FOOTBALL_API_KEY),"web_url":WEB_URL,
+    }
+
+# ── Alle Spiele (inkl. Tipp-Anzahl) ──────────────────────────────
+@app.get("/api/admin/all-matches")
+async def admin_all_matches(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows=await db.fetch("""
+            SELECT m.id,m.home_team,m.away_team,m.match_date,m.match_time,
+                   m.group_name,m.status,m.home_score,m.away_score,
+                   COUNT(t.id) as tip_count
+            FROM matches m LEFT JOIN tips t ON t.match_id=m.id
+            GROUP BY m.id ORDER BY m.match_date,m.match_time
+        """)
+    return [dict(r) for r in rows]
+
+@app.post("/api/admin/match-status/{match_id}")
+async def admin_set_match_status(match_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    body=await request.json()
+    status=body.get("status")
+    if status not in ("open","live","done"): raise HTTPException(400,"Ungültiger Status")
+    async with pool.acquire() as db:
+        await db.execute("UPDATE matches SET status=$1 WHERE id=$2",status,match_id)
+    return {"ok":True}
+
+@app.post("/api/admin/recalculate/{match_id}")
+async def admin_recalculate_match(match_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        m=await db.fetchrow("SELECT home_score,away_score FROM matches WHERE id=$1 AND status='done'",match_id)
+        if not m: raise HTTPException(404,"Spiel nicht abgeschlossen")
+        hs,as_=m["home_score"],m["away_score"]
+        await db.execute("UPDATE tips SET points=NULL,evaluated_at=NULL WHERE match_id=$1",match_id)
+        tips=await db.fetch("SELECT id,home_tip,away_tip FROM tips WHERE match_id=$1",match_id)
+        for tip in tips:
+            ht,at=tip["home_tip"],tip["away_tip"]
+            if ht==hs and at==as_: pts=3
+            elif (ht>at and hs>as_) or (ht<at and hs<as_) or (ht==at and hs==as_): pts=1
+            else: pts=0
+            await db.execute("UPDATE tips SET points=$1,evaluated_at=NOW() WHERE id=$2",pts,tip["id"])
+    return {"ok":True,"recalculated":len(tips)}
+
+@app.get("/api/admin/match-tips/{match_id}")
+async def admin_match_tips(match_id: int, request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows=await db.fetch("""
+            SELECT u.username,u.avatar,t.home_tip,t.away_tip,t.points
+            FROM tips t JOIN users u ON t.user_id=u.id
+            WHERE t.match_id=$1 ORDER BY t.points DESC NULLS LAST
+        """,match_id)
+    return [dict(r) for r in rows]
+
+# ── Tipp-Statistiken ──────────────────────────────────────────────
+@app.get("/api/admin/tip-stats")
+async def admin_tip_stats(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows=await db.fetch("""
+            SELECT m.id,m.home_team,m.away_team,m.match_date,m.group_name,
+                   m.status,m.home_score,m.away_score,
+                   COUNT(t.id) as tips,
+                   COUNT(CASE WHEN t.points=3 THEN 1 END) as exact_count,
+                   COUNT(CASE WHEN t.points=1 THEN 1 END) as tend_count,
+                   COUNT(CASE WHEN t.points=0 THEN 1 END) as wrong_count
+            FROM matches m LEFT JOIN tips t ON t.match_id=m.id
+            GROUP BY m.id ORDER BY m.match_date,m.match_time
+        """)
+    return [dict(r) for r in rows]
+
+# ── System-Info ───────────────────────────────────────────────────
+@app.get("/api/admin/system")
+async def admin_system_info(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    import sys,platform
+    async with pool.acquire() as db:
+        db_size=await db.fetchval("SELECT pg_size_pretty(pg_database_size(current_database()))")
+        tables=await db.fetch("""
+            SELECT tablename,
+                   pg_size_pretty(pg_total_relation_size(tablename::regclass)) as size
+            FROM pg_tables WHERE schemaname='public' ORDER BY tablename
+        """)
+    return {
+        "python_version":sys.version[:50],
+        "platform":platform.platform()[:60],
+        "db_size":db_size,
+        "tables":[dict(r) for r in tables],
+        "kader_cache_entries":len(_kader_cache),
+        "football_api":bool(FOOTBALL_API_KEY),
+        "discord_oauth":bool(DISCORD_CLIENT_ID),
+        "discord_bot":bool(DISCORD_TOKEN),
+        "web_url":WEB_URL,
+        "admin_ids":ADMIN_DISCORD_IDS,
+    }
+
+# ── Discord Broadcast (via Bot-Token, Bot selbst bleibt unverändert) ──
+@app.get("/api/admin/discord-channels")
+async def admin_discord_channels(request: Request):
+    if not await is_admin(request): raise HTTPException(403)
+    return {
+        "stand":STAND_CHANNEL_ID,
+        "erinnerungen":ERINNERUNGEN_CHANNEL_ID,
+        "teilnehmer":TEILNEHMER_CHANNEL_ID,
+        "token_set":bool(DISCORD_TOKEN),
+    }
+
+@app.post("/api/admin/discord-broadcast")
+async def admin_discord_broadcast(request: Request):
+    """
+    Sendet eine Nachricht in einen Discord-Channel via Bot-Token.
+    Der Bot selbst (bot/) bleibt vollständig unverändert.
+    Nur der Token wird hier zur direkten REST-API-Anfrage genutzt.
+    """
+    if not await is_admin(request): raise HTTPException(403)
+    if not DISCORD_TOKEN: raise HTTPException(400,"Kein Discord Token konfiguriert")
+    body=await request.json()
+    channel_id=body.get("channel_id","").strip()
+    message=body.get("message","").strip()
+    if not channel_id: raise HTTPException(400,"channel_id fehlt")
+    if not message: raise HTTPException(400,"message fehlt")
+    if len(message)>2000: raise HTTPException(400,"Nachricht zu lang (max 2000 Zeichen)")
+    try:
+        async with httpx.AsyncClient() as client:
+            r=await client.post(
+                f"https://discord.com/api/v10/channels/{channel_id}/messages",
+                headers={"Authorization":f"Bot {DISCORD_TOKEN}","Content-Type":"application/json"},
+                json={"content":message},timeout=10)
+        if r.status_code in (200,201):
+            return {"ok":True,"message_id":r.json().get("id")}
+        return {"ok":False,"error":f"Discord API: {r.status_code}","detail":r.text[:200]}
+    except Exception as e:
+        raise HTTPException(500,str(e))
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
