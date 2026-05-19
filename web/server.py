@@ -490,12 +490,316 @@ async def live_update_loop():
         await close_expired_tips()
         await fetch_live_scores()
 
+# ══════════════════════════════════════════════════════════════════
+# DISCORD BOT FUNKTIONEN
+# ══════════════════════════════════════════════════════════════════
+
+async def discord_send(channel_id: str, message: str):
+    """Sendet eine Nachricht in einen Discord-Channel via Bot-Token."""
+    if not DISCORD_TOKEN or not channel_id:
+        return False
+    try:
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                f"https://discord.com/api/v10/channels/{channel_id}/messages",
+                headers={"Authorization": f"Bot {DISCORD_TOKEN}", "Content-Type": "application/json"},
+                json={"content": message},
+                timeout=10
+            )
+        return r.status_code in (200, 201)
+    except Exception as e:
+        print(f"[Bot] Discord send error: {e}")
+        return False
+
+async def bot_send_welcome(username: str, discord_id: str):
+    """Begruest einen neuen Mitspieler im Teilnehmer-Channel mit Discord Embed."""
+    if not TEILNEHMER_CHANNEL_ID or not DISCORD_TOKEN:
+        return
+    try:
+        # Mention wenn Discord-User, sonst nur Name
+        mention = "<@" + discord_id + ">" if discord_id else "**" + username + "**"
+
+        # Discord Embed — wie die alte Bot-Nachricht
+        embed = {
+            "title": "🎉 Neuer Mitspieler!",
+            "description": (
+                mention + " **" + username + "** ist dem WM 2026 Tippspiel von "
+                "Manelo98 beigetreten. Viel Glück und vor allem Spaß! 🍀⚽"
+            ),
+            "color": 0xFFD700,  # Gold
+            "url": "https://www.manelo98-league.de",
+            "fields": [
+                {
+                    "name": "🌐 Zum Tippspiel",
+                    "value": "[https://www.manelo98-league.de](https://www.manelo98-league.de)",
+                    "inline": False
+                }
+            ],
+            "footer": {
+                "text": "Fanclub Manelo98 | WM Tippspiel 2026"
+            }
+        }
+
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                "https://discord.com/api/v10/channels/" + TEILNEHMER_CHANNEL_ID + "/messages",
+                headers={
+                    "Authorization": "Bot " + DISCORD_TOKEN,
+                    "Content-Type": "application/json"
+                },
+                json={"embeds": [embed]},
+                timeout=10
+            )
+        if r.status_code not in (200, 201):
+            print("[Bot] Welcome embed error: " + str(r.status_code) + " " + r.text[:100])
+    except Exception as e:
+        print("[Bot] Welcome error: " + str(e))
+
+async def bot_post_standings(is_morning: bool = True):
+    """Postet den kompletten Stand als Discord Embed."""
+    if not STAND_CHANNEL_ID or not pool or not DISCORD_TOKEN:
+        return
+    try:
+        from datetime import date as _date
+        today_str = _date.today().strftime("%d.%m.%Y")
+        title_prefix = "📊 🌅 Morgendlicher" if is_morning else "📊 🌆 Abendlicher"
+
+        async with pool.acquire() as db:
+            # Top 3 Spieler mit Punkten und Tipp-Anzahl
+            rows = await db.fetch("""
+                SELECT u.username,
+                       COALESCE(SUM(t.points), 0) + COALESCE(MAX(wc.points), 0) as pts,
+                       COUNT(t.id) as tip_count
+                FROM users u
+                LEFT JOIN tips t ON t.user_id = u.id
+                LEFT JOIN wm_champions wc ON wc.user_id = u.id
+                GROUP BY u.id, u.username
+                ORDER BY pts DESC, tip_count DESC
+                LIMIT 3
+            """)
+            # Nächste 3 Spiele
+            next_matches = await db.fetch("""
+                SELECT home_team, away_team, match_date, match_time
+                FROM matches
+                WHERE status = 'open'
+                ORDER BY match_date, match_time
+                LIMIT 3
+            """)
+            # Spiele gespielt
+            done_count = await db.fetchval("SELECT COUNT(*) FROM matches WHERE status = 'done'") or 0
+
+        if not rows:
+            return
+
+        # Spieler-Liste aufbauen
+        medals = ["🥇", "🥈", "🥉"]
+        player_lines = []
+        for i, row in enumerate(rows):
+            medal = medals[i] if i < 3 else str(i + 1) + "."
+            uname = str(row["username"])
+            pts = str(row["pts"])
+            tips = str(row["tip_count"])
+            player_lines.append(
+                medal + " **" + uname + "** — " + pts + " Punkte *" + tips + " Tipps*"
+            )
+        players_text = "\n".join(player_lines)
+
+        # Nächste Spiele aufbauen
+        match_lines = []
+        for m in next_matches:
+            home = str(m["home_team"])
+            away = str(m["away_team"])
+            d = str(m["match_date"]).replace("-", ".")
+            # Datum umformatieren DD.MM.YYYY
+            parts_d = d.split(".")
+            if len(parts_d) == 3:
+                d = parts_d[2] + "." + parts_d[1] + "." + parts_d[0]
+            t = str(m["match_time"])[:5] if m["match_time"] else "00:00"
+            match_lines.append("⚽ **" + home + "** vs **" + away + "** — " + d + " " + t + " Uhr")
+        matches_text = "\n".join(match_lines) if match_lines else "Keine offenen Spiele"
+
+        embed = {
+            "title": title_prefix + " Tippspiel-Stand",
+            "color": 0xFFD700,
+            "fields": [
+                {
+                    "name": "\u200b",
+                    "value": players_text,
+                    "inline": False
+                },
+                {
+                    "name": "📈 Turnier",
+                    "value": str(done_count) + " Spiele gespielt",
+                    "inline": False
+                },
+                {
+                    "name": "📅 Nächste Spiele",
+                    "value": matches_text,
+                    "inline": False
+                },
+                {
+                    "name": "🌐 Vollständige Tabelle",
+                    "value": "[Zum Tippspiel](https://www.manelo98-league.de/tabelle.html)",
+                    "inline": False
+                }
+            ],
+            "footer": {
+                "text": "Fanclub Manelo98 | " + today_str
+            }
+        }
+
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                "https://discord.com/api/v10/channels/" + STAND_CHANNEL_ID + "/messages",
+                headers={
+                    "Authorization": "Bot " + DISCORD_TOKEN,
+                    "Content-Type": "application/json"
+                },
+                json={"embeds": [embed]},
+                timeout=10
+            )
+        if r.status_code not in (200, 201):
+            print("[Bot] Standings embed error: " + str(r.status_code))
+    except Exception as e:
+        print("[Bot] Standings error: " + str(e))
+
+async def bot_send_reminders():
+    """Sendet Tipp-Erinnerungen als Embed fuer Spiele die in ~60 Min beginnen."""
+    if not ERINNERUNGEN_CHANNEL_ID or not pool or not DISCORD_TOKEN:
+        return
+    try:
+        from datetime import date as _date
+        today_str = _date.today().strftime("%d.%m.%Y")
+
+        async with pool.acquire() as db:
+            rows = await db.fetch("""
+                SELECT m.id, m.home_team, m.away_team,
+                       m.match_date, m.match_time, m.group_name
+                FROM matches m
+                WHERE m.status = 'open'
+                AND (m.match_date::text || ' ' || COALESCE(m.match_time::text, '00:00:00'))::timestamp
+                    BETWEEN NOW() + INTERVAL '50 minutes'
+                    AND NOW() + INTERVAL '70 minutes'
+            """)
+            if not rows:
+                return
+
+            # Wie viele User haben noch NICHT getippt?
+            for match in rows:
+                match_id = match["id"]
+                if match_id in _reminder_sent_matches:
+                    continue
+                _reminder_sent_matches.add(match_id)
+
+                home = str(match["home_team"])
+                away = str(match["away_team"])
+                group = str(match["group_name"] or "")
+                time_str = str(match["match_time"])[:5] if match["match_time"] else "00:00"
+
+                # Datum formatieren
+                d = str(match["match_date"])
+                parts_d = d.split("-")
+                if len(parts_d) == 3:
+                    d_fmt = parts_d[2] + "." + parts_d[1] + "." + parts_d[0]
+                else:
+                    d_fmt = d
+
+                group_str = " | Gruppe " + group if group else ""
+
+                # Wie viele haben getippt vs. gesamt?
+                tip_count = await db.fetchval(
+                    "SELECT COUNT(*) FROM tips WHERE match_id=$1", match_id
+                ) or 0
+                total_users = await db.fetchval("SELECT COUNT(*) FROM users") or 0
+                missing = total_users - tip_count
+
+                embed = {
+                    "title": "⏰ Tipp-Erinnerung!",
+                    "description": (
+                        "In ca. **1 Stunde** beginnt ein neues Spiel — "
+                        "noch nicht getippt? Jetzt schnell!"
+                    ),
+                    "color": 0xCC0000,
+                    "fields": [
+                        {
+                            "name": "⚽ Spiel",
+                            "value": "**" + home + "** vs **" + away + "**" + group_str,
+                            "inline": False
+                        },
+                        {
+                            "name": "🕐 Anpfiff",
+                            "value": d_fmt + " um **" + time_str + " Uhr**",
+                            "inline": True
+                        },
+                        {
+                            "name": "📊 Tipps abgegeben",
+                            "value": str(tip_count) + " von " + str(total_users) + " Spielern" +
+                                     (" (" + str(missing) + " fehlen noch!)" if missing > 0 else " ✅"),
+                            "inline": True
+                        },
+                        {
+                            "name": "🌐 Jetzt tippen",
+                            "value": "[Zum Spielplan](https://www.manelo98-league.de/spielplan.html)",
+                            "inline": False
+                        }
+                    ],
+                    "footer": {
+                        "text": "Fanclub Manelo98 | " + today_str
+                    }
+                }
+
+                async with httpx.AsyncClient() as client:
+                    r = await client.post(
+                        "https://discord.com/api/v10/channels/" + ERINNERUNGEN_CHANNEL_ID + "/messages",
+                        headers={
+                            "Authorization": "Bot " + DISCORD_TOKEN,
+                            "Content-Type": "application/json"
+                        },
+                        json={"content": "@everyone", "embeds": [embed]},
+                        timeout=10
+                    )
+                if r.status_code not in (200, 201):
+                    print("[Bot] Reminder embed error: " + str(r.status_code))
+    except Exception as e:
+        print("[Bot] Reminder error: " + str(e))
+
+_last_morning_post = None
+_last_evening_post = None
+_reminder_sent_matches = set()
+
+async def bot_loop():
+    """Laeuft alle 60 Sekunden und prueft Bot-Aufgaben."""
+    global _last_morning_post, _last_evening_post, _reminder_sent_matches
+    await asyncio.sleep(10)
+    while True:
+        try:
+            now = datetime.now(timezone.utc).astimezone()
+            today = now.date()
+            hour = now.hour
+            minute = now.minute
+            if hour == 8 and minute < 2:
+                if _last_morning_post != today:
+                    _last_morning_post = today
+                    await bot_post_standings(is_morning=True)
+                    print("[Bot] Morgen-Stand gepostet")
+            if hour == 20 and minute < 2:
+                if _last_evening_post != today:
+                    _last_evening_post = today
+                    await bot_post_standings(is_morning=False)
+                    print("[Bot] Abend-Stand gepostet")
+            await bot_send_reminders()
+        except Exception as e:
+            print(f"[Bot] Loop error: {e}")
+        await asyncio.sleep(60)
+
 @app.on_event("startup")
 async def startup():
     global pool
     pool = await asyncpg.create_pool(DATABASE_URL, min_size=1, max_size=10)
     await init_db()
     asyncio.create_task(live_update_loop())
+    asyncio.create_task(bot_loop())
+    print("[Bot] Bot-Loop gestartet")
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -534,6 +838,7 @@ async def register(body: RegisterBody, response: Response):
                 body.username, body.email, hash_pw(body.password), token)
         except Exception: raise HTTPException(400, "E-Mail bereits registriert")
     response.set_cookie("session", token, httponly=True, samesite="lax", max_age=2592000)
+    asyncio.create_task(bot_send_welcome(body.username, ""))
     return {"ok": True, "username": body.username}
 
 @app.post("/api/login")
@@ -575,12 +880,16 @@ async def discord_callback(code: str, response: Response):
     token = secrets.token_urlsafe(32)
     async with pool.acquire() as db:
         ex = await db.fetchrow("SELECT id FROM users WHERE discord_id=$1", did)
+        is_new_user = ex is None
         if ex:
             await db.execute("UPDATE users SET session_token=$1,avatar=$2 WHERE discord_id=$3", token, av, did)
         else:
             await db.execute(
                 "INSERT INTO users (discord_id,username,avatar,session_token) VALUES ($1,$2,$3,$4)",
                 did, uname, av, token)
+    # Begruessung fuer neue User im Discord
+    if is_new_user:
+        asyncio.create_task(bot_send_welcome(uname, did))
     r = RedirectResponse(url="/")
     r.set_cookie("session", token, httponly=True, samesite="lax", max_age=2592000)
     return r
@@ -1162,5 +1471,75 @@ async def admin_discord_broadcast(request: Request):
         return {"ok":False,"error":f"Discord API: {r.status_code}","detail":r.text[:200]}
     except Exception as e:
         raise HTTPException(500,str(e))
+
+
+# ── Bot Test-Endpoints (nur Admin) ───────────────────────────────
+@app.post("/api/admin/bot-test/welcome")
+async def bot_test_welcome(request: Request):
+    """Schickt eine Test-Begrüßung mit dem eigenen Account."""
+    if not await is_admin(request): raise HTTPException(403)
+    user = await get_user(request.cookies.get("session"))
+    if not user: raise HTTPException(401)
+    await bot_send_welcome(user["username"], user.get("discord_id") or "")
+    return {"ok": True, "message": "Test-Begrüßung gesendet"}
+
+@app.post("/api/admin/bot-test/standings")
+async def bot_test_standings(request: Request):
+    """Postet sofort den aktuellen Stand."""
+    if not await is_admin(request): raise HTTPException(403)
+    body = await request.json()
+    is_morning = body.get("is_morning", True)
+    await bot_post_standings(is_morning=is_morning)
+    return {"ok": True, "message": "Stand gepostet"}
+
+@app.post("/api/admin/bot-test/reminder")
+async def bot_test_reminder(request: Request):
+    """Schickt eine Test-Erinnerung für das nächste offene Spiel."""
+    if not await is_admin(request): raise HTTPException(403)
+    if not ERINNERUNGEN_CHANNEL_ID or not DISCORD_TOKEN:
+        raise HTTPException(400, "Channel oder Token nicht konfiguriert")
+    async with pool.acquire() as db:
+        match = await db.fetchrow("""
+            SELECT id, home_team, away_team, match_date, match_time, group_name
+            FROM matches WHERE status = 'open'
+            ORDER BY match_date, match_time LIMIT 1
+        """)
+    if not match:
+        raise HTTPException(404, "Kein offenes Spiel gefunden")
+    from datetime import date as _date
+    today_str = _date.today().strftime("%d.%m.%Y")
+    home = str(match["home_team"])
+    away = str(match["away_team"])
+    group = str(match["group_name"] or "")
+    time_str = str(match["match_time"])[:5] if match["match_time"] else "00:00"
+    d = str(match["match_date"])
+    parts_d = d.split("-")
+    d_fmt = parts_d[2] + "." + parts_d[1] + "." + parts_d[0] if len(parts_d) == 3 else d
+    group_str = " | Gruppe " + group if group else ""
+    async with pool.acquire() as db:
+        tip_count = await db.fetchval("SELECT COUNT(*) FROM tips WHERE match_id=$1", match["id"]) or 0
+        total_users = await db.fetchval("SELECT COUNT(*) FROM users") or 0
+    missing = total_users - tip_count
+    embed = {
+        "title": "⏰ Tipp-Erinnerung! [TEST]",
+        "description": "In ca. **1 Stunde** beginnt ein neues Spiel — noch nicht getippt? Jetzt schnell!",
+        "color": 0xCC0000,
+        "fields": [
+            {"name": "⚽ Spiel", "value": "**" + home + "** vs **" + away + "**" + group_str, "inline": False},
+            {"name": "🕐 Anpfiff", "value": d_fmt + " um **" + time_str + " Uhr**", "inline": True},
+            {"name": "📊 Tipps abgegeben", "value": str(tip_count) + " von " + str(total_users) + " Spielern" + (" (" + str(missing) + " fehlen noch!)" if missing > 0 else " ✅"), "inline": True},
+            {"name": "🌐 Jetzt tippen", "value": "[Zum Spielplan](https://www.manelo98-league.de/spielplan.html)", "inline": False}
+        ],
+        "footer": {"text": "Fanclub Manelo98 | " + today_str + " — TEST"}
+    }
+    async with httpx.AsyncClient() as client:
+        r = await client.post(
+            "https://discord.com/api/v10/channels/" + ERINNERUNGEN_CHANNEL_ID + "/messages",
+            headers={"Authorization": "Bot " + DISCORD_TOKEN, "Content-Type": "application/json"},
+            json={"embeds": [embed]}, timeout=10
+        )
+    if r.status_code not in (200, 201):
+        raise HTTPException(500, "Discord Fehler: " + str(r.status_code))
+    return {"ok": True, "message": "Test-Erinnerung gesendet für: " + home + " vs " + away}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
