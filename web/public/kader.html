@@ -57,18 +57,19 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 
 /* SEARCH + FILTER */
 .k-controls{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.k-search{flex:1;min-width:200px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.k-search{flex:1;min-width:200px;background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;-webkit-appearance:none}
 .k-search:focus{border-color:var(--gold)}
 .k-search::placeholder{color:#555}
-.k-group-select{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s}
+.k-group-select{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:13px;font-family:inherit;outline:none;cursor:pointer;transition:border-color .15s;-webkit-appearance:none}
 .k-group-select:focus{border-color:var(--gold)}
 
 /* TEAM GRID */
 .k-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px}
-.k-team-card{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 12px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;text-align:center;-webkit-user-select:none;user-select:none}
+.k-team-card{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px 12px;cursor:pointer;transition:border-color .2s,background .2s,transform .15s;text-align:center;-webkit-user-select:none;user-select:none;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
 .k-team-card:hover{border-color:var(--gold);background:#1a1200;transform:translateY(-2px)}
+.k-team-card:active{transform:scale(0.97);background:#1a1200;border-color:var(--gold)}
 .k-team-card.active{border-color:var(--gold);background:#1a1200}
-.k-team-flag{font-size:36px;line-height:1;margin-bottom:6px}
+.k-team-flag{width:56px;height:38px;margin:0 auto 8px;border-radius:4px;overflow:hidden;border:1px solid #2a2a2a}
 .k-team-name{font-size:12px;font-weight:700;color:#ddd}
 .k-team-group{font-size:10px;color:#666;margin-top:2px}
 
@@ -76,7 +77,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .k-panel{background:#111;border:1px solid #2a2a2a;border-radius:10px;overflow:hidden;margin-bottom:16px;display:none}
 .k-panel.visible{display:block}
 .k-panel-head{background:#0d0d0d;border-bottom:1px solid #2a2a2a;padding:14px 16px;display:flex;align-items:center;gap:12px}
-.k-panel-flag{font-size:40px;line-height:1}
+.k-panel-flag{width:64px;height:43px;border-radius:4px;overflow:hidden;border:1px solid #333;flex-shrink:0}
 .k-panel-info{flex:1}
 .k-panel-country{font-size:18px;font-weight:900;color:#fff}
 .k-panel-meta{font-size:11px;color:#666;margin-top:2px}
@@ -103,11 +104,43 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .k-empty{text-align:center;padding:32px;color:#666;font-size:13px}
 .k-info-banner{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#666;display:flex;gap:8px;align-items:center}
 
-@media(max-width:600px){
-  .k-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+/* Tablet (768px) */
+@media(max-width:768px){
+  .k-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+  .k-player-list{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  .k-panel-head{padding:12px}
+  .k-panel-country{font-size:16px}
+}
+/* Smartphone (480px) */
+@media(max-width:480px){
+  .k-wrap{padding:10px 8px 24px}
+  .k-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  .k-team-card{padding:10px 6px}
+  .k-team-flag{width:44px;height:30px}
+  .k-team-name{font-size:11px}
+  .k-team-group{font-size:9px}
+  .k-controls{flex-direction:column;gap:6px}
+  .k-search{min-width:unset;font-size:16px}
+  .k-group-select{width:100%;font-size:16px}
   .k-player-list{grid-template-columns:1fr}
-  .k-controls{flex-direction:column}
-  .k-group-select{width:100%}
+  .k-player{padding:8px}
+  .k-player-name{font-size:12px}
+  .k-player-club{font-size:9px}
+  .k-player-age{font-size:10px}
+  .k-player-nr{font-size:12px;width:18px}
+  .k-panel-head{padding:10px 12px;gap:10px}
+  .k-panel-flag{width:52px;height:35px}
+  .k-panel-country{font-size:15px}
+  .k-panel-meta{font-size:10px}
+  .k-panel-close{width:28px;height:28px;font-size:14px}
+  .k-pos-section{padding:10px 12px}
+  .k-pos-label{font-size:9px}
+  .k-info-banner{font-size:11px;padding:10px 12px}
+}
+/* Sehr kleine Screens (360px) */
+@media(max-width:360px){
+  .k-grid{grid-template-columns:repeat(2,1fr)}
+  .k-team-flag{width:40px;height:27px}
 }
 </style>
 </head>
@@ -169,66 +202,54 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 // WM 2026 TEAMS — 48 Mannschaften mit Gruppen + Flaggen-Emoji
 // ============================================================
 const TEAMS = [
-  // GRUPPE A
-  {id:'usa',     name:'USA',           flag:'🇺🇸', group:'A', confed:'CONCACAF'},
-  {id:'mex',     name:'Mexiko',        flag:'🇲🇽', group:'A', confed:'CONCACAF'},
-  {id:'can',     name:'Kanada',        flag:'🇨🇦', group:'A', confed:'CONCACAF'},
-  {id:'nzl',     name:'Neuseeland',    flag:'🇳🇿', group:'A', confed:'OFC'},
-  // GRUPPE B
-  {id:'arg',     name:'Argentinien',   flag:'🇦🇷', group:'B', confed:'CONMEBOL'},
-  {id:'per',     name:'Peru',          flag:'🇵🇪', group:'B', confed:'CONMEBOL'},
-  {id:'chi',     name:'Chile',         flag:'🇨🇱', group:'B', confed:'CONMEBOL'},
-  {id:'alb',     name:'Albanien',      flag:'🇦🇱', group:'B', confed:'UEFA'},
-  // GRUPPE C
-  {id:'bra',     name:'Brasilien',     flag:'🇧🇷', group:'C', confed:'CONMEBOL'},
-  {id:'mex2',    name:'Ecuador',       flag:'🇪🇨', group:'C', confed:'CONMEBOL'},
-  {id:'par',     name:'Paraguay',      flag:'🇵🇾', group:'C', confed:'CONMEBOL'},
-  {id:'nig',     name:'Nigeria',       flag:'🇳🇬', group:'C', confed:'CAF'},
-  // GRUPPE D
-  {id:'fra',     name:'Frankreich',    flag:'🇫🇷', group:'D', confed:'UEFA'},
-  {id:'mar',     name:'Marokko',       flag:'🇲🇦', group:'D', confed:'CAF'},
-  {id:'eng',     name:'England',       flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', group:'D', confed:'UEFA'},
-  {id:'tun',     name:'Tunesien',      flag:'🇹🇳', group:'D', confed:'CAF'},
-  // GRUPPE E
-  {id:'ger',     name:'Deutschland',   flag:'🇩🇪', group:'E', confed:'UEFA'},
-  {id:'esp',     name:'Spanien',       flag:'🇪🇸', group:'E', confed:'UEFA'},
-  {id:'jap',     name:'Japan',         flag:'🇯🇵', group:'E', confed:'AFC'},
-  {id:'ksa',     name:'Saudi-Arabien', flag:'🇸🇦', group:'E', confed:'AFC'},
-  // GRUPPE F
-  {id:'por',     name:'Portugal',      flag:'🇵🇹', group:'F', confed:'UEFA'},
-  {id:'uru',     name:'Uruguay',       flag:'🇺🇾', group:'F', confed:'CONMEBOL'},
-  {id:'sen',     name:'Senegal',       flag:'🇸🇳', group:'F', confed:'CAF'},
-  {id:'irq',     name:'Irak',          flag:'🇮🇶', group:'F', confed:'AFC'},
-  // GRUPPE G
-  {id:'ned',     name:'Niederlande',   flag:'🇳🇱', group:'G', confed:'UEFA'},
-  {id:'col',     name:'Kolumbien',     flag:'🇨🇴', group:'G', confed:'CONMEBOL'},
-  {id:'egy',     name:'Ägypten',       flag:'🇪🇬', group:'G', confed:'CAF'},
-  {id:'tur',     name:'Türkei',        flag:'🇹🇷', group:'G', confed:'UEFA'},
-  // GRUPPE H
-  {id:'bel',     name:'Belgien',       flag:'🇧🇪', group:'H', confed:'UEFA'},
-  {id:'ven',     name:'Venezuela',     flag:'🇻🇪', group:'H', confed:'CONMEBOL'},
-  {id:'cmr',     name:'Kamerun',       flag:'🇨🇲', group:'H', confed:'CAF'},
-  {id:'nkr',     name:'Nordkorea',     flag:'🇰🇵', group:'H', confed:'AFC'},
-  // GRUPPE I
-  {id:'ita',     name:'Italien',       flag:'🇮🇹', group:'I', confed:'UEFA'},
-  {id:'kor',     name:'Südkorea',      flag:'🇰🇷', group:'I', confed:'AFC'},
-  {id:'mex3',    name:'Mexiko B',      flag:'🇲🇽', group:'I', confed:'CONCACAF'},
-  {id:'saf',     name:'Südafrika',     flag:'🇿🇦', group:'I', confed:'CAF'},
-  // GRUPPE J
-  {id:'cro',     name:'Kroatien',      flag:'🇭🇷', group:'J', confed:'UEFA'},
-  {id:'brz2',    name:'Bolivien',      flag:'🇧🇴', group:'J', confed:'CONMEBOL'},
-  {id:'aus',     name:'Australien',    flag:'🇦🇺', group:'J', confed:'AFC'},
-  {id:'uga',     name:'Uganda',        flag:'🇺🇬', group:'J', confed:'CAF'},
-  // GRUPPE K
-  {id:'swi',     name:'Schweiz',       flag:'🇨🇭', group:'K', confed:'UEFA'},
-  {id:'den',     name:'Dänemark',      flag:'🇩🇰', group:'K', confed:'UEFA'},
-  {id:'irn',     name:'Iran',          flag:'🇮🇷', group:'K', confed:'AFC'},
-  {id:'civ',     name:'Elfenbeinküste',flag:'🇨🇮', group:'K', confed:'CAF'},
-  // GRUPPE L
-  {id:'prt',     name:'Serbien',       flag:'🇷🇸', group:'L', confed:'UEFA'},
-  {id:'ukr',     name:'Ukraine',       flag:'🇺🇦', group:'L', confed:'UEFA'},
-  {id:'egy2',    name:'Ghana',         flag:'🇬🇭', group:'L', confed:'CAF'},
-  {id:'nzl2',    name:'Panama',        flag:'🇵🇦', group:'L', confed:'CONCACAF'},
+  {id:'usa',name:'USA',cc:'us',group:'A',confed:'CONCACAF'},
+  {id:'mex',name:'Mexiko',cc:'mx',group:'A',confed:'CONCACAF'},
+  {id:'can',name:'Kanada',cc:'ca',group:'A',confed:'CONCACAF'},
+  {id:'nzl',name:'Neuseeland',cc:'nz',group:'A',confed:'OFC'},
+  {id:'arg',name:'Argentinien',cc:'ar',group:'B',confed:'CONMEBOL'},
+  {id:'per',name:'Peru',cc:'pe',group:'B',confed:'CONMEBOL'},
+  {id:'chi',name:'Chile',cc:'cl',group:'B',confed:'CONMEBOL'},
+  {id:'alb',name:'Albanien',cc:'al',group:'B',confed:'UEFA'},
+  {id:'bra',name:'Brasilien',cc:'br',group:'C',confed:'CONMEBOL'},
+  {id:'mex2',name:'Ecuador',cc:'ec',group:'C',confed:'CONMEBOL'},
+  {id:'par',name:'Paraguay',cc:'py',group:'C',confed:'CONMEBOL'},
+  {id:'nig',name:'Nigeria',cc:'ng',group:'C',confed:'CAF'},
+  {id:'fra',name:'Frankreich',cc:'fr',group:'D',confed:'UEFA'},
+  {id:'mar',name:'Marokko',cc:'ma',group:'D',confed:'CAF'},
+  {id:'eng',name:'England',cc:'gb-eng',group:'D',confed:'UEFA'},
+  {id:'tun',name:'Tunesien',cc:'tn',group:'D',confed:'CAF'},
+  {id:'ger',name:'Deutschland',cc:'de',group:'E',confed:'UEFA'},
+  {id:'esp',name:'Spanien',cc:'es',group:'E',confed:'UEFA'},
+  {id:'jap',name:'Japan',cc:'jp',group:'E',confed:'AFC'},
+  {id:'ksa',name:'Saudi-Arabien',cc:'sa',group:'E',confed:'AFC'},
+  {id:'por',name:'Portugal',cc:'pt',group:'F',confed:'UEFA'},
+  {id:'uru',name:'Uruguay',cc:'uy',group:'F',confed:'CONMEBOL'},
+  {id:'sen',name:'Senegal',cc:'sn',group:'F',confed:'CAF'},
+  {id:'irq',name:'Irak',cc:'iq',group:'F',confed:'AFC'},
+  {id:'ned',name:'Niederlande',cc:'nl',group:'G',confed:'UEFA'},
+  {id:'col',name:'Kolumbien',cc:'co',group:'G',confed:'CONMEBOL'},
+  {id:'egy',name:'Ägypten',cc:'eg',group:'G',confed:'CAF'},
+  {id:'tur',name:'Türkei',cc:'tr',group:'G',confed:'UEFA'},
+  {id:'bel',name:'Belgien',cc:'be',group:'H',confed:'UEFA'},
+  {id:'ven',name:'Venezuela',cc:'ve',group:'H',confed:'CONMEBOL'},
+  {id:'cmr',name:'Kamerun',cc:'cm',group:'H',confed:'CAF'},
+  {id:'nkr',name:'Nordkorea',cc:'kp',group:'H',confed:'AFC'},
+  {id:'ita',name:'Italien',cc:'it',group:'I',confed:'UEFA'},
+  {id:'kor',name:'Südkorea',cc:'kr',group:'I',confed:'AFC'},
+  {id:'mex3',name:'Mexiko B',cc:'mx',group:'I',confed:'CONCACAF'},
+  {id:'saf',name:'Südafrika',cc:'za',group:'I',confed:'CAF'},
+  {id:'cro',name:'Kroatien',cc:'hr',group:'J',confed:'UEFA'},
+  {id:'brz2',name:'Bolivien',cc:'bo',group:'J',confed:'CONMEBOL'},
+  {id:'aus',name:'Australien',cc:'au',group:'J',confed:'AFC'},
+  {id:'uga',name:'Uganda',cc:'ug',group:'J',confed:'CAF'},
+  {id:'swi',name:'Schweiz',cc:'ch',group:'K',confed:'UEFA'},
+  {id:'den',name:'Dänemark',cc:'dk',group:'K',confed:'UEFA'},
+  {id:'irn',name:'Iran',cc:'ir',group:'K',confed:'AFC'},
+  {id:'civ',name:'Elfenbeinküste',cc:'ci',group:'K',confed:'CAF'},
+  {id:'prt',name:'Serbien',cc:'rs',group:'L',confed:'UEFA'},
+  {id:'ukr',name:'Ukraine',cc:'ua',group:'L',confed:'UEFA'},
+  {id:'egy2',name:'Ghana',cc:'gh',group:'L',confed:'CAF'},
+  {id:'nzl2',name:'Panama',cc:'pa',group:'L',confed:'CONCACAF'},
 ];
 
 // ============================================================
@@ -1051,7 +1072,7 @@ function renderGrid(filter = '', groupFilter = '') {
 
   grid.innerHTML = filtered.map(t => `
     <div class="k-team-card${activeTeam === t.id ? ' active' : ''}" onclick="showTeam('${t.id}')" data-id="${t.id}">
-      <div class="k-team-flag">${t.flag}</div>
+      <div class="k-team-flag"><img src="https://flagcdn.com/w80/${t.cc}.png" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"></div>
       <div class="k-team-name">${t.name}</div>
       <div class="k-team-group">Gruppe ${t.group} · ${t.confed}</div>
     </div>
@@ -1078,7 +1099,7 @@ function showTeam(id) {
     panel.className = 'k-panel visible';
     panel.innerHTML = `
       <div class="k-panel-head">
-        <div class="k-panel-flag">${team.flag}</div>
+        <div class="k-panel-flag"><img src="https://flagcdn.com/w80/${team.cc}.png" alt="${team.name}" loading="lazy"></div>
         <div class="k-panel-info">
           <div class="k-panel-country">${team.name}</div>
           <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed}</div>
@@ -1099,7 +1120,7 @@ function showTeam(id) {
 
   let html = `
     <div class="k-panel-head">
-      <div class="k-panel-flag">${team.flag}</div>
+      <div class="k-panel-flag"><img src="https://flagcdn.com/w80/${team.cc}.png" alt="${team.name}" loading="lazy"></div>
       <div class="k-panel-info">
         <div class="k-panel-country">${team.name}</div>
         <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed} · Trainer: ${squad.trainer}</div>
