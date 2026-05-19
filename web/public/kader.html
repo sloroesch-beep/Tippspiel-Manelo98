@@ -1079,80 +1079,112 @@ function renderGrid(filter = '', groupFilter = '') {
   `).join('');
 }
 
-function showTeam(id) {
+const posLabels = {
+  tor: '🧤 Tor',
+  abwehr: '🛡️ Abwehr',
+  mittelfeld: '⚙️ Mittelfeld',
+  sturm: '⚡ Sturm'
+};
+
+function panelHead(team, meta) {
+  return `<div class="k-panel-head">
+    <div class="k-panel-flag"><img src="https://flagicons.lipis.dev/flags/4x3/${team.cc}.svg" alt="${team.name}" loading="lazy"></div>
+    <div class="k-panel-info">
+      <div class="k-panel-country">${team.name}</div>
+      <div class="k-panel-meta">${meta}</div>
+    </div>
+    <button class="k-panel-close" onclick="closePanel()">✕</button>
+  </div>`;
+}
+
+function renderSquadHtml(team, squadData, source) {
+  const sourceBadge = source === 'api'
+    ? '<span style="font-size:10px;background:#16a34a22;color:#16a34a;border:1px solid #16a34a44;padding:2px 6px;border-radius:4px;margin-left:6px">🔴 Live</span>'
+    : '<span style="font-size:10px;background:#ca8a0422;color:#ca8a04;border:1px solid #ca8a0444;padding:2px 6px;border-radius:4px;margin-left:6px">📋 Vorläufig</span>';
+
+  const trainer = squadData.trainer || '';
+  const meta = `Gruppe ${team.group} · ${team.confed}${trainer ? ' · ' + trainer : ''}`;
+  let html = panelHead(team, meta);
+  html += `<div style="padding:8px 16px 0;display:flex;align-items:center;gap:4px;font-size:11px;color:#666">
+    Kader${sourceBadge}
+    ${source === 'api' ? '<span style="margin-left:auto;font-size:10px;color:#444">Aktualisiert via football-data.org</span>' : ''}
+  </div>`;
+
+  ['tor','abwehr','mittelfeld','sturm'].forEach(pos => {
+    const players = squadData[pos] || squadData.squad?.[pos];
+    if (!players || !players.length) return;
+
+    // API-Format: {nr, name, club, age} — Hardcode-Format: [nr, name, club, age, cap]
+    const isApi = typeof players[0] === 'object' && !Array.isArray(players[0]);
+
+    html += `<div class="k-pos-section">
+      <div class="k-pos-label">${posLabels[pos]}</div>
+      <div class="k-player-list">
+        ${players.map(p => {
+          const nr   = isApi ? (p.nr || '') : p[0];
+          const name = isApi ? p.name : p[1];
+          const club = isApi ? (p.club || '') : p[2];
+          const age  = isApi ? p.age : p[3];
+          const cap  = isApi ? false : !!p[4];
+          return `<div class="k-player">
+            <div class="k-player-nr">${nr}</div>
+            <div class="k-player-info">
+              <div class="k-player-name">${name}${cap ? ' <span class="k-cap">©</span>' : ''}</div>
+              <div class="k-player-club">${club}</div>
+            </div>
+            <div class="k-player-age">${age || ''}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+async function showTeam(id) {
   const team = TEAMS.find(t => t.id === id);
   if (!team) return;
   activeTeam = id;
 
-  // Update active state
   document.querySelectorAll('.k-team-card').forEach(c => {
     c.classList.toggle('active', c.dataset.id === id);
   });
 
   const panel = document.getElementById('kPanel');
-  const squad = getSquad(id);
+  panel.className = 'k-panel visible';
 
-  // Scroll to panel
+  // Ladeanzeige sofort
+  panel.innerHTML = panelHead(team, `Gruppe ${team.group} · ${team.confed}`) +
+    `<div class="k-loading">⏳ Lade Kader…</div>`;
   panel.scrollIntoView({behavior:'smooth', block:'nearest'});
 
-  if (!squad) {
-    panel.className = 'k-panel visible';
-    panel.innerHTML = `
-      <div class="k-panel-head">
-        <div class="k-panel-flag"><img src="https://flagicons.lipis.dev/flags/4x3/${team.cc}.svg" alt="${team.name}" loading="lazy"></div>
-        <div class="k-panel-info">
-          <div class="k-panel-country">${team.name}</div>
-          <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed}</div>
-        </div>
-        <button class="k-panel-close" onclick="closePanel()">✕</button>
-      </div>
-      <div class="k-loading">⏳ Kader wird noch bekanntgegeben…</div>
-    `;
+  // 1. Versuche API
+  try {
+    const r = await fetch(`/api/kader/${id}`);
+    if (r.ok) {
+      const data = await r.json();
+      if (data.squad && Object.values(data.squad).some(g => g.length > 0)) {
+        panel.innerHTML = renderSquadHtml(team, data, 'api');
+        return;
+      }
+      if (data.error) {
+        console.warn('API Kader Fehler:', data.error);
+      }
+    }
+  } catch(e) {
+    console.warn('API nicht erreichbar:', e);
+  }
+
+  // 2. Fallback: hardcoded
+  const squad = getSquad(id);
+  if (squad) {
+    panel.innerHTML = renderSquadHtml(team, squad, 'static');
     return;
   }
 
-  const posLabels = {
-    tor: '🧤 Tor',
-    abwehr: '🛡️ Abwehr',
-    mittelfeld: '⚙️ Mittelfeld',
-    sturm: '⚡ Sturm'
-  };
-
-  let html = `
-    <div class="k-panel-head">
-      <div class="k-panel-flag"><img src="https://flagicons.lipis.dev/flags/4x3/${team.cc}.svg" alt="${team.name}" loading="lazy"></div>
-      <div class="k-panel-info">
-        <div class="k-panel-country">${team.name}</div>
-        <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed} · Trainer: ${squad.trainer}</div>
-      </div>
-      <button class="k-panel-close" onclick="closePanel()">✕</button>
-    </div>
-  `;
-
-  ['tor','abwehr','mittelfeld','sturm'].forEach(pos => {
-    const players = squad[pos];
-    if (!players || !players.length) return;
-    html += `
-      <div class="k-pos-section">
-        <div class="k-pos-label">${posLabels[pos]}</div>
-        <div class="k-player-list">
-          ${players.map(p => `
-            <div class="k-player">
-              <div class="k-player-nr">${p[0]}</div>
-              <div class="k-player-info">
-                <div class="k-player-name">${p[1]}${p[4] ? ' <span class="k-cap">©</span>' : ''}</div>
-                <div class="k-player-club">${p[2]}</div>
-              </div>
-              <div class="k-player-age">${p[3]}</div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  });
-
-  panel.className = 'k-panel visible';
-  panel.innerHTML = html;
+  // 3. Nichts verfügbar
+  panel.innerHTML = panelHead(team, `Gruppe ${team.group} · ${team.confed}`) +
+    `<div class="k-loading">📋 Kader wird nach offizieller Nominierung angezeigt</div>`;
 }
 
 function closePanel() {
