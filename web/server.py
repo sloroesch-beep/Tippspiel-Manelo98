@@ -821,6 +821,72 @@ async def admin_reset_user_tips(user_id: int, request: Request):
         await db.execute("DELETE FROM tips WHERE user_id=$1", user_id)
     return {"ok": True}
 
+@app.get("/api/admin/user-tips/{user_id}")
+async def admin_get_user_tips(user_id: int, request: Request):
+    """Alle Tipps eines Users laden (inkl. Spielinfo)."""
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with pool.acquire() as db:
+        rows = await db.fetch("""
+            SELECT t.id, t.home_tip, t.away_tip, t.points, t.evaluated_at,
+                   m.home_team, m.away_team, m.match_date, m.group_name, m.status,
+                   m.home_score, m.away_score
+            FROM tips t
+            JOIN matches m ON t.match_id = m.id
+            WHERE t.user_id = $1
+            ORDER BY m.match_date, m.id
+        """, user_id)
+    return [dict(r) for r in rows]
+
+@app.delete("/api/admin/tip/{tip_id}")
+async def admin_delete_single_tip(tip_id: int, request: Request):
+    """Einzelnen Tipp löschen."""
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with pool.acquire() as db:
+        await db.execute("DELETE FROM tips WHERE id=$1", tip_id)
+    return {"ok": True}
+
+@app.post("/api/admin/reset-wm-champion/{user_id}")
+async def admin_reset_wm_champion(user_id: int, request: Request):
+    """WM-Tipp eines Users zurücksetzen."""
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with pool.acquire() as db:
+        await db.execute("DELETE FROM wm_champions WHERE user_id=$1", user_id)
+    return {"ok": True}
+
+@app.post("/api/admin/reset-password/{user_id}")
+async def admin_reset_password(user_id: int, request: Request):
+    """Passwort eines Users zurücksetzen."""
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    body = await request.json()
+    new_password = body.get("password", "")
+    if len(new_password) < 6:
+        raise HTTPException(400, "Passwort muss mindestens 6 Zeichen haben")
+    pw_hash = hash_pw(new_password)
+    async with pool.acquire() as db:
+        result = await db.execute(
+            "UPDATE users SET password_hash=$1 WHERE id=$2", pw_hash, user_id)
+    return {"ok": True}
+
+@app.get("/api/admin/users-detail")
+async def admin_users_detail(request: Request):
+    """Erweiterte Userliste mit WM-Tipp."""
+    if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
+    async with pool.acquire() as db:
+        rows = await db.fetch("""
+            SELECT u.id, u.username, u.email, u.discord_id, u.avatar,
+                   u.joined_at,
+                   COUNT(t.id) as tips,
+                   COALESCE(SUM(t.points),0) as points,
+                   wc.champion as wm_tip,
+                   wc.points as wm_points
+            FROM users u
+            LEFT JOIN tips t ON t.user_id = u.id
+            LEFT JOIN wm_champions wc ON wc.user_id = u.id
+            GROUP BY u.id, u.username, u.email, u.discord_id, u.avatar, u.joined_at, wc.champion, wc.points
+            ORDER BY points DESC
+        """)
+    return [dict(r) for r in rows]
+
 @app.post("/api/admin/result")
 async def admin_set_result(request: Request):
     if not await is_admin(request): raise HTTPException(403, "Kein Zugriff")
@@ -855,185 +921,5 @@ async def admin_get_matches(request: Request):
 @app.get("/api/admin/check")
 async def admin_check(request: Request):
     return {"is_admin": await is_admin(request)}
-
-# ─── Kader System ────────────────────────────────────────────────
-
-# Cache: {team_id: {"data": [...], "fetched_at": timestamp}}
-_kader_cache: dict = {}
-KADER_CACHE_TTL = 3600 * 6  # 6 Stunden Cache
-
-# Mapping: unsere Team-IDs → football-data.org Team-IDs (WM 2026)
-# Diese IDs kommen aus der football-data.org API /competitions/2000/teams
-TEAM_ID_MAP = {
-    "ger": 759,   # Deutschland
-    "fra": 773,   # Frankreich
-    "esp": 760,   # Spanien
-    "eng": 770,   # England
-    "por": 765,   # Portugal
-    "ned": 779,   # Niederlande
-    "bel": 805,   # Belgien
-    "ita": 784,   # Italien
-    "cro": 799,   # Kroatien
-    "swi": 788,   # Schweiz
-    "den": 782,   # Dänemark
-    "tur": 803,   # Türkei
-    "ukr": 790,   # Ukraine
-    "prt": 798,   # Serbien
-    "alb": 1036,  # Albanien
-    "arg": 762,   # Argentinien
-    "bra": 764,   # Brasilien
-    "uru": 803,   # Uruguay
-    "col": 769,   # Kolumbien
-    "chi": 801,   # Chile
-    "per": 796,   # Peru
-    "mex": 791,   # Mexiko
-    "mex2": 780,  # Ecuador
-    "par": 780,   # Paraguay
-    "ven": 802,   # Venezuela
-    "brz2": 800,  # Bolivien
-    "usa": 768,   # USA
-    "can": 772,   # Kanada
-    "nzl2": 814,  # Panama
-    "sen": 907,   # Senegal
-    "mar": 1030,  # Marokko
-    "nig": 910,   # Nigeria
-    "egy": 922,   # Ägypten
-    "cmr": 904,   # Kamerun
-    "civ": 892,   # Elfenbeinküste
-    "tun": 924,   # Tunesien
-    "saf": 911,   # Südafrika
-    "uga": 928,   # Uganda
-    "egy2": 897,  # Ghana
-    "jap": 827,   # Japan
-    "kor": 832,   # Südkorea
-    "aus": 835,   # Australien
-    "ksa": 833,   # Saudi-Arabien
-    "irq": 831,   # Irak
-    "irn": 820,   # Iran
-    "nzl": 829,   # Neuseeland
-    "nkr": 824,   # Nordkorea
-    "mex3": 791,  # Mexiko (Gruppe I)
-    "uga": 928,   # Uganda
-}
-
-def _format_player(p: dict) -> dict:
-    """Spieler aus football-data.org API formatieren."""
-    return {
-        "name": p.get("name", ""),
-        "position": p.get("position", ""),
-        "dateOfBirth": p.get("dateOfBirth", ""),
-        "nationality": p.get("nationality", ""),
-        "shirtNumber": p.get("shirtNumber"),
-        "marketValue": p.get("marketValue"),
-    }
-
-def _calc_age(dob: str) -> int:
-    """Alter aus Geburtsdatum berechnen."""
-    if not dob:
-        return 0
-    try:
-        from datetime import date
-        birth = date.fromisoformat(dob[:10])
-        today = date.today()
-        return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
-    except:
-        return 0
-
-def _position_group(pos: str) -> str:
-    """Position in Gruppe einteilen."""
-    pos = (pos or "").upper()
-    if pos in ("GOALKEEPER",):
-        return "tor"
-    if pos in ("CENTRE_BACK", "LEFT_BACK", "RIGHT_BACK", "DEFENCE", "DEFENDER"):
-        return "abwehr"
-    if pos in ("CENTRAL_MIDFIELD", "DEFENSIVE_MIDFIELD", "ATTACKING_MIDFIELD",
-               "LEFT_MIDFIELD", "RIGHT_MIDFIELD", "MIDFIELD", "MIDFIELDER"):
-        return "mittelfeld"
-    if pos in ("CENTRE_FORWARD", "LEFT_WINGER", "RIGHT_WINGER", "OFFENCE",
-               "FORWARD", "ATTACKER", "STRIKER"):
-        return "sturm"
-    return "mittelfeld"
-
-@app.get("/api/kader/{team_id}")
-async def get_kader(team_id: str):
-    """Kader eines Teams laden — live von football-data.org mit Cache."""
-    import time
-
-    # Cache prüfen
-    cached = _kader_cache.get(team_id)
-    if cached and (time.time() - cached["fetched_at"]) < KADER_CACHE_TTL:
-        return cached["data"]
-
-    # football-data.org Team-ID ermitteln
-    fd_team_id = TEAM_ID_MAP.get(team_id)
-    if not fd_team_id:
-        return {"error": "Team nicht gefunden", "team_id": team_id, "source": "not_found"}
-
-    if not FOOTBALL_API_KEY:
-        return {"error": "Kein API Key", "source": "no_key"}
-
-    try:
-        async with httpx.AsyncClient() as client:
-            r = await client.get(
-                f"{FOOTBALL_API_URL}/teams/{fd_team_id}",
-                headers={"X-Auth-Token": FOOTBALL_API_KEY},
-                timeout=10
-            )
-
-        if r.status_code == 429:
-            return {"error": "API Rate Limit — bitte warte kurz", "source": "rate_limit"}
-
-        if r.status_code != 200:
-            return {"error": f"API Fehler {r.status_code}", "source": "api_error"}
-
-        data = r.json()
-        squad = data.get("squad", [])
-
-        if not squad:
-            return {"error": "Kein Kader verfügbar", "source": "empty", "team": data.get("name", "")}
-
-        # Spieler nach Position gruppieren
-        grouped = {"tor": [], "abwehr": [], "mittelfeld": [], "sturm": []}
-        for p in squad:
-            pos_group = _position_group(p.get("position", ""))
-            age = _calc_age(p.get("dateOfBirth", ""))
-            grouped[pos_group].append({
-                "nr": p.get("shirtNumber") or "",
-                "name": p.get("name", ""),
-                "club": "",  # football-data.org liefert hier keinen Vereinsnamen im squad
-                "age": age,
-                "dob": p.get("dateOfBirth", "")[:10] if p.get("dateOfBirth") else "",
-                "nationality": p.get("nationality", ""),
-                "position": p.get("position", ""),
-            })
-
-        # Nach Trikotnummer sortieren (leere am Ende)
-        for grp in grouped.values():
-            grp.sort(key=lambda x: (x["nr"] == "" or x["nr"] is None, x["nr"] or 99))
-
-        result = {
-            "source": "api",
-            "team_name": data.get("name", ""),
-            "trainer": data.get("coach", {}).get("name", "") if data.get("coach") else "",
-            "squad": grouped,
-            "fetched_at": int(time.time()),
-        }
-
-        # Im Cache speichern
-        _kader_cache[team_id] = {"data": result, "fetched_at": time.time()}
-        return result
-
-    except httpx.TimeoutException:
-        return {"error": "Timeout — API antwortet nicht", "source": "timeout"}
-    except Exception as e:
-        return {"error": str(e), "source": "exception"}
-
-@app.delete("/api/admin/kader-cache")
-async def clear_kader_cache(request: Request):
-    """Kader-Cache leeren (nur Admin)."""
-    if not await is_admin(request):
-        return Response(status_code=403)
-    _kader_cache.clear()
-    return {"ok": True, "message": "Kader-Cache geleert"}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
