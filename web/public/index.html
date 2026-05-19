@@ -358,97 +358,107 @@ img{max-width:100%;}
 .podium-2 .podium-base{background:rgba(0,0,0,.12);margin:-14px;}
 .podium-3 .podium-base{background:rgba(0,0,0,.12);margin:-12px;}
 
-.admin-page{max-width:960px;}
-.admin-section{background:#111;border:1px solid #2a2a2a;border-radius:10px;margin-bottom:14px;overflow:hidden}
-.admin-section-head{background:#0d0d0d;border-bottom:1px solid #1a1a1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.admin-section-head h2{font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
-.admin-section-head span{font-size:11px;color:#666}
-.admin-section-body{padding:14px 16px}
-.admin-tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
-.admin-tool-btn{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:8px;padding:10px 14px;color:#ddd;font-size:12px;font-weight:600;cursor:pointer;text-align:left;transition:border-color .15s,background .15s;font-family:inherit;display:flex;align-items:center;gap:8px}
-.admin-tool-btn:hover{border-color:#555;background:#1a1a1a}
-.admin-tool-btn.gold{border-color:#ffd70044;color:#ffd700}
-.admin-tool-btn.gold:hover{border-color:#ffd700;background:#1a1200}
-.admin-tool-btn.red{border-color:#cc000044;color:#ff4444}
-.admin-tool-btn.red:hover{border-color:#cc0000;background:#1a0000}
-.admin-tool-btn.green{border-color:#16a34a44;color:#4ade80}
-.admin-tool-btn.green:hover{border-color:#16a34a;background:#001a0d}
-.admin-msg{font-size:12px;color:#888;padding:6px 0;min-height:20px}
-/* User Table */
-.adm-table{width:100%;border-collapse:collapse;font-size:12px}
-.adm-table th{text-align:left;padding:8px 10px;color:#555;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #1a1a1a}
-.adm-table td{padding:8px 10px;border-bottom:1px solid #111;vertical-align:middle}
+.admin-page{max-width:980px;padding:0}
+/* Tabs */
+.adm-tabs{display:flex;gap:2px;padding:10px 10px 0;border-bottom:1px solid #1a1a1a;overflow-x:auto;scrollbar-width:none}
+.adm-tabs::-webkit-scrollbar{display:none}
+.adm-tab{padding:8px 14px;border-radius:6px 6px 0 0;font-size:12px;font-weight:600;color:#555;cursor:pointer;border:1px solid transparent;border-bottom:none;white-space:nowrap;transition:color .15s,background .15s;-webkit-user-select:none;user-select:none;background:none;font-family:inherit}
+.adm-tab:hover{color:#ddd;background:#111}
+.adm-tab.active{color:#ffd700;background:#111;border-color:#2a2a2a}
+.adm-tab-content{display:none;padding:12px 10px}
+.adm-tab-content.active{display:block}
+/* Sections */
+.adm-section{background:#111;border:1px solid #2a2a2a;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.adm-section-head{background:#0d0d0d;border-bottom:1px solid #1a1a1a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.adm-section-head h2{font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;margin:0}
+.adm-section-head span{font-size:11px;color:#555}
+.adm-section-body{padding:12px 14px}
+/* Dashboard stats */
+.adm-stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px}
+.adm-stat{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:12px;text-align:center}
+.adm-stat-v{font-size:24px;font-weight:900;color:#ffd700;line-height:1}
+.adm-stat-l{font-size:10px;color:#555;margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+.adm-stat-sub{font-size:11px;color:#333;margin-top:2px}
+/* Buttons */
+.adm-btn{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:7px 12px;color:#888;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.adm-btn:hover{border-color:#555;color:#ddd}
+.adm-btn.gold{border-color:#ffd70055;color:#ffd700}
+.adm-btn.gold:hover{border-color:#ffd700;background:#1a1200}
+.adm-btn.red{border-color:#cc000055;color:#ff6666}
+.adm-btn.red:hover{border-color:#cc0000;background:#1a0000}
+.adm-btn.green{border-color:#16a34a55;color:#4ade80}
+.adm-btn.green:hover{border-color:#16a34a;background:#001a0d}
+.adm-btn.blue{border-color:#3b82f655;color:#60a5fa}
+.adm-btn.blue:hover{border-color:#3b82f6;background:#00101a}
+.adm-btn.orange{border-color:#ea580c55;color:#fb923c}
+.adm-btn.orange:hover{border-color:#ea580c;background:#1a0800}
+.adm-btn-grid{display:flex;gap:6px;flex-wrap:wrap}
+/* Tables */
+.adm-table{width:100%;border-collapse:collapse;font-size:11px}
+.adm-table th{text-align:left;padding:7px 10px;color:#444;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid #1a1a1a;white-space:nowrap}
+.adm-table td{padding:7px 10px;border-bottom:1px solid #0d0d0d;vertical-align:middle}
 .adm-table tr:last-child td{border-bottom:none}
 .adm-table tr:hover td{background:#0d0d0d}
-.adm-act-btn{background:#111;border:1px solid #2a2a2a;color:#888;padding:4px 8px;border-radius:5px;font-size:10px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .15s,color .15s}
-.adm-act-btn:hover{border-color:#555;color:#ddd}
-.adm-act-btn.gold:hover{border-color:#ffd700;color:#ffd700}
-.adm-act-btn.red:hover{border-color:#cc0000;color:#ff4444}
-.adm-act-btn.blue:hover{border-color:#3b82f6;color:#60a5fa}
-.adm-act-btn.orange:hover{border-color:#ea580c;color:#fb923c}
-/* Detail panel */
-.adm-detail{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:12px;margin-top:8px;display:none}
-.adm-detail.open{display:block}
-.adm-tip-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;border:1px solid #1a1a1a;margin-bottom:4px;font-size:11px;background:#111}
-.adm-tip-match{flex:1;color:#aaa}
-.adm-tip-score{font-weight:700;color:#ddd;min-width:40px;text-align:center}
-.adm-tip-pts{min-width:28px;text-align:right}
-.adm-tip-pts.p3{color:#16a34a}
-.adm-tip-pts.p1{color:#ca8a04}
+/* Badges */
+.adm-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;display:inline-block;white-space:nowrap}
+.adm-badge.discord{background:#5865f222;color:#818cf8;border:1px solid #5865f244}
+.adm-badge.email{background:#33333322;color:#666;border:1px solid #33333344}
+.adm-badge.wm{background:#ffd70022;color:#ffd700;border:1px solid #ffd70044}
+.adm-badge.live{background:#16a34a22;color:#4ade80;border:1px solid #16a34a44}
+.adm-badge.done{background:#33333322;color:#555;border:1px solid #33333344}
+.adm-badge.open{background:#3b82f622;color:#60a5fa;border:1px solid #3b82f644}
+/* Tips detail */
+.adm-tip-row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:5px;border:1px solid #1a1a1a;margin-bottom:3px;font-size:10px;background:#0d0d0d;flex-wrap:wrap}
+.adm-tip-match{flex:1;color:#888;min-width:120px}
+.adm-tip-score{font-weight:700;color:#ddd;min-width:70px}
+.adm-tip-pts.p3{color:#16a34a;font-weight:700}
+.adm-tip-pts.p1{color:#ca8a04;font-weight:700}
 .adm-tip-pts.p0{color:#dc2626}
-.adm-tip-pts.pn{color:#555}
-/* Result form */
-.result-form{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.result-form select,.result-form input{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:8px 10px;color:#ddd;font-size:12px;font-family:inherit;outline:none}
-.result-form select:focus,.result-form input:focus{border-color:#ffd700}
-.result-form input[type=number]{width:60px;text-align:center}
-/* Badge */
-.adm-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;display:inline-block}
-.adm-badge.discord{background:#5865f244;color:#818cf8}
-.adm-badge.email{background:#37374744;color:#888}
-.adm-badge.wm{background:#ffd70022;color:#ffd700}
-/* Danger zone */
-.adm-danger{background:#110000;border:1px solid #2a0000;border-radius:10px;padding:14px 16px;margin-bottom:14px}
-.adm-danger h3{color:#ff4444;font-size:13px;margin-bottom:6px}
-.adm-danger p{font-size:11px;color:#666;margin-bottom:10px}
-.adm-danger-btns{display:flex;gap:8px;flex-wrap:wrap}
+.adm-tip-pts.pn{color:#333}
+.adm-detail{background:#050505;border:1px solid #1a1a1a;border-radius:6px;padding:8px;margin-top:6px;display:none}
+.adm-detail.open{display:block}
+/* Forms */
+.adm-form-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.adm-form-row select,.adm-form-row input,.adm-select,.adm-input{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:7px 10px;color:#ddd;font-size:12px;font-family:inherit;outline:none;transition:border-color .15s}
+.adm-form-row select:focus,.adm-form-row input:focus,.adm-select:focus,.adm-input:focus{border-color:#ffd700}
+.adm-form-row input[type=number]{width:60px;text-align:center}
+.adm-msg{font-size:11px;padding:4px 0;color:#555;min-height:18px}
+/* Match list */
+.adm-match-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid #0d0d0d;font-size:11px;flex-wrap:wrap}
+.adm-match-row:hover{background:#0d0d0d}
+.adm-match-teams{flex:1;color:#ddd;font-weight:600}
+.adm-match-meta{color:#444;font-size:10px}
+/* System info */
+.adm-info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.adm-info-card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:6px;padding:10px 12px}
+.adm-info-label{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.adm-info-value{font-size:12px;color:#ddd;font-weight:600;word-break:break-all}
+/* Discord */
+.adm-discord-form{display:flex;flex-direction:column;gap:8px}
+.adm-discord-form textarea{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:10px;color:#ddd;font-size:12px;font-family:inherit;resize:vertical;min-height:80px;outline:none}
+.adm-discord-form textarea:focus{border-color:#5865f2}
+/* Danger */
+.adm-danger{background:#110000;border:1px solid #2a0000;border-radius:10px;padding:12px 14px}
+.adm-danger h3{color:#ff4444;font-size:12px;margin-bottom:4px}
+.adm-danger p{font-size:10px;color:#555;margin-bottom:8px}
+/* Tip stats bar */
+.adm-bar{height:6px;border-radius:3px;background:#1a1a1a;overflow:hidden;display:flex;margin-top:3px}
+.adm-bar-g{height:100%;background:#16a34a}
+.adm-bar-y{height:100%;background:#ca8a04}
+.adm-bar-r{height:100%;background:#dc2626}
+/* Admin notice */
+.admin-notice{background:#1a0a00;border:1px solid #ffd70033;border-radius:6px;padding:8px 12px;font-size:11px;color:#ca8a04;margin-bottom:10px;display:flex;gap:6px;align-items:center}
+/* Compat */
+.result-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.result-form select,.result-form input[type=number]{background:#0d0d0d;border:1px solid #2a2a2a;border-radius:6px;padding:7px 10px;color:#ddd;font-size:12px;font-family:inherit;outline:none}
+.result-form input[type=number]{width:55px;text-align:center}
+.empty-state{text-align:center;padding:40px 20px;color:#555}
+.bot-bar{display:none}
 @media(max-width:600px){
-  .adm-table{font-size:11px}
-  .adm-table th:nth-child(3),.adm-table td:nth-child(3){display:none}
-  .adm-table th:nth-child(6),.adm-table td:nth-child(6){display:none}
-  .admin-tools-grid{grid-template-columns:1fr 1fr}
+  .adm-stats-grid{grid-template-columns:repeat(2,1fr)}
+  .adm-table th:nth-child(n+5),.adm-table td:nth-child(n+5){display:none}
+  .adm-info-grid{grid-template-columns:1fr}
 }
-.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px;}
-.admin-head{background:#1a1a1a;border-bottom:3px solid var(--red);padding:11px 18px;display:flex;align-items:center;gap:8px;}
-.admin-head h2{color:#fff;font-size:13px;font-weight:700;}
-.admin-head span{color:rgba(255,255,255,.4);font-size:12px;margin-left:auto;}
-.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
-.admin-table th{background:#f5f5f5;color:var(--muted);font-weight:600;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;}
-.admin-table td{padding:8px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
-.admin-table tr:last-child td{border-bottom:none;}
-.admin-table tr:hover td{background:#fafafa;}
-.admin-btn{padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .12s;}
-.admin-btn-red{background:#fee2e2;color:#991b1b;}
-.admin-btn-red:hover{background:#fca5a5;}
-.admin-btn-blue{background:#dbeafe;color:#1d4ed8;}
-.admin-btn-blue:hover{background:#93c5fd;}
-.admin-btn-gold{background:#fef9c3;color:#854d0e;}
-.admin-btn-gold:hover{background:#fde047;}
-.admin-danger-zone{background:#fff5f5;border:1px solid #fca5a5;border-radius:var(--radius);padding:16px 20px;margin-bottom:14px;}
-.admin-danger-zone h3{color:#991b1b;font-size:14px;font-weight:700;margin-bottom:8px;}
-.admin-danger-zone p{font-size:12px;color:var(--muted);margin-bottom:12px;}
-.admin-danger-btns{display:flex;gap:8px;flex-wrap:wrap;}
-.danger-btn{padding:8px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;border:none;cursor:pointer;}
-.danger-btn-red{background:#dc2626;color:#fff;}
-.danger-btn-red:hover{background:#b91c1c;}
-.danger-btn-orange{background:#ea580c;color:#fff;}
-.danger-btn-orange:hover{background:#c2410c;}
-.result-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.result-form select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--surface);}
-.result-form input{width:50px;padding:6px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;text-align:center;}
-.admin-notice{background:#fffbeb;border:1px solid #fde68a;border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:#92400e;margin-bottom:12px;}
-.bot-bar{background:#eef0fd;border:1px solid #c7d2fe;border-radius:var(--radius-sm);padding:9px 14px;display:flex;align-items:center;gap:9px;font-size:12px;color:#3730a3;margin-bottom:12px;}
-.empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 
 @media(max-width:899px){
   .topnav{display:none!important;}
@@ -798,6 +808,7 @@ function renderHeader(){
     ['spielbaum','🌳 Spielbaum'],
     ['tabelle','🏆 Tabelle'],
     ['auswertung','📊 Auswertung'],
+    ['kader','👕 Kader'],
     ['profil','👤 Profil'],
     state.isAdmin?['admin','🔧 Admin']:null,
   ];
@@ -817,7 +828,7 @@ function renderHeader(){
     </a>
     <nav class="topnav">
       ${navItems.filter(Boolean).map(([id,label])=>{
-    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html'};
+    const urls={spielplan:'/spielplan.html',spielbaum:'/spielbaum.html',tabelle:'/tabelle.html',auswertung:'/auswertung.html',profil:'/profil.html',kader:'/kader.html'};
     if(urls[id])return`<a href="${urls[id]}" style="text-decoration:none;${id===state.page?'color:var(--gold);border:1px solid var(--gold);padding:4px 8px;border-radius:5px;':''}">${label}</a>`;
     return`<a class="${state.page===id?'active':''}" onclick="setPage('${id}')">${label}</a>`;
   }).join('')}
@@ -1307,66 +1318,520 @@ function renderAdmin(){
   if(!state.isAdmin){
     return`<div class="locked-overlay"><div class="lock-icon">🔒</div><h3>Kein Zugriff</h3><p>Nur Administratoren können diese Seite sehen.</p></div>`;
   }
-  return`<div class="admin-page" style="padding:12px">
-    <div style="background:#1a0a00;border:1px solid #ffd70033;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#ca8a04;display:flex;gap:8px;align-items:center">
-      ⚠️ Admin-Bereich — Änderungen sind sofort wirksam!
+  return`<div class="admin-page">
+    <div class="admin-notice">⚠️ Admin-Bereich — Änderungen sind sofort wirksam!</div>
+    <div class="adm-tabs" id="admTabs">
+      <button class="adm-tab active" onclick="admTab(0)">📊 Dashboard</button>
+      <button class="adm-tab" onclick="admTab(1)">👥 Mitspieler</button>
+      <button class="adm-tab" onclick="admTab(2)">⚽ Spiele</button>
+      <button class="adm-tab" onclick="admTab(3)">📈 Statistiken</button>
+      <button class="adm-tab" onclick="admTab(4)">💬 Discord</button>
+      <button class="adm-tab" onclick="admTab(5)">⚙️ System</button>
+      <button class="adm-tab" onclick="admTab(6)">🗑️ Gefahrenzone</button>
     </div>
 
-    <!-- TOOLS -->
-    <div class="admin-section">
-      <div class="admin-section-head"><h2>🛠️ Live & Brackets</h2><div class="admin-msg" id="fetch-scores-msg"></div></div>
-      <div class="admin-section-body">
-        <div class="admin-tools-grid">
-          <button class="admin-tool-btn green" onclick="adminFetchScores()">🌐 Scores abrufen</button>
-          <button class="admin-tool-btn green" onclick="adminUpdateBrackets()">🔄 KO-Brackets update</button>
-          <button class="admin-tool-btn gold" onclick="adminEvalChampion()">🏆 Weltmeister auswerten</button>
+    <!-- TAB 0: DASHBOARD -->
+    <div class="adm-tab-content active" id="admTab0">
+      <div id="adm-dash-stats" class="adm-stats-grid">
+        <div class="adm-stat"><div class="adm-stat-v">…</div><div class="adm-stat-l">Wird geladen</div></div>
+      </div>
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>🛠️ Schnellaktionen</h2><div class="adm-msg" id="adm-quick-msg"></div></div>
+        <div class="adm-section-body">
+          <div class="adm-btn-grid">
+            <button class="adm-btn green" onclick="adminFetchScores()">🌐 Live-Scores abrufen</button>
+            <button class="adm-btn green" onclick="adminUpdateBrackets()">🔄 KO-Brackets update</button>
+            <button class="adm-btn gold" onclick="adminEvalChampion()">🏆 Weltmeister auswerten</button>
+            <button class="adm-btn blue" onclick="admLoadDashboard()">🔁 Dashboard reload</button>
+          </div>
+        </div>
+      </div>
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>⚽ Ergebnis eintragen</h2><span>Punkte werden sofort vergeben</span></div>
+        <div class="adm-section-body">
+          <div class="adm-form-row">
+            <select id="admin-match-sel" style="flex:1;min-width:180px">
+              <option value="">Spiel auswählen…</option>
+              ${state.matches.filter(m=>m.status!=='done').map(m=>`<option value="${m.id}">${m.home} vs ${m.away} (${m.date})</option>`).join('')}
+            </select>
+            <input type="number" id="admin-home-score" min="0" max="20" value="0">
+            <span style="color:#333;font-weight:700">:</span>
+            <input type="number" id="admin-away-score" min="0" max="20" value="0">
+            <button class="adm-btn gold" onclick="adminSetResult()">✅ Eintragen</button>
+          </div>
+          <div class="adm-msg" id="adm-result-msg"></div>
         </div>
       </div>
     </div>
 
-    <!-- ERGEBNIS -->
-    <div class="admin-section">
-      <div class="admin-section-head"><h2>⚽ Ergebnis eintragen</h2><span>Punkte werden sofort vergeben</span></div>
-      <div class="admin-section-body">
-        <div class="result-form">
-          <select id="admin-match-sel" style="flex:1;min-width:180px;">
-            <option value="">Spiel auswählen...</option>
-            ${state.matches.filter(m=>m.status!=='done').map(m=>`<option value="${m.id}">${m.home} vs ${m.away} (${m.date})</option>`).join('')}
-          </select>
-          <input type="number" id="admin-home-score" min="0" max="20" value="0" style="width:55px">
-          <span style="font-weight:700;color:#555">:</span>
-          <input type="number" id="admin-away-score" min="0" max="20" value="0" style="width:55px">
-          <button class="admin-tool-btn gold" style="padding:8px 14px" onclick="adminSetResult()">✅ Eintragen</button>
+    <!-- TAB 1: MITSPIELER -->
+    <div class="adm-tab-content" id="admTab1">
+      <div class="adm-section" id="admin-users-card">
+        <div class="adm-section-head">
+          <h2>👥 Alle Mitspieler</h2>
+          <span id="admin-user-count">Wird geladen…</span>
+        </div>
+        <div id="admin-users-body" style="padding:4px 0">
+          <div style="padding:16px;color:#555;font-size:12px">⏳ Wird geladen…</div>
         </div>
       </div>
     </div>
 
-    <!-- MITSPIELER -->
-    <div class="admin-section" id="admin-users-card">
-      <div class="admin-section-head">
-        <h2>👥 Mitspieler</h2>
-        <span id="admin-user-count">Wird geladen…</span>
-      </div>
-      <div id="admin-users-body" style="padding:4px 0">
-        <div style="padding:16px;color:#666;font-size:12px">⏳ Wird geladen…</div>
+    <!-- TAB 2: SPIELE -->
+    <div class="adm-tab-content" id="admTab2">
+      <div class="adm-section">
+        <div class="adm-section-head">
+          <h2>📋 Alle Spiele</h2>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select class="adm-select" id="adm-match-filter" onchange="admFilterMatches()" style="font-size:11px;padding:4px 8px">
+              <option value="">Alle</option>
+              <option value="open">Offen</option>
+              <option value="live">Live</option>
+              <option value="done">Abgeschlossen</option>
+            </select>
+          </div>
+        </div>
+        <div id="adm-matches-body" style="max-height:500px;overflow-y:auto">
+          <div style="padding:16px;color:#555;font-size:12px">⏳ Wird geladen…</div>
+        </div>
       </div>
     </div>
 
-    <!-- GEFAHRENZONE -->
-    <div class="adm-danger">
-      <h3>🗑️ Gefahrenzone</h3>
-      <p>Unwiderrufliche Aktionen — bitte mit Bedacht verwenden!</p>
-      <div class="adm-danger-btns">
-        <button class="admin-tool-btn red" onclick="adminResetTips()">🔄 Alle Tipps reset</button>
-        <button class="admin-tool-btn red" onclick="adminResetUsers()">💥 Alle Nutzer löschen</button>
+    <!-- TAB 3: STATISTIKEN -->
+    <div class="adm-tab-content" id="admTab3">
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>📈 Tipp-Statistiken pro Spiel</h2></div>
+        <div id="adm-tipstats-body" style="max-height:500px;overflow-y:auto">
+          <div style="padding:16px;color:#555;font-size:12px">⏳ Wird geladen…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: DISCORD -->
+    <div class="adm-tab-content" id="admTab4">
+      <div class="adm-section">
+        <div class="adm-section-head">
+          <h2>💬 Discord Nachricht senden</h2>
+          <span id="adm-discord-bot-status">Wird geprüft…</span>
+        </div>
+        <div class="adm-section-body">
+
+          <!-- Channel + Vorlagen -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div>
+              <div style="font-size:10px;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">📡 Channel</div>
+              <select class="adm-select" id="adm-discord-channel" style="width:100%" onchange="admChannelChanged()">
+                <option value="">Channel auswählen…</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:10px;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">📋 Vorlage</div>
+              <select class="adm-select" id="adm-discord-template" style="width:100%" onchange="admApplyTemplate()">
+                <option value="">Vorlage wählen…</option>
+                <optgroup label="📊 Stand-Channel">
+                  <option value="stand_tabelle">📊 Aktuelle Tabelle posten</option>
+                  <option value="stand_woche">📅 Wochenrückblick</option>
+                  <option value="stand_spitze">🏆 Führender hervorheben</option>
+                </optgroup>
+                <optgroup label="⏰ Erinnerungen">
+                  <option value="erin_heute">⏰ Tipps für heute eintragen</option>
+                  <option value="erin_morgen">📅 Spiele morgen</option>
+                  <option value="erin_deadline">🚨 Deadline-Warnung</option>
+                  <option value="erin_ko">⚡ KO-Phase startet</option>
+                </optgroup>
+                <optgroup label="👥 Teilnehmer">
+                  <option value="teil_willkommen">👋 Neuer Mitspieler</option>
+                  <option value="teil_einladung">📢 Einladung mitmachen</option>
+                  <option value="teil_start">🚀 WM startet</option>
+                </optgroup>
+                <optgroup label="🏆 Allgemein">
+                  <option value="allg_ergebnis">⚽ Ergebnis & Punkte</option>
+                  <option value="allg_weltmeister">🏆 Weltmeister ausgewertet</option>
+                  <option value="allg_wartung">🔧 Wartungshinweis</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <!-- Nachrichtenfeld -->
+          <div class="adm-discord-form">
+            <div style="font-size:10px;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">✏️ Nachricht <span id="adm-discord-charcount" style="color:#333;float:right">0/2000</span></div>
+            <textarea id="adm-discord-msg" placeholder="Nachricht hier eingeben…\n\nTipp: Discord-Formatting funktioniert:\n**Fett** · *Kursiv* · \`Code\` · > Zitat" oninput="admCountChars()" rows="6"></textarea>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <button class="adm-btn blue" onclick="admSendDiscord()">📤 Senden</button>
+              <button class="adm-btn" onclick="admClearDiscord()" style="font-size:10px">✕ Leeren</button>
+              <div class="adm-msg" id="adm-discord-result"></div>
+            </div>
+          </div>
+
+          <!-- Vorschau -->
+          <div style="margin-top:10px">
+            <div style="font-size:10px;color:#555;margin-bottom:5px;text-transform:uppercase;letter-spacing:1px">👁️ Vorschau</div>
+            <div id="adm-discord-preview" style="background:#36393f;border-radius:6px;padding:10px 14px;font-size:12px;color:#dcddde;min-height:40px;white-space:pre-wrap;word-break:break-word;font-family:-apple-system,sans-serif">
+              <span style="color:#555;font-style:italic">Nachricht erscheint hier…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Channel-Info -->
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>📡 Channel-Konfiguration</h2></div>
+        <div class="adm-section-body">
+          <div class="adm-info-grid" id="adm-discord-channels-body">
+            <div style="color:#555;font-size:11px">Wird geladen…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: SYSTEM -->
+    <div class="adm-tab-content" id="admTab5">
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>⚙️ System-Info</h2><button class="adm-btn" onclick="admLoadSystem()" style="padding:4px 8px;font-size:10px">🔁 Reload</button></div>
+        <div class="adm-section-body">
+          <div class="adm-info-grid" id="adm-system-body">
+            <div style="color:#555;font-size:11px">Wird geladen…</div>
+          </div>
+        </div>
+      </div>
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>🗄️ Kader-Cache</h2></div>
+        <div class="adm-section-body">
+          <div class="adm-btn-grid">
+            <button class="adm-btn orange" onclick="admClearKaderCache()">🗑️ Kader-Cache leeren</button>
+          </div>
+          <div class="adm-msg" id="adm-cache-msg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: GEFAHRENZONE -->
+    <div class="adm-tab-content" id="admTab6">
+      <div class="adm-danger" style="margin-bottom:10px">
+        <h3>🗑️ Gefahrenzone</h3>
+        <p>Unwiderrufliche Aktionen — bitte nur mit Bedacht verwenden!</p>
+        <div class="adm-btn-grid">
+          <button class="adm-btn red" onclick="adminResetTips()">🔄 Alle Tipps zurücksetzen</button>
+          <button class="adm-btn red" onclick="adminResetUsers()">💥 Alle Nutzer löschen</button>
+        </div>
       </div>
     </div>
   </div>`;
 }
 
+function admTab(n){
+  document.querySelectorAll('.adm-tab').forEach((t,i)=>t.classList.toggle('active',i===n));
+  document.querySelectorAll('.adm-tab-content').forEach((c,i)=>c.classList.toggle('active',i===n));
+  if(n===0)admLoadDashboard();
+  if(n===1)loadAdminUsers();
+  if(n===2)admLoadMatches();
+  if(n===3)admLoadTipStats();
+  if(n===4)admLoadDiscord();
+  if(n===5)admLoadSystem();
+}
+
+async function admLoadDashboard(){
+  try{
+    const d=await api('/api/admin/dashboard');
+    const g=document.getElementById('adm-dash-stats');
+    if(!g)return;
+    const pct=(a,b)=>b?Math.round(a/b*100):0;
+    g.innerHTML=`
+      <div class="adm-stat"><div class="adm-stat-v">${d.users}</div><div class="adm-stat-l">Mitspieler</div></div>
+      <div class="adm-stat"><div class="adm-stat-v">${d.tips_total}</div><div class="adm-stat-l">Tipps gesamt</div><div class="adm-stat-sub">${d.tips_evaluated} gewertet</div></div>
+      <div class="adm-stat"><div class="adm-stat-v">${d.matches_done}</div><div class="adm-stat-l">Spiele fertig</div><div class="adm-stat-sub">${d.matches_open} offen · ${d.matches_live} live</div></div>
+      <div class="adm-stat"><div class="adm-stat-v">${d.wm_tips}</div><div class="adm-stat-l">WM-Tipps</div></div>
+      <div class="adm-stat"><div class="adm-stat-v" style="color:#16a34a">${d.exact_tips}</div><div class="adm-stat-l">Exakt (3 Pkt)</div></div>
+      <div class="adm-stat"><div class="adm-stat-v" style="color:#ca8a04">${d.tend_tips}</div><div class="adm-stat-l">Tendenz (1 Pkt)</div></div>
+      <div class="adm-stat"><div class="adm-stat-v" style="color:#dc2626">${d.wrong_tips}</div><div class="adm-stat-l">Falsch (0 Pkt)</div></div>
+      ${d.top_scorer?`<div class="adm-stat"><div class="adm-stat-v" style="font-size:14px;color:#ffd700">🏆 ${d.top_scorer.username}</div><div class="adm-stat-l">Top-Scorer</div><div class="adm-stat-sub">${d.top_scorer.pts} Pkt</div></div>`:''}
+    `;
+  }catch(e){console.error(e);}
+}
+
+async function admLoadMatches(){
+  const body=document.getElementById('adm-matches-body');
+  if(!body)return;
+  try{
+    const matches=await api('/api/admin/all-matches');
+    window._admMatches=matches;
+    admRenderMatches(matches);
+  }catch(e){body.innerHTML=`<div style="padding:12px;color:#cc0000;font-size:11px">Fehler: ${e.message}</div>`;}
+}
+
+function admFilterMatches(){
+  if(!window._admMatches)return;
+  const f=document.getElementById('adm-match-filter')?.value||'';
+  const filtered=f?window._admMatches.filter(m=>m.status===f):window._admMatches;
+  admRenderMatches(filtered);
+}
+
+function admRenderMatches(matches){
+  const body=document.getElementById('adm-matches-body');
+  if(!body)return;
+  if(!matches.length){body.innerHTML='<div style="padding:12px;color:#555;font-size:11px">Keine Spiele</div>';return;}
+  const statusBadge=s=>s==='done'?'<span class="adm-badge done">✓ Fertig</span>':
+    s==='live'?'<span class="adm-badge live">🔴 Live</span>':
+    '<span class="adm-badge open">○ Offen</span>';
+  body.innerHTML=matches.map(m=>`
+    <div class="adm-match-row">
+      <div class="adm-match-teams">${m.home_team} vs ${m.away_team}</div>
+      <div class="adm-match-meta">Gr.${m.group_name} · ${m.match_date||''}</div>
+      ${statusBadge(m.status)}
+      ${m.status==='done'?`<span style="color:#ffd700;font-size:11px;font-weight:700">${m.home_score}:${m.away_score}</span>`:''}
+      <span style="color:#444;font-size:10px">${m.tip_count} Tipps</span>
+      <div style="display:flex;gap:4px">
+        ${m.status==='done'?`<button class="adm-btn" style="padding:3px 7px;font-size:9px" onclick="admSetMatchStatus(${m.id},'open')">↩ Öffnen</button>`:''}
+        ${m.status==='done'?`<button class="adm-btn gold" style="padding:3px 7px;font-size:9px" onclick="admRecalculate(${m.id},'${m.home_team} vs ${m.away_team}')">🔁 Neu werten</button>`:''}
+        <button class="adm-btn blue" style="padding:3px 7px;font-size:9px" onclick="admShowMatchTips(${m.id},'${m.home_team} vs ${m.away_team}')">📋 Tipps</button>
+      </div>
+    </div>
+    <div class="adm-detail" id="match-detail-${m.id}"></div>
+  `).join('');
+}
+
+async function admSetMatchStatus(id,status){
+  if(!confirm(`Match-Status auf "${status}" setzen?`))return;
+  try{
+    await api(`/api/admin/match-status/${id}`,{method:'POST',body:JSON.stringify({status})});
+    await admLoadMatches();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function admRecalculate(id,name){
+  if(!confirm(`Punkte für "${name}" neu berechnen? Bestehende Punkte werden überschrieben.`))return;
+  try{
+    const r=await api(`/api/admin/recalculate/${id}`,{method:'POST'});
+    alert(`✅ ${r.recalculated} Tipps neu bewertet!`);
+    state.rankings=await api('/api/rankings');
+    await admLoadMatches();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function admShowMatchTips(id,name){
+  const panel=document.getElementById(`match-detail-${id}`);
+  if(!panel)return;
+  if(panel.classList.contains('open')){panel.classList.remove('open');return;}
+  panel.classList.add('open');
+  panel.innerHTML='<div style="color:#555;font-size:10px;padding:4px">⏳ Lade…</div>';
+  try{
+    const tips=await api(`/api/admin/match-tips/${id}`);
+    if(!tips.length){panel.innerHTML='<div style="color:#555;font-size:10px;padding:4px">Keine Tipps</div>';return;}
+    panel.innerHTML=`<div style="font-size:9px;color:#444;margin-bottom:5px;padding:2px 0">${name} — ${tips.length} Tipps</div>`+
+      tips.map(t=>{
+        const pClass=t.points===3?'p3':t.points===1?'p1':t.points===0?'p0':'pn';
+        const pLabel=t.points===null?'—':(t.points>0?'+':'')+t.points;
+        return `<div class="adm-tip-row">
+          <div class="adm-tip-match">${t.username}</div>
+          <div class="adm-tip-score">Tipp: ${t.home_tip}:${t.away_tip}</div>
+          <div class="adm-tip-pts ${pClass}">${pLabel} Pkt</div>
+        </div>`;
+      }).join('');
+  }catch(e){panel.innerHTML=`<div style="color:#cc0000;font-size:10px">Fehler</div>`;}
+}
+
+async function admLoadTipStats(){
+  const body=document.getElementById('adm-tipstats-body');
+  if(!body)return;
+  try{
+    const stats=await api('/api/admin/tip-stats');
+    const done=stats.filter(m=>m.status==='done');
+    if(!done.length){body.innerHTML='<div style="padding:12px;color:#555;font-size:11px">Noch keine abgeschlossenen Spiele</div>';return;}
+    body.innerHTML=`<div style="overflow-x:auto"><table class="adm-table">
+      <thead><tr><th>Spiel</th><th>Gruppe</th><th>Erg.</th><th>Tipps</th><th>Exakt</th><th>Tendenz</th><th>Falsch</th><th>Verteilung</th></tr></thead>
+      <tbody>${done.map(m=>{
+        const total=m.tips||1;
+        const gPct=Math.round((m.exact_count||0)/total*100);
+        const yPct=Math.round((m.tend_count||0)/total*100);
+        const rPct=Math.round((m.wrong_count||0)/total*100);
+        return `<tr>
+          <td style="font-weight:600;color:#ddd">${m.home_team} vs ${m.away_team}</td>
+          <td style="color:#555">${m.group_name}</td>
+          <td style="font-weight:700;color:#ffd700">${m.home_score}:${m.away_score}</td>
+          <td style="color:#888">${m.tips}</td>
+          <td style="color:#16a34a">${m.exact_count||0}</td>
+          <td style="color:#ca8a04">${m.tend_count||0}</td>
+          <td style="color:#dc2626">${m.wrong_count||0}</td>
+          <td style="min-width:80px">
+            <div class="adm-bar">
+              <div class="adm-bar-g" style="width:${gPct}%"></div>
+              <div class="adm-bar-y" style="width:${yPct}%"></div>
+              <div class="adm-bar-r" style="width:${rPct}%"></div>
+            </div>
+          </td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  }catch(e){body.innerHTML=`<div style="padding:12px;color:#cc0000;font-size:11px">Fehler: ${e.message}</div>`;}
+}
+
+// Discord Channel IDs werden nach dem Laden gespeichert
+let _discordChannels = {};
+
+const DISCORD_TEMPLATES = {
+  stand_tabelle: '📊 **Aktuelle Tabelle — WM Tippspiel 2026**\n\nSchaut mal rein wer aktuell führt! 🏆\n👉 https://www.manelo98-league.de/tabelle.html',
+  stand_woche: '📅 **Wochenrückblick**\n\nEine weitere WM-Woche liegt hinter uns! Wer hat am meisten Punkte geholt?\n👉 Schaut in die Tabelle: https://www.manelo98-league.de/tabelle.html',
+  stand_spitze: '🏆 **Tabellenführer im Rampenlicht!**\n\nHerzlichen Glückwunsch an den aktuellen Führenden — aber das Spiel ist noch nicht vorbei! 😤\n👉 https://www.manelo98-league.de/tabelle.html',
+  erin_heute: '⏰ **Erinnerung: Tipps noch nicht abgegeben?**\n\nHeute spielen noch Teams — vergesst nicht eure Tipps rechtzeitig einzutragen!\n👉 https://www.manelo98-league.de/spielplan.html',
+  erin_morgen: '📅 **Morgen geht es weiter!**\n\nMorgen stehen wieder Spiele an. Tragt eure Tipps rechtzeitig ein — nach Anpfiff ist es zu spät!\n👉 https://www.manelo98-league.de/spielplan.html',
+  erin_deadline: '🚨 **DEADLINE-WARNUNG** 🚨\n\nGleich geht es los! Wer noch keinen Tipp abgegeben hat, hat jetzt die letzte Chance!\n⚡ https://www.manelo98-league.de/spielplan.html',
+  erin_ko: '⚡ **KO-Phase startet!**\n\nDie Gruppenphase ist vorbei — jetzt beginnt der Ernst des Lebens! Alle KO-Spiele tippen!\n👉 https://www.manelo98-league.de/spielplan.html\n🌳 Spielbaum: https://www.manelo98-league.de/spielbaum.html',
+  teil_willkommen: '👋 **Willkommen beim WM Tippspiel!**\n\nEin neuer Mitspieler ist dabei — herzlich willkommen im Fanclub Manelo98 Tippspiel! 🎉\n👉 https://www.manelo98-league.de',
+  teil_einladung: '📢 **WM Tippspiel 2026 — Jetzt mitmachen!**\n\nIhr tippt noch nicht mit? Dann wird es höchste Zeit! Registriert euch kostenlos und kämpft um den Tipp-Weltmeister-Titel! 🏆\n👉 https://www.manelo98-league.de',
+  teil_start: '🚀 **Die WM 2026 hat begonnen!**\n\nDas Warten hat ein Ende — die Weltmeisterschaft läuft! Tippt alle Spiele und zeigt wer der beste Tipp-Weltmeister ist!\n⚽ https://www.manelo98-league.de',
+  allg_ergebnis: '⚽ **Ergebnisse & Punkte aktualisiert!**\n\nDie Punkte für die letzten Spiele wurden vergeben. Schaut in die Auswertung!\n👉 https://www.manelo98-league.de/auswertung.html',
+  allg_weltmeister: '🏆 **Weltmeister ausgewertet!**\n\nDer Weltmeister steht fest und die Bonuspunkte (+15) wurden vergeben. Schaut wer davon profitiert!\n👉 https://www.manelo98-league.de/tabelle.html',
+  allg_wartung: '🔧 **Kurze Wartung**\n\nDie Seite ist kurz nicht erreichbar. Wir sind gleich wieder für euch da!',
+};
+
+// Empfohlener Channel pro Vorlage
+const TEMPLATE_CHANNEL = {
+  stand_tabelle:'stand', stand_woche:'stand', stand_spitze:'stand',
+  erin_heute:'erinnerungen', erin_morgen:'erinnerungen', erin_deadline:'erinnerungen', erin_ko:'erinnerungen',
+  teil_willkommen:'teilnehmer', teil_einladung:'teilnehmer', teil_start:'teilnehmer',
+  allg_ergebnis:'erinnerungen', allg_weltmeister:'stand', allg_wartung:'erinnerungen',
+};
+
+async function admLoadDiscord(){
+  try{
+    const ch=await api('/api/admin/discord-channels');
+    _discordChannels=ch;
+    const sel=document.getElementById('adm-discord-channel');
+    const status=document.getElementById('adm-discord-bot-status');
+    if(status)status.textContent=ch.token_set?'✅ Bot verbunden':'❌ Kein Token';
+    if(sel){
+      sel.innerHTML='<option value="">Channel auswählen…</option>';
+      if(ch.stand){sel.innerHTML+=`<option value="${ch.stand}" data-key="stand">📊 Stand-Channel</option>`;}
+      if(ch.erinnerungen){sel.innerHTML+=`<option value="${ch.erinnerungen}" data-key="erinnerungen">⏰ Erinnerungen-Channel</option>`;}
+      if(ch.teilnehmer){sel.innerHTML+=`<option value="${ch.teilnehmer}" data-key="teilnehmer">👥 Teilnehmer-Channel</option>`;}
+      if(!ch.token_set){sel.innerHTML='<option value="">⚠️ Kein Discord Token konfiguriert</option>';}
+    }
+    const body=document.getElementById('adm-discord-channels-body');
+    if(body){
+      body.innerHTML=`
+        <div class="adm-info-card"><div class="adm-info-label">Bot Token</div><div class="adm-info-value">${ch.token_set?'✅ Konfiguriert':'❌ Fehlt in Railway Env'}</div></div>
+        <div class="adm-info-card"><div class="adm-info-label">📊 Stand-Channel ID</div><div class="adm-info-value">${ch.stand||'—'}</div></div>
+        <div class="adm-info-card"><div class="adm-info-label">⏰ Erinnerungen-Channel ID</div><div class="adm-info-value">${ch.erinnerungen||'—'}</div></div>
+        <div class="adm-info-card"><div class="adm-info-label">👥 Teilnehmer-Channel ID</div><div class="adm-info-value">${ch.teilnehmer||'—'}</div></div>
+        <div class="adm-info-card" style="grid-column:1/-1"><div class="adm-info-label">ℹ️ Hinweis</div><div class="adm-info-value" style="font-size:10px;color:#555">Der Discord Bot selbst (bot/) bleibt unverändert. Nachrichten werden direkt über die Discord REST API gesendet.</div></div>
+      `;
+    }
+  }catch(e){console.error('admLoadDiscord:',e);}
+}
+
+function admApplyTemplate(){
+  const key=document.getElementById('adm-discord-template')?.value;
+  if(!key)return;
+  const text=DISCORD_TEMPLATES[key];
+  if(text){
+    const ta=document.getElementById('adm-discord-msg');
+    if(ta){ta.value=text;admUpdatePreview();admCountChars();}
+  }
+  // Empfohlenen Channel vorauswählen
+  const recChannel=TEMPLATE_CHANNEL[key];
+  if(recChannel&&_discordChannels[recChannel]){
+    const sel=document.getElementById('adm-discord-channel');
+    if(sel){
+      for(let opt of sel.options){
+        if(opt.dataset.key===recChannel){opt.selected=true;break;}
+      }
+    }
+  }
+}
+
+function admChannelChanged(){
+  // Nichts weiteres nötig
+}
+
+function admCountChars(){
+  const ta=document.getElementById('adm-discord-msg');
+  const counter=document.getElementById('adm-discord-charcount');
+  if(!ta||!counter)return;
+  const len=ta.value.length;
+  counter.textContent=`${len}/2000`;
+  counter.style.color=len>1800?'#dc2626':len>1500?'#ca8a04':'#333';
+  admUpdatePreview();
+}
+
+function admUpdatePreview(){
+  const ta=document.getElementById('adm-discord-msg');
+  const preview=document.getElementById('adm-discord-preview');
+  if(!ta||!preview)return;
+  const text=ta.value||'';
+  if(!text.trim()){preview.innerHTML='<span style="color:#555;font-style:italic">Nachricht erscheint hier…</span>';return;}
+  // Einfaches Discord Markdown
+  let html=text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/`(.+?)`/g,'<code style="background:#2f3136;padding:1px 4px;border-radius:3px">$1</code>')
+    .replace(/^> (.+)$/gm,'<blockquote style="border-left:3px solid #4f545c;padding-left:8px;color:#a3a6aa">$1</blockquote>')
+    .replace(/
+/g,'<br>');
+  preview.innerHTML=html;
+}
+
+function admClearDiscord(){
+  const ta=document.getElementById('adm-discord-msg');
+  const tmpl=document.getElementById('adm-discord-template');
+  if(ta){ta.value='';admUpdatePreview();admCountChars();}
+  if(tmpl)tmpl.value='';
+}
+
+async function admSendDiscord(){
+  const channelId=document.getElementById('adm-discord-channel')?.value;
+  const msg=document.getElementById('adm-discord-msg')?.value?.trim();
+  const res=document.getElementById('adm-discord-result');
+  if(!channelId){if(res){res.textContent='⚠️ Bitte Channel auswählen';res.style.color='#ca8a04';}return;}
+  if(!msg){if(res){res.textContent='⚠️ Bitte Nachricht eingeben';res.style.color='#ca8a04';}return;}
+  if(msg.length>2000){if(res){res.textContent='❌ Nachricht zu lang (max 2000 Zeichen)';res.style.color='#dc2626';}return;}
+  if(res){res.textContent='📤 Wird gesendet…';res.style.color='#60a5fa';}
+  try{
+    const r=await api('/api/admin/discord-broadcast',{method:'POST',body:JSON.stringify({channel_id:channelId,message:msg})});
+    if(r.ok){
+      if(res){res.textContent='✅ Erfolgreich gesendet!';res.style.color='#4ade80';}
+      document.getElementById('adm-discord-msg').value='';
+      document.getElementById('adm-discord-template').value='';
+      admUpdatePreview();admCountChars();
+      setTimeout(()=>{if(res){res.textContent='';res.style.color=''}},4000);
+    } else {
+      if(res){res.textContent=`❌ ${r.error||'Fehler beim Senden'}`;res.style.color='#dc2626';}
+    }
+  }catch(e){if(res){res.textContent='❌ '+e.message;res.style.color='#dc2626';}}
+}
+
+async function admLoadSystem(){
+  const body=document.getElementById('adm-system-body');
+  if(!body)return;
+  try{
+    const s=await api('/api/admin/system');
+    body.innerHTML=`
+      <div class="adm-info-card"><div class="adm-info-label">Datenbank-Größe</div><div class="adm-info-value">${s.db_size}</div></div>
+      <div class="adm-info-card"><div class="adm-info-label">Kader-Cache</div><div class="adm-info-value">${s.kader_cache_entries} Einträge</div></div>
+      <div class="adm-info-card"><div class="adm-info-label">Football API</div><div class="adm-info-value">${s.football_api?'✅ Konfiguriert':'❌ Fehlt'}</div></div>
+      <div class="adm-info-card"><div class="adm-info-label">Discord OAuth</div><div class="adm-info-value">${s.discord_oauth?'✅ Konfiguriert':'❌ Fehlt'}</div></div>
+      <div class="adm-info-card"><div class="adm-info-label">Web URL</div><div class="adm-info-value">${s.web_url}</div></div>
+      <div class="adm-info-card"><div class="adm-info-label">Admin IDs</div><div class="adm-info-value">${(s.admin_ids||[]).join(', ')||'—'}</div></div>
+      ${(s.tables||[]).map(t=>`<div class="adm-info-card"><div class="adm-info-label">Tabelle: ${t.tablename}</div><div class="adm-info-value">${t.size}</div></div>`).join('')}
+      <div class="adm-info-card" style="grid-column:1/-1"><div class="adm-info-label">Python</div><div class="adm-info-value" style="font-size:10px;color:#444">${s.python_version}</div></div>
+    `;
+  }catch(e){body.innerHTML=`<div style="color:#cc0000;font-size:11px">Fehler: ${e.message}</div>`;}
+}
+
+async function admClearKaderCache(){
+  const msg=document.getElementById('adm-cache-msg');
+  try{
+    await api('/api/admin/kader-cache',{method:'DELETE'});
+    if(msg)msg.textContent='✅ Cache geleert!';
+    setTimeout(()=>{if(msg)msg.textContent=''},3000);
+    await admLoadSystem();
+  }catch(e){if(msg)msg.textContent='❌ '+e.message;}
+}
+
 async function loadAdminUsers(){
   try{
-    const users=await api('/api/admin/users-detail');
+    const users=await api('/api/admin/users-detail').catch(()=>api('/api/admin/users'));
     const count=document.getElementById('admin-user-count');
     const body=document.getElementById('admin-users-body');
     if(count)count.textContent=users.length+' Mitspieler';
@@ -1375,7 +1840,7 @@ async function loadAdminUsers(){
     let html=`<div style="overflow-x:auto"><table class="adm-table">
       <thead><tr>
         <th></th><th>Name</th><th>Login</th>
-        <th>Tipps</th><th>Punkte</th><th>WM-Tipp</th><th>Datum</th><th style="min-width:280px">Aktionen</th>
+        <th>Tipps</th><th>Punkte</th><th>WM-Tipp</th><th>Dabei seit</th><th style="min-width:260px">Aktionen</th>
       </tr></thead><tbody>`;
     users.forEach(u=>{
       const col=avatarColor(u.username);
@@ -1388,22 +1853,24 @@ async function loadAdminUsers(){
         :`<span class="adm-badge email">E-Mail</span>`;
       const wmBadge=u.wm_tip
         ?`<span class="adm-badge wm">🏆 ${u.wm_tip}</span>`
-        :`<span style="color:#333;font-size:10px">—</span>`;
+        :`<span style="color:#2a2a2a;font-size:10px">—</span>`;
+      const pts=u.points||0;
+      const wmPts=u.wm_points||0;
       html+=`<tr>
         <td>${av}</td>
-        <td><strong style="color:#ddd">${u.username}</strong>${u.email?`<div style="font-size:10px;color:#444">${u.email}</div>`:''}</td>
+        <td><strong style="color:#ddd">${u.username}</strong>${u.email?`<div style="font-size:9px;color:#333">${u.email}</div>`:''}</td>
         <td>${loginBadge}</td>
-        <td style="color:#888">${u.tips}</td>
-        <td><strong style="color:#ffd700">${u.points}</strong>${u.wm_points?`<span style="color:#ffd70066;font-size:10px"> +${u.wm_points}</span>`:''}</td>
+        <td style="color:#666">${u.tips||0}</td>
+        <td><strong style="color:#ffd700">${pts}</strong>${wmPts?`<span style="color:#ffd70055;font-size:9px"> +${wmPts}</span>`:''}</td>
         <td>${wmBadge}</td>
-        <td style="color:#444;font-size:11px">${joined}</td>
+        <td style="color:#333;font-size:10px">${joined}</td>
         <td>
           <div style="display:flex;gap:4px;flex-wrap:wrap">
-            <button class="adm-act-btn gold" onclick="adminShowUserTips(${u.id},'${u.username}')">📋 Tipps</button>
-            <button class="adm-act-btn orange" onclick="adminResetUserTips(${u.id},'${u.username}')">🔄 Alle Tipps</button>
-            <button class="adm-act-btn orange" onclick="adminResetWmChampion(${u.id},'${u.username}')">🏆 WM-Tipp</button>
-            <button class="adm-act-btn blue" onclick="adminResetPassword(${u.id},'${u.username}')">🔑 Passwort</button>
-            <button class="adm-act-btn red" onclick="adminDeleteUser(${u.id},'${u.username}')">🗑️ Löschen</button>
+            <button class="adm-btn gold" style="padding:3px 7px;font-size:9px" onclick="adminShowUserTips(${u.id},'${u.username}')">📋 Tipps</button>
+            <button class="adm-btn orange" style="padding:3px 7px;font-size:9px" onclick="adminResetUserTips(${u.id},'${u.username}')">🔄 Tipps reset</button>
+            <button class="adm-btn orange" style="padding:3px 7px;font-size:9px" onclick="adminResetWmChampion(${u.id},'${u.username}')">🏆 WM reset</button>
+            <button class="adm-btn blue" style="padding:3px 7px;font-size:9px" onclick="adminResetPassword(${u.id},'${u.username}')">🔑 Passwort</button>
+            <button class="adm-btn red" style="padding:3px 7px;font-size:9px" onclick="adminDeleteUser(${u.id},'${u.username}')">🗑️ Löschen</button>
           </div>
           <div class="adm-detail" id="tips-detail-${u.id}"></div>
         </td>
@@ -1411,7 +1878,7 @@ async function loadAdminUsers(){
     });
     html+='</tbody></table></div>';
     body.innerHTML=html;
-  }catch(e){console.error(e);}
+  }catch(e){console.error('loadAdminUsers:',e);}
 }
 
 async function adminShowUserTips(id,name){
@@ -1419,34 +1886,32 @@ async function adminShowUserTips(id,name){
   if(!panel)return;
   if(panel.classList.contains('open')){panel.classList.remove('open');return;}
   panel.classList.add('open');
-  panel.innerHTML='<div style="color:#555;font-size:11px;padding:4px">⏳ Lade Tipps…</div>';
+  panel.innerHTML='<div style="color:#555;font-size:10px;padding:4px">⏳ Lade Tipps…</div>';
   try{
     const tips=await api(`/api/admin/user-tips/${id}`);
-    if(!tips.length){panel.innerHTML='<div style="color:#555;font-size:11px;padding:4px">Noch keine Tipps abgegeben</div>';return;}
-    let html=`<div style="font-size:10px;color:#555;margin-bottom:6px;font-weight:700;padding:4px 0">${name} — ${tips.length} Tipps</div>`;
+    if(!tips.length){panel.innerHTML='<div style="color:#555;font-size:10px;padding:4px">Noch keine Tipps</div>';return;}
+    let html=`<div style="font-size:9px;color:#444;margin-bottom:5px;padding:2px 0;font-weight:700">${name} — ${tips.length} Tipps</div>`;
     tips.forEach(t=>{
       const pts=t.points;
-      const ptsClass=pts===3?'p3':pts===1?'p1':pts===0?'p0':'pn';
-      const ptsLabel=pts===null||pts===undefined?'—':(pts>0?'+':'')+pts;
+      const pClass=pts===3?'p3':pts===1?'p1':pts===0?'p0':'pn';
+      const pLabel=pts===null||pts===undefined?'—':(pts>0?'+':'')+pts;
       const result=t.home_score!==null&&t.home_score!==undefined?`${t.home_score}:${t.away_score}`:'offen';
       html+=`<div class="adm-tip-row">
         <div class="adm-tip-match">${t.home_team} vs ${t.away_team} <span style="color:#2a2a2a">(Gr.${t.group_name})</span></div>
-        <div class="adm-tip-score">Tipp: ${t.home_tip}:${t.away_tip}</div>
-        <div style="font-size:10px;color:#444;min-width:55px">Erg: ${result}</div>
-        <div class="adm-tip-pts ${ptsClass}">${ptsLabel} Pkt</div>
-        <button class="adm-act-btn red" style="padding:2px 6px;font-size:9px" onclick="adminDeleteTip(${t.id},${id},'${name}')">✕</button>
+        <div class="adm-tip-score">Tipp: ${t.home_tip}:${t.away_tip} · Erg: ${result}</div>
+        <div class="adm-tip-pts ${pClass}">${pLabel} Pkt</div>
+        <button class="adm-btn red" style="padding:2px 5px;font-size:9px" onclick="adminDeleteTip(${t.id},${id},'${name}')">✕</button>
       </div>`;
     });
     panel.innerHTML=html;
-  }catch(e){panel.innerHTML=`<div style="color:#cc0000;font-size:11px">Fehler: ${e.message}</div>`;}
+  }catch(e){panel.innerHTML=`<div style="color:#cc0000;font-size:10px">Fehler: ${e.message}</div>`;}
 }
 
 async function adminDeleteTip(tipId,userId,name){
   if(!confirm(`Diesen einzelnen Tipp von "${name}" löschen?`))return;
   try{
     await api(`/api/admin/tip/${tipId}`,{method:'DELETE'});
-    await adminShowUserTips(userId,name);
-    const panel=document.getElementById(`tips-detail-${userId}`);
+    panel=document.getElementById(`tips-detail-${userId}`);
     if(panel){panel.classList.remove('open');setTimeout(()=>{panel.classList.add('open');adminShowUserTips(userId,name);},50);}
     await loadAdminUsers();
   }catch(e){alert('Fehler: '+e.message);}
@@ -1489,18 +1954,17 @@ async function adminResetUserTips(id,name){
 }
 
 async function adminResetTips(){
-  if(!confirm('ALLE Tipps aller Mitspieler zurücksetzen? Dies kann nicht rückgängig gemacht werden!'))return;
+  if(!confirm('ALLE Tipps aller Mitspieler zurücksetzen? Kann nicht rückgängig gemacht werden!'))return;
   try{
     await api('/api/admin/reset-tips',{method:'POST'});
     state.tips={};state.rankings=[];state.results=[];
-    await loadAdminUsers();
-    render();
+    await loadAdminUsers();render();
     alert('Alle Tipps wurden zurückgesetzt!');
   }catch(e){alert('Fehler: '+e.message);}
 }
 
 async function adminResetUsers(){
-  if(!confirm('ALLE Nutzer und Tipps löschen? Alle müssen sich neu anmelden!'))return;
+  if(!confirm('ALLE Nutzer und Tipps löschen?'))return;
   if(!confirm('Wirklich sicher? Diese Aktion kann NICHT rückgängig gemacht werden!'))return;
   try{
     await api('/api/admin/reset-users',{method:'POST'});
@@ -1514,6 +1978,7 @@ async function adminSetResult(){
   const matchId=document.getElementById('admin-match-sel')?.value;
   const homeScore=parseInt(document.getElementById('admin-home-score')?.value);
   const awayScore=parseInt(document.getElementById('admin-away-score')?.value);
+  const msg=document.getElementById('adm-result-msg')||document.getElementById('fetch-scores-msg');
   if(!matchId){alert('Bitte ein Spiel auswählen!');return;}
   if(isNaN(homeScore)||isNaN(awayScore)){alert('Bitte Ergebnis eingeben!');return;}
   try{
@@ -1521,16 +1986,15 @@ async function adminSetResult(){
     state.matches=await api('/api/matches');
     state.rankings=await api('/api/rankings');
     state.results=await api('/api/results');
-    render();
-    setTimeout(loadAdminUsers,500);
-    alert('Ergebnis eingetragen und Punkte vergeben!');
+    render();setTimeout(loadAdminUsers,500);
+    if(msg){msg.textContent='✅ Ergebnis eingetragen!';setTimeout(()=>msg.textContent='',3000);}
   }catch(e){alert('Fehler: '+e.message);}
 }
 
 async function adminEvalChampion(){
   const winner=prompt('Weltmeister eingeben (exakter Teamname):');
   if(!winner)return;
-  const msg=document.getElementById('fetch-scores-msg');
+  const msg=document.getElementById('adm-quick-msg')||document.getElementById('fetch-scores-msg');
   if(msg)msg.textContent='Auswerte...';
   try{
     const r=await api('/api/admin/evaluate-champion',{method:'POST',body:JSON.stringify({winner})});
@@ -1540,28 +2004,26 @@ async function adminEvalChampion(){
 }
 
 async function adminUpdateBrackets(){
-  const msg=document.getElementById('fetch-scores-msg');
+  const msg=document.getElementById('adm-quick-msg')||document.getElementById('fetch-scores-msg');
   if(msg)msg.textContent='Aktualisiere KO-Brackets...';
   try{
     const r=await api('/api/admin/update-brackets',{method:'POST'});
     if(msg)msg.textContent=`✅ ${(r.updated||[]).join(', ')||'Keine Änderungen'}`;
-    setTimeout(()=>{if(msg)msg.textContent='';},4000);
-  }catch(e){if(msg)msg.textContent='❌ '+e.message;}
+    setTimeout(()=>{if(msg)msg.textContent=''},4000);
+  }catch(e){if(msg)msg.textContent='❌ Fehler: '+e.message;}
 }
 
 async function adminFetchScores(){
-  const msg=document.getElementById('fetch-scores-msg');
+  const msg=document.getElementById('adm-quick-msg')||document.getElementById('fetch-scores-msg');
   if(msg)msg.textContent='Wird abgerufen...';
   try{
     await api('/api/admin/fetch-scores',{method:'POST'});
     state.matches=await api('/api/matches');
     if(msg)msg.textContent='✅ Erfolgreich abgerufen!';
-    setTimeout(()=>{if(msg)msg.textContent='';},3000);
-    render();
-    setTimeout(loadAdminUsers,500);
-  }catch(e){if(msg)msg.textContent='❌ '+e.message;}
+    setTimeout(()=>{if(msg)msg.textContent=''},3000);
+    render();setTimeout(loadAdminUsers,500);
+  }catch(e){if(msg)msg.textContent='❌ Fehler: '+e.message;}
 }
-
 
 function renderLogin(){
   if(state.authStep==='discord'){
@@ -2060,6 +2522,7 @@ init();
     <a href="/spielbaum.html"><span>🌳</span><span>Spielbaum</span></a>
     <a href="/tabelle.html"><span>🏆</span><span>Tabelle</span></a>
     <a href="/auswertung.html"><span>📊</span><span>Auswertung</span></a>
+    <a href="/kader.html"><span>👕</span><span>Kader</span></a>
     <a href="/profil.html"><span>👤</span><span>Profil</span></a>
   </div>
 </div>
