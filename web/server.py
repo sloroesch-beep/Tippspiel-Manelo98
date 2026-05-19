@@ -533,52 +533,35 @@ async def discord_send(channel_id: str, message: str):
         print(f"[Bot] Discord send error: {e}")
         return False
 
-def _send_email_sync(to_email: str, subject: str, html_body: str) -> bool:
-    """Synchroner E-Mail-Versand via Gmail SMTP."""
-    import smtplib
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
+async def send_email(to_email: str, subject: str, html_body: str) -> bool:
+    """Sendet E-Mail via Resend API (HTTPS, kein SMTP-Port nötig)."""
+    if not RESEND_API_KEY:
+        print("[Email] Kein RESEND_API_KEY konfiguriert")
+        return False
     try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = subject
-        msg["From"] = "WM Tippspiel 2026 <" + GMAIL_USER + ">"
-        msg["To"] = to_email
-        msg["Reply-To"] = GMAIL_USER
-        msg.attach(MIMEText(html_body, "html", "utf-8"))
-        # Versuche Port 587 (STARTTLS) — Railway blockiert oft Port 465
-        try:
-            with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as smtp:
-                smtp.ehlo()
-                smtp.starttls()
-                smtp.ehlo()
-                smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-                smtp.sendmail(GMAIL_USER, to_email, msg.as_string())
-        except Exception:
-            # Fallback: Port 465 SSL
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
-                smtp.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-                smtp.sendmail(GMAIL_USER, to_email, msg.as_string())
-        print("[Email] Gesendet an: " + to_email)
-        return True
+        async with httpx.AsyncClient() as client:
+            r = await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": "Bearer " + RESEND_API_KEY,
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from": RESEND_FROM,
+                    "to": [to_email],
+                    "subject": subject,
+                    "html": html_body
+                },
+                timeout=15
+            )
+        if r.status_code in (200, 201):
+            print("[Email] Gesendet an: " + to_email)
+            return True
+        else:
+            print("[Email] Resend Fehler: " + str(r.status_code) + " " + r.text[:100])
+            return False
     except Exception as e:
         print("[Email] Fehler: " + str(e))
-        return False
-
-async def send_email(to_email: str, subject: str, html_body: str) -> bool:
-    """Sendet E-Mail async (blockiert Event-Loop nicht)."""
-    if not GMAIL_USER or not GMAIL_APP_PASSWORD:
-        print("[Email] Keine Gmail-Konfiguration — GMAIL_USER/GMAIL_APP_PASSWORD fehlt")
-        return False
-    import concurrent.futures
-    loop = asyncio.get_event_loop()
-    try:
-        with concurrent.futures.ThreadPoolExecutor() as pool:
-            result = await loop.run_in_executor(
-                pool, _send_email_sync, to_email, subject, html_body
-            )
-        return result
-    except Exception as e:
-        print("[Email] Async Fehler: " + str(e))
         return False
 
 def make_email_html(title: str, content: str, footer: str = "") -> str:
@@ -1428,9 +1411,13 @@ STAND_CHANNEL_ID       = os.environ.get("STAND_CHANNEL_ID", "")
 ERINNERUNGEN_CHANNEL_ID = os.environ.get("ERINNERUNGEN_CHANNEL_ID", "")
 TEILNEHMER_CHANNEL_ID  = os.environ.get("TEILNEHMER_CHANNEL_ID", "")
 
-# Gmail SMTP
+# Gmail SMTP (Fallback, falls Resend nicht konfiguriert)
 GMAIL_USER         = os.environ.get("GMAIL_USER", "")
 GMAIL_APP_PASSWORD = os.environ.get("GMAIL_APP_PASSWORD", "")
+
+# Resend API (primär)
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
+RESEND_FROM    = "WM Tippspiel 2026 <noreply@manelo98-league.de>"
 
 # ── Kader-Cache ───────────────────────────────────────────────────
 _kader_cache: dict = {}
