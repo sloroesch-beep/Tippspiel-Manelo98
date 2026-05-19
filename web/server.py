@@ -677,9 +677,11 @@ async def bot_send_reminders():
                        m.match_date, m.match_time, m.group_name
                 FROM matches m
                 WHERE m.status = 'open'
-                AND (m.match_date::text || ' ' || COALESCE(m.match_time::text, '00:00:00'))::timestamp
-                    BETWEEN NOW() + INTERVAL '50 minutes'
-                    AND NOW() + INTERVAL '70 minutes'
+                AND (
+                    m.match_date + COALESCE(m.match_time, '00:00:00'::time)
+                    BETWEEN (NOW() AT TIME ZONE 'UTC') + INTERVAL '50 minutes'
+                    AND (NOW() AT TIME ZONE 'UTC') + INTERVAL '70 minutes'
+                )
             """)
             if not rows:
                 return
