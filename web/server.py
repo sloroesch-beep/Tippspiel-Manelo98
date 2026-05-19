@@ -1841,10 +1841,58 @@ async def admin_mark_reset_done(reset_id: int, request: Request):
 
 @app.delete("/api/admin/email-verification/{email}")
 async def admin_delete_verification(email: str, request: Request):
-    """Löscht eine ausstehende E-Mail-Verifizierung — damit kann der User sich neu registrieren."""
+    """Löscht eine ausstehende E-Mail-Verifizierung."""
     if not await is_admin(request): raise HTTPException(403)
     async with pool.acquire() as db:
         await db.execute("DELETE FROM email_verifications WHERE LOWER(email)=$1", email.lower())
+    return {"ok": True}
+
+@app.get("/api/admin/pending-registrations")
+async def admin_pending_registrations(request: Request):
+    """Alle ausstehenden E-Mail-Verifizierungen."""
+    if not await is_admin(request): raise HTTPException(403)
+    async with pool.acquire() as db:
+        rows = await db.fetch("""
+            SELECT email, username, created_at
+            FROM email_verifications
+            WHERE created_at > NOW() - INTERVAL '24 hours'
+            ORDER BY created_at DESC
+        """)
+    return [dict(r) for r in rows]
+
+@app.post("/api/admin/resend-verification")
+async def admin_resend_verification(request: Request):
+    """Sendet die Bestätigungs-E-Mail erneut."""
+    if not await is_admin(request): raise HTTPException(403)
+    body = await request.json()
+    email = body.get("email","").strip().lower()
+    username = body.get("username","")
+    if not email: raise HTTPException(400, "E-Mail fehlt")
+    async with pool.acquire() as db:
+        entry = await db.fetchrow(
+            "SELECT token FROM email_verifications WHERE LOWER(email)=$1", email)
+    if not entry:
+        raise HTTPException(404, "Keine ausstehende Registrierung gefunden")
+    verify_url = WEB_URL + "/auth/verify-email?token=" + entry["token"]
+    email_content = """
+        <p style="color:#ddd;font-size:14px;margin:0 0 16px 0">
+            Hallo <strong style="color:#ffd700">""" + username + """</strong>,<br><br>
+            hier ist dein Bestätigungslink nochmals:
+        </p>
+        <div style="text-align:center;margin:24px 0">
+            <a href="""" + verify_url + """"
+               style="background:#ffd700;color:#000;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
+                ✅ E-Mail bestätigen
+            </a>
+        </div>
+        <p style="color:#555;font-size:11px;margin-top:16px;text-align:center">
+            Dieser Link ist 24 Stunden ab der ersten Registrierung gültig.
+        </p>
+    """
+    html = make_email_html("E-Mail bestätigen 📧", email_content)
+    sent = await send_email(email, "WM Tippspiel — Bestätigung erneut senden", html)
+    if not sent:
+        raise HTTPException(500, "E-Mail konnte nicht gesendet werden")
     return {"ok": True}
 
 app.mount("/", StaticFiles(directory="web/public", html=True), name="static")
