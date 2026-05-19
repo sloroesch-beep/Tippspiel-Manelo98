@@ -964,7 +964,7 @@ async def register(body: RegisterBody, response: Response):
             Bitte bestätige deine E-Mail-Adresse um dein Konto zu aktivieren.
         </p>
         <div style="text-align:center;margin:24px 0">
-            <a href="""" + verify_url + """"
+            <a href='" + verify_url + "'
                style="background:#ffd700;color:#000;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
                 ✅ E-Mail bestätigen
             </a>
@@ -1892,7 +1892,7 @@ async def admin_resend_verification(request: Request):
             hier ist dein Bestätigungslink nochmals:
         </p>
         <div style="text-align:center;margin:24px 0">
-            <a href="""" + verify_url + """"
+            <a href='" + verify_url + "'
                style="background:#ffd700;color:#000;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">
                 ✅ E-Mail bestätigen
             </a>
