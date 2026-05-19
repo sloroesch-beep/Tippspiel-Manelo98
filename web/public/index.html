@@ -1366,6 +1366,16 @@ function renderAdmin(){
 
     <!-- TAB 1: MITSPIELER -->
     <div class="adm-tab-content" id="admTab1">
+      <div class="adm-section" id="adm-pending-regs" style="border-color:#3b82f633">
+        <div class="adm-section-head" style="background:#00101a">
+          <h2>📧 Ausstehende Registrierungen</h2>
+          <span id="adm-pending-count" style="color:#60a5fa">Wird geladen…</span>
+        </div>
+        <div id="adm-pending-body" style="padding:8px 14px">
+          <div style="color:#555;font-size:11px">Keine ausstehenden Registrierungen</div>
+        </div>
+      </div>
+
       <div class="adm-section" id="adm-pw-resets" style="border-color:#ffd70033">
         <div class="adm-section-head" style="background:#1a1200">
           <h2>🔑 Passwort-Reset Anfragen</h2>
@@ -1880,6 +1890,35 @@ async function admClearKaderCache(){
 }
 
 async function loadAdminUsers(){
+  // Ausstehende Registrierungen laden
+  try{
+    const pending = await api('/api/admin/pending-registrations');
+    const pCount = document.getElementById('adm-pending-count');
+    const pBody = document.getElementById('adm-pending-body');
+    if(pCount) pCount.textContent = pending.length ? pending.length + ' ausstehend' : 'Keine';
+    if(pBody){
+      if(!pending.length){
+        pBody.innerHTML = '<div style="color:#555;font-size:11px;padding:4px 0">Keine ausstehenden Registrierungen</div>';
+      } else {
+        pBody.innerHTML = pending.map(r => {
+          const date = r.created_at ? new Date(r.created_at).toLocaleString('de-DE') : '—';
+          const expires = r.created_at ? new Date(new Date(r.created_at).getTime() + 24*60*60*1000).toLocaleString('de-DE') : '—';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #111;font-size:11px;flex-wrap:wrap">
+            <div style="flex:1">
+              <strong style="color:#60a5fa">${r.username}</strong>
+              <span style="color:#555"> · ${r.email}</span>
+              <div style="color:#333;font-size:10px">Registriert: ${date} · Läuft ab: ${expires}</div>
+            </div>
+            <button class="adm-btn blue" style="padding:3px 8px;font-size:10px"
+              onclick="admResendVerification('${r.email}','${r.username}')">📧 Erneut senden</button>
+            <button class="adm-btn red" style="padding:3px 8px;font-size:10px"
+              onclick="admDeletePendingReg('${r.email}')">🗑️ Löschen</button>
+          </div>`;
+        }).join('');
+      }
+    }
+  }catch(e){console.error('pending regs:',e);}
+
   // Passwort-Reset Anfragen laden
   try{
     const resets = await api('/api/admin/password-resets');
@@ -1958,6 +1997,30 @@ async function loadAdminUsers(){
     html+='</tbody></table></div>';
     body.innerHTML=html;
   }catch(e){console.error('loadAdminUsers:',e);}
+}
+
+async function admDeletePendingReg(email){
+  if(!confirm('Ausstehende Registrierung für "' + email + '" löschen?\nDer User kann sich dann neu registrieren.'))return;
+  try{
+    await fetch('/api/admin/email-verification/' + encodeURIComponent(email), {
+      method:'DELETE', credentials:'include'
+    });
+    await loadAdminUsers();
+  }catch(e){alert('Fehler: '+e.message);}
+}
+
+async function admResendVerification(email, username){
+  if(!confirm('Bestätigungs-E-Mail erneut an "' + email + '" senden?'))return;
+  try{
+    const r = await fetch('/api/admin/resend-verification', {
+      method:'POST', credentials:'include',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email, username})
+    });
+    const d = await r.json();
+    if(r.ok) alert('✅ E-Mail erneut gesendet!');
+    else alert('❌ Fehler: ' + (d.detail||'Unbekannt'));
+  }catch(e){alert('Fehler: '+e.message);}
 }
 
 async function admMarkResetDone(id){
