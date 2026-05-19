@@ -1072,7 +1072,7 @@ function renderGrid(filter = '', groupFilter = '') {
 
   grid.innerHTML = filtered.map(t => `
     <div class="k-team-card${activeTeam === t.id ? ' active' : ''}" onclick="showTeam('${t.id}')" data-id="${t.id}">
-      <div class="k-team-flag"><img src="https://flagcdn.com/w80/${t.cc}.png" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"></div>
+      <div class="k-team-flag"><img src="https://flagicons.lipis.dev/flags/4x3/${t.cc}.svg" alt="${t.name}" loading="lazy" onerror="this.style.display='none'"></div>
       <div class="k-team-name">${t.name}</div>
       <div class="k-team-group">Gruppe ${t.group} · ${t.confed}</div>
     </div>
@@ -1099,7 +1099,7 @@ function showTeam(id) {
     panel.className = 'k-panel visible';
     panel.innerHTML = `
       <div class="k-panel-head">
-        <div class="k-panel-flag"><img src="https://flagcdn.com/w80/${team.cc}.png" alt="${team.name}" loading="lazy"></div>
+        <div class="k-panel-flag"><img src="https://flagicons.lipis.dev/flags/4x3/${team.cc}.svg" alt="${team.name}" loading="lazy"></div>
         <div class="k-panel-info">
           <div class="k-panel-country">${team.name}</div>
           <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed}</div>
@@ -1120,7 +1120,7 @@ function showTeam(id) {
 
   let html = `
     <div class="k-panel-head">
-      <div class="k-panel-flag"><img src="https://flagcdn.com/w80/${team.cc}.png" alt="${team.name}" loading="lazy"></div>
+      <div class="k-panel-flag"><img src="https://flagicons.lipis.dev/flags/4x3/${team.cc}.svg" alt="${team.name}" loading="lazy"></div>
       <div class="k-panel-info">
         <div class="k-panel-country">${team.name}</div>
         <div class="k-panel-meta">Gruppe ${team.group} · ${team.confed} · Trainer: ${squad.trainer}</div>
