@@ -1474,6 +1474,20 @@ function renderAdmin(){
         </div>
       </div>
 
+      <!-- Bot Test-Buttons -->
+      <div class="adm-section">
+        <div class="adm-section-head"><h2>🧪 Bot testen</h2><span>Sendet echte Nachrichten in Discord</span></div>
+        <div class="adm-section-body">
+          <div class="adm-btn-grid">
+            <button class="adm-btn green" onclick="admBotTest('welcome')">👋 Test: Begrüßung</button>
+            <button class="adm-btn gold" onclick="admBotTest('standings-morning')">🌅 Test: Morgen-Stand</button>
+            <button class="adm-btn gold" onclick="admBotTest('standings-evening')">🌆 Test: Abend-Stand</button>
+            <button class="adm-btn red" onclick="admBotTest('reminder')">⏰ Test: Erinnerung</button>
+          </div>
+          <div class="adm-msg" id="adm-bot-test-msg"></div>
+        </div>
+      </div>
+
       <!-- Channel-Info -->
       <div class="adm-section">
         <div class="adm-section-head"><h2>📡 Channel-Konfiguration</h2></div>
@@ -1776,6 +1790,34 @@ function admClearDiscord(){
   const tmpl=document.getElementById('adm-discord-template');
   if(ta){ta.value='';admUpdatePreview();admCountChars();}
   if(tmpl)tmpl.value='';
+}
+
+async function admBotTest(type){
+  const msg=document.getElementById('adm-bot-test-msg');
+  if(msg){msg.textContent='📤 Wird gesendet…';msg.style.color='#60a5fa';}
+  try{
+    let url, body={};
+    if(type==='welcome'){
+      url='/api/admin/bot-test/welcome';
+    } else if(type==='standings-morning'){
+      url='/api/admin/bot-test/standings';
+      body={is_morning:true};
+    } else if(type==='standings-evening'){
+      url='/api/admin/bot-test/standings';
+      body={is_morning:false};
+    } else if(type==='reminder'){
+      url='/api/admin/bot-test/reminder';
+    }
+    const r=await api(url,{method:'POST',body:JSON.stringify(body)});
+    if(r.ok){
+      if(msg){msg.textContent='✅ '+r.message;msg.style.color='#4ade80';}
+      setTimeout(()=>{if(msg){msg.textContent='';msg.style.color=''}},5000);
+    } else {
+      if(msg){msg.textContent='❌ Fehler';msg.style.color='#dc2626';}
+    }
+  }catch(e){
+    if(msg){msg.textContent='❌ '+e.message;msg.style.color='#dc2626';}
+  }
 }
 
 async function admSendDiscord(){
