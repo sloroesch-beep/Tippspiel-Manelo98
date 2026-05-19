@@ -206,7 +206,6 @@ async def init_db():
                 created_at TIMESTAMP DEFAULT NOW()
             )""")
         except: pass
-        except: pass
         try: await db.execute("ALTER TABLE tips ADD COLUMN IF NOT EXISTS evaluated_at TIMESTAMP DEFAULT NULL")
         except: pass
         # wm_champion table
